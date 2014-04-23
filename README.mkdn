@@ -50,9 +50,10 @@ See ["FILTER SYNTAX"](#filter-syntax).
         $ yq .foo
         bar
 
-- if lhs\_filter eq rhs\_filter then filter
+- if lhs\_filter eq rhs\_filter then true\_filter else false\_filter
 
-    If the lhs filter and rhs\_filter are equal, return the then filter.
+    If the lhs filter and rhs\_filter are equal, return the true\_filter,
+    otherwise return the false\_filter.
 
     For example
 
@@ -60,8 +61,32 @@ See ["FILTER SYNTAX"](#filter-syntax).
         foo: bar
         baz: fuzz
 
-        $ yq 'if .foo eq bar then .baz'
+        $ yq 'if .foo eq bar then .baz else .foo'
         fuzz
+
+        $ yq 'if .foo eq buzz then .baz else .foo'
+        bar
+
+    The else false\_filter is optional and defaults to returning undefined.
+
+- empty
+
+    The special value empty suppresses printing of a document. Normally,
+    an undefined document will show up in the output as "--- ~". If your
+    filter instead yields empty, the document will not be printed at all.
+
+    This is especially useful in conditionals:
+
+        # INPUT
+        foo: bar
+        baz: fuzz
+
+        $ yq 'if .foo eq bar then . else empty'
+        foo: bar
+        baz: fuzz
+
+        $ yq 'if .foo eq buzz then . else empty'
+        $
 
 - Values
 

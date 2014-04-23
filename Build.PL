@@ -28,12 +28,14 @@ my %module_build_args = (
     "Getopt::Long" => 0,
     "Import::Into" => 0,
     "Module::Runtime" => 0,
+    "Pod::Usage" => 0,
     "YAML" => 0
   },
   "script_files" => [
     "bin/yq"
   ],
   "test_requires" => {
+    "Capture::Tiny" => 0,
     "Test::Compile" => 0,
     "Test::Most" => 0
   }
@@ -41,6 +43,7 @@ my %module_build_args = (
 
 
 my %fallback_build_requires = (
+  "Capture::Tiny" => 0,
   "Module::Build" => "0.3601",
   "Test::Compile" => 0,
   "Test::Most" => 0

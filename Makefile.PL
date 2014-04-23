@@ -29,9 +29,11 @@ my %WriteMakefileArgs = (
     "Getopt::Long" => 0,
     "Import::Into" => 0,
     "Module::Runtime" => 0,
+    "Pod::Usage" => 0,
     "YAML" => 0
   },
   "TEST_REQUIRES" => {
+    "Capture::Tiny" => 0,
     "Test::Compile" => 0,
     "Test::Most" => 0
   },
@@ -43,10 +45,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Capture::Tiny" => 0,
   "Getopt::Long" => 0,
   "Import::Into" => 0,
   "Module::Build" => "0.3601",
   "Module::Runtime" => 0,
+  "Pod::Usage" => 0,
   "Test::Compile" => 0,
   "Test::Most" => 0,
   "YAML" => 0
