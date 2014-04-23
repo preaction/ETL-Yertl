@@ -34,14 +34,13 @@ sub main {
 # Filter MUST NOT mutate $doc!
 sub filter {
     my ( $class, $filter, $doc ) = @_;
-    my $output;
     # Whole document (needed for if/then)
     if ( $filter =~ /^[.]$/ ) {
-        $output = $doc;
+        return $doc;
     }
     # Hash key (future: deeper inspection, arrays)
     elsif ( $filter =~ /^[.](\w+)$/ ) {
-        $output = $doc->{ $1 };
+        return $doc->{ $1 };
     }
     # If/then (future: else, better conditions)
     elsif ( $filter =~ /^if\s+(.+?)\s+(eq|ne)\s+(.+?)\s+then\s+(.+)$/ ) {
@@ -62,7 +61,7 @@ sub filter {
     else {
         die "Could not parse filter '$filter'\n";
     }
-    return $output;
+    return;
 }
 
 exit __PACKAGE__->main( @ARGV ) unless caller(0);
