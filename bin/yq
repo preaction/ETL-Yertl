@@ -1,7 +1,6 @@
+#!/usr/bin/env perl
 package yq;
 # ABSTRACT: Filter YAML through a command-line program
-
-# vim:ft=perl
 
 use YAML::Filter::Base;
 use Getopt::Long qw( GetOptionsFromArray );
