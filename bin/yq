@@ -138,9 +138,10 @@ Extract a single key out of a hash document.
     $ yq .foo
     bar
 
-=item if lhs_filter eq rhs_filter then filter
+=item if lhs_filter eq rhs_filter then true_filter else false_filter
 
-If the lhs filter and rhs_filter are equal, return the then filter.
+If the lhs filter and rhs_filter are equal, return the true_filter,
+otherwise return the false_filter.
 
 For example
 
@@ -148,8 +149,32 @@ For example
     foo: bar
     baz: fuzz
 
-    $ yq 'if .foo eq bar then .baz'
+    $ yq 'if .foo eq bar then .baz else .foo'
     fuzz
+
+    $ yq 'if .foo eq buzz then .baz else .foo'
+    bar
+
+The else false_filter is optional and defaults to returning undefined.
+
+=item empty
+
+The special value empty suppresses printing of a document. Normally,
+an undefined document will show up in the output as "--- ~". If your
+filter instead yields empty, the document will not be printed at all.
+
+This is especially useful in conditionals:
+
+    # INPUT
+    foo: bar
+    baz: fuzz
+
+    $ yq 'if .foo eq bar then . else empty'
+    foo: bar
+    baz: fuzz
+
+    $ yq 'if .foo eq buzz then . else empty'
+    $
 
 =item Values
 
