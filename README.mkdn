@@ -1,0 +1,86 @@
+# NAME
+
+yq - Filter YAML through a command-line program
+
+# VERSION
+
+version 0.001
+
+# SYNOPSIS
+
+    yq <filter>
+
+    yq -h|--help
+
+# DESCRIPTION
+
+This program takes a stream of YAML documents on STDIN, applies a filter, then
+writes the results to STDOUT.
+
+# ARGUMENTS
+
+## filter
+
+See ["FILTER SYNTAX"](#filter-syntax).
+
+# OPTIONS
+
+# FILTER SYNTAX
+
+- .
+
+    Returns the entire document, unfiltered. Useful in if/then statements.
+
+        # INPUT
+        foo: bar
+        baz: fuzz
+
+        $ yq .
+        foo: bar
+        baz: fuzz
+
+- .<key>
+
+    Extract a single key out of a hash document.
+
+        # INPUT
+        foo: bar
+        baz: fuzz
+
+        $ yq .foo
+        bar
+
+- if <lhs\_filter> eq <rhs\_filter> then <filter>
+
+    If the lhs filter and rhs\_filter are equal, return the then filter.
+
+    For example
+
+        # INPUT
+        foo: bar
+        baz: fuzz
+
+        $ yq 'if .foo eq bar then .baz'
+        fuzz
+
+- Values
+
+    Any bareword that is not recognized as a syntax element is treated
+    as a value.
+
+# SEE ALSO
+
+- jq
+
+    A filter for JSON documents. The inspiration for this project.
+
+# AUTHOR
+
+Doug Bell <preaction@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
