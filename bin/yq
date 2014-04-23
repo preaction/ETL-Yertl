@@ -102,7 +102,7 @@ Returns the entire document, unfiltered. Useful in if/then statements.
     foo: bar
     baz: fuzz
 
-=item .<key>
+=item .key
 
 Extract a single key out of a hash document.
 
@@ -113,7 +113,7 @@ Extract a single key out of a hash document.
     $ yq .foo
     bar
 
-=item if <lhs_filter> eq <rhs_filter> then <filter>
+=item if lhs_filter eq rhs_filter then filter
 
 If the lhs filter and rhs_filter are equal, return the then filter.
 

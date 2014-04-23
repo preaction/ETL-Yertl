@@ -30,7 +30,7 @@ FILTER SYNTAX
             foo: bar
             baz: fuzz
 
-    .<key>
+    .key
         Extract a single key out of a hash document.
 
             # INPUT
@@ -40,7 +40,7 @@ FILTER SYNTAX
             $ yq .foo
             bar
 
-    if <lhs_filter> eq <rhs_filter> then <filter>
+    if lhs_filter eq rhs_filter then filter
         If the lhs filter and rhs_filter are equal, return the then filter.
 
         For example

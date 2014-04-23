@@ -39,7 +39,7 @@ See ["FILTER SYNTAX"](#filter-syntax).
         foo: bar
         baz: fuzz
 
-- .<key>
+- .key
 
     Extract a single key out of a hash document.
 
@@ -50,7 +50,7 @@ See ["FILTER SYNTAX"](#filter-syntax).
         $ yq .foo
         bar
 
-- if <lhs\_filter> eq <rhs\_filter> then <filter>
+- if lhs\_filter eq rhs\_filter then filter
 
     If the lhs filter and rhs\_filter are equal, return the then filter.
 
