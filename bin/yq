@@ -139,6 +139,7 @@ as a value.
 
 =item jq
 
-A filter for JSON documents. The inspiration for this project.
+L<http://stedolan.github.io/jq/> A filter for JSON documents. The inspiration
+for this project.
 
 =back

@@ -57,7 +57,8 @@ FILTER SYNTAX
         as a value.
 
 SEE ALSO
-    jq  A filter for JSON documents. The inspiration for this project.
+    jq  <http://stedolan.github.io/jq/> A filter for JSON documents. The
+        inspiration for this project.
 
 AUTHOR
     Doug Bell <preaction@cpan.org>

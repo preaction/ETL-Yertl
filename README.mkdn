@@ -72,7 +72,8 @@ See ["FILTER SYNTAX"](#filter-syntax).
 
 - jq
 
-    A filter for JSON documents. The inspiration for this project.
+    [http://stedolan.github.io/jq/](http://stedolan.github.io/jq/) A filter for JSON documents. The inspiration
+    for this project.
 
 # AUTHOR
 
