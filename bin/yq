@@ -7,6 +7,13 @@ use Pod::Usage qw( pod2usage );
 use Getopt::Long qw( GetOptionsFromArray );
 use YAML;
 
+sub empty() {
+    bless {}, 'empty';
+}
+sub is_empty {
+    return ref $_[0] eq 'empty';
+}
+
 sub main {
     my ( $class, @argv ) = @_;
     my %opt;
@@ -22,7 +29,7 @@ sub main {
     while ( my $line = <STDIN> ) {
         if ( $buffer && $line =~ /^---/ ) {
             my $output = $class->filter( $filter, YAML::Load( $buffer ) );
-            print YAML::Dump( $output );
+            print YAML::Dump( $output ) unless is_empty( $output );
             $buffer = '';
         }
         $buffer .= $line;
@@ -69,6 +76,9 @@ sub filter {
                 return;
             }
         }
+    }
+    elsif ( $filter eq 'empty' ) {
+        return empty;
     }
     # Barewords (future: quoted strings)
     elsif ( $filter !~ /^[.]/ ) {

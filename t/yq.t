@@ -1,6 +1,8 @@
 
 use YAML::Filter::Base;
 use Test::Most;
+use YAML qw( Dump Load );
+use Capture::Tiny qw( capture_merged );
 require 'bin/yq';
 
 subtest 'filter single hash key' => sub {
@@ -35,6 +37,30 @@ subtest 'conditional with else' => sub {
     $filter = 'if .foo eq buzz then .foo else .baz';
     $out = yq->filter( $filter, $doc );
     cmp_deeply $out, $doc->{baz};
+};
+
+subtest 'empty' => sub {
+    my $filter = 'empty';
+    my $out = yq->filter( $filter, { foo => 'bar' } );
+    isa_ok $out, 'empty';
+};
+
+subtest 'empty does not print' => sub {
+    my @doc = (
+        {
+            foo => 'bar',
+        },
+        {
+            bar => 'baz',
+        },
+    );
+
+    open my $stdin, '<', \( YAML::Dump( @doc ) );
+    local *STDIN = $stdin;
+    my $filter = 'if .foo eq bar then . else empty';
+    my ( $output ) = capture_merged { yq->main( $filter ) };
+    my @got = YAML::Load( $output );
+    cmp_deeply \@got, [ $doc[0] ];
 };
 
 done_testing;
