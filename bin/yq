@@ -43,15 +43,31 @@ sub filter {
         return $doc->{ $1 };
     }
     # If/then (future: else, better conditions)
-    elsif ( $filter =~ /^if\s+(.+?)\s+(eq|ne)\s+(.+?)\s+then\s+(.+)$/ ) {
-        my ( $lhs_filter, $cond, $rhs_filter, $true_filter ) = ( $1, $2, $3, $4 );
+    elsif ( $filter =~ /^if\s+(.+?)\s+(eq|ne)\s+(.+?)\s+then\s+(.+?)(?:\s+else\s+(.+?))?$/ ) {
+        my ( $lhs_filter, $cond, $rhs_filter, $true_filter, $false_filter ) = ( $1, $2, $3, $4, $5 );
         my $lhs_value = $class->filter( $lhs_filter, $doc );
         my $rhs_value = $class->filter( $rhs_filter, $doc );
-        if ( $cond eq 'eq' && $lhs_value eq $rhs_value ) {
-            return $class->filter( $true_filter, $doc );
+        if ( $cond eq 'eq' ) {
+            if ( $lhs_value eq $rhs_value ) {
+                return $class->filter( $true_filter, $doc );
+            }
+            elsif ( $false_filter ) {
+                return $class->filter( $false_filter, $doc );
+            }
+            else {
+                return;
+            }
         }
-        elsif ( $cond eq 'ne' && $lhs_value ne $rhs_value ) {
-            return $class->filter( $true_filter, $doc );
+        elsif ( $cond eq 'ne' ) {
+            if ( $lhs_value ne $rhs_value ) {
+                return $class->filter( $true_filter, $doc );
+            }
+            elsif ( $false_filter ) {
+                return $class->filter( $false_filter, $doc );
+            }
+            else {
+                return;
+            }
         }
     }
     # Barewords (future: quoted strings)
