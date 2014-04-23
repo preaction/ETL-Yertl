@@ -1,0 +1,144 @@
+package yq;
+# ABSTRACT: Filter YAML through a command-line program
+
+# vim:ft=perl
+
+use YAML::Filter::Base;
+use Getopt::Long qw( GetOptionsFromArray );
+use YAML;
+
+sub main {
+    my ( $class, @argv ) = @_;
+    my %opt;
+    GetOptionsFromArray( \@argv, \%opt,
+        'h|help',
+    );
+    pod2usage(0) if $opt{help};
+
+    my $filter = shift @argv;
+    pod2usage("ERROR: Must give a filter") unless $filter;
+
+    my $buffer;
+    while ( my $line = <STDIN> ) {
+        if ( $buffer && $line =~ /^---/ ) {
+            my $output = $class->filter( $filter, YAML::Load( $buffer ) );
+            print YAML::Dump( $output );
+            $buffer = '';
+        }
+        $buffer .= $line;
+    }
+
+    return 0;
+}
+
+# Filter MUST NOT mutate $doc!
+sub filter {
+    my ( $class, $filter, $doc ) = @_;
+    my $output;
+    # Whole document (needed for if/then)
+    if ( $filter =~ /^[.]$/ ) {
+        $output = $doc;
+    }
+    # Hash key (future: deeper inspection, arrays)
+    elsif ( $filter =~ /^[.](\w+)$/ ) {
+        $output = $doc->{ $1 };
+    }
+    # If/then (future: else, better conditions)
+    elsif ( $filter =~ /^if\s+(.+?)\s+(eq|ne)\s+(.+?)\s+then\s+(.+)$/ ) {
+        my ( $lhs_filter, $cond, $rhs_filter, $true_filter ) = ( $1, $2, $3, $4 );
+        my $lhs_value = $class->filter( $lhs_filter, $doc );
+        my $rhs_value = $class->filter( $rhs_filter, $doc );
+        if ( $cond eq 'eq' && $lhs_value eq $rhs_value ) {
+            return $class->filter( $true_filter, $doc );
+        }
+        elsif ( $cond eq 'ne' && $lhs_value ne $rhs_value ) {
+            return $class->filter( $true_filter, $doc );
+        }
+    }
+    # Barewords (future: quoted strings)
+    elsif ( $filter !~ /^[.]/ ) {
+        return $filter;
+    }
+    else {
+        die "Could not parse filter '$filter'\n";
+    }
+    return $output;
+}
+
+exit __PACKAGE__->main( @ARGV ) unless caller(0);
+
+=head1 SYNOPSIS
+
+    yq <filter>
+
+    yq -h|--help
+
+=head1 DESCRIPTION
+
+This program takes a stream of YAML documents on STDIN, applies a filter, then
+writes the results to STDOUT.
+
+=head1 ARGUMENTS
+
+=head2 filter
+
+See L<FILTER SYNTAX>.
+
+=head1 OPTIONS
+
+=head1 FILTER SYNTAX
+
+=over
+
+=item .
+
+Returns the entire document, unfiltered. Useful in if/then statements.
+
+    # INPUT
+    foo: bar
+    baz: fuzz
+
+    $ yq .
+    foo: bar
+    baz: fuzz
+
+=item .<key>
+
+Extract a single key out of a hash document.
+
+    # INPUT
+    foo: bar
+    baz: fuzz
+
+    $ yq .foo
+    bar
+
+=item if <lhs_filter> eq <rhs_filter> then <filter>
+
+If the lhs filter and rhs_filter are equal, return the then filter.
+
+For example
+
+    # INPUT
+    foo: bar
+    baz: fuzz
+
+    $ yq 'if .foo eq bar then .baz'
+    fuzz
+
+=item Values
+
+Any bareword that is not recognized as a syntax element is treated
+as a value.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item jq
+
+A filter for JSON documents. The inspiration for this project.
+
+=back
