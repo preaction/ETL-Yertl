@@ -1,5 +1,5 @@
 
-use YAML::Filter::Base;
+use App::YAML::Filter::Base;
 use Test::Most;
 use YAML qw( Dump Load );
 use Capture::Tiny qw( capture_merged );

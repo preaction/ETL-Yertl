@@ -1,4 +1,4 @@
-package YAML::Filter;
+package App::YAML::Filter;
 # ABSTRACT: Filter YAML with a series of rules
 
 use strict;

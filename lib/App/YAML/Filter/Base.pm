@@ -1,5 +1,5 @@
-package YAML::Filter::Base;
-# ABSTRACT: Base module for YAML::Filter
+package App::YAML::Filter::Base;
+# ABSTRACT: Base module for App::YAML::Filter
 
 use strict;
 use warnings;
