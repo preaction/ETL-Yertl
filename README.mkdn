@@ -21,7 +21,7 @@ writes the results to STDOUT.
 
 ## filter
 
-See ["FILTER SYNTAX"](#filter-syntax).
+See ["FILTER SYNTAX"](#FILTER SYNTAX).
 
 # OPTIONS
 
