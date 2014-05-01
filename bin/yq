@@ -217,7 +217,7 @@ This is especially useful in conditionals:
 Any bareword that is not recognized as a syntax element is treated
 as a value.
 
-=over
+=back
 
 =head2 CONDITIONALS
 

@@ -4,7 +4,7 @@ yq - Filter YAML through a command-line program
 
 # VERSION
 
-version 0.002
+version 0.003
 
 # SYNOPSIS
 
@@ -112,41 +112,41 @@ to reach deep inside the documents you're working with.
     Any bareword that is not recognized as a syntax element is treated
     as a value.
 
-        ## CONDITIONALS
+## CONDITIONALS
 
-        - if lhs\_filter eq rhs\_filter then true\_filter else false\_filter
+- if lhs\_filter eq rhs\_filter then true\_filter else false\_filter
 
-            If the lhs filter and rhs\_filter are equal, return the true\_filter,
-            otherwise return the false\_filter.
+    If the lhs filter and rhs\_filter are equal, return the true\_filter,
+    otherwise return the false\_filter.
 
-            For example
+    For example
 
-                # INPUT
-                foo: bar
-                baz: fuzz
+        # INPUT
+        foo: bar
+        baz: fuzz
 
-                $ yq 'if .foo eq bar then .baz else .foo'
-                fuzz
+        $ yq 'if .foo eq bar then .baz else .foo'
+        fuzz
 
-                $ yq 'if .foo eq buzz then .baz else .foo'
-                bar
+        $ yq 'if .foo eq buzz then .baz else .foo'
+        bar
 
-            The else false\_filter is optional and defaults to returning undefined.
+    The else false\_filter is optional and defaults to returning undefined.
 
-        # SEE ALSO
+# SEE ALSO
 
-        - jq
+- jq
 
-            [http://stedolan.github.io/jq/](http://stedolan.github.io/jq/) A filter for JSON documents. The inspiration
-            for this project.
+    [http://stedolan.github.io/jq/](http://stedolan.github.io/jq/) A filter for JSON documents. The inspiration
+    for this project.
 
-        # AUTHOR
+# AUTHOR
 
-        Doug Bell <preaction@cpan.org>
+Doug Bell <preaction@cpan.org>
 
-        # COPYRIGHT AND LICENSE
+# COPYRIGHT AND LICENSE
 
-        This software is copyright (c) 2014 by Doug Bell.
+This software is copyright (c) 2014 by Doug Bell.
 
-        This is free software; you can redistribute it and/or modify it under
-        the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -2,7 +2,7 @@ NAME
     yq - Filter YAML through a command-line program
 
 VERSION
-    version 0.002
+    version 0.003
 
 SYNOPSIS
         yq <filter>
@@ -130,13 +130,4 @@ COPYRIGHT AND LICENSE
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
-
-POD ERRORS
-    Hey! The above document had some coding errors, which are explained
-    below:
-
-    Around line 237:
-        You forgot a '=back' before '=head2'
-
-        You forgot a '=back' before '=head2'
 
