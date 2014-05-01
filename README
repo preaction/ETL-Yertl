@@ -2,7 +2,7 @@ NAME
     yq - Filter YAML through a command-line program
 
 VERSION
-    version 0.001
+    version 0.002
 
 SYNOPSIS
         yq <filter>
@@ -15,10 +15,14 @@ DESCRIPTION
 
 ARGUMENTS
   filter
-    See "FILTER SYNTAX".
+    See SYNTAX.
 
 OPTIONS
-FILTER SYNTAX
+SYNTAX
+  FILTERS
+    Filters select a portion of the incoming documents. Filters can be
+    combined to reach deep inside the documents you're working with.
+
     .   Returns the entire document, unfiltered. Useful in if/then
         statements.
 
@@ -31,34 +35,46 @@ FILTER SYNTAX
             baz: fuzz
 
     .key
-        Extract a single key out of a hash document.
+        Extract a single item out of a hash.
 
             # INPUT
-            foo: bar
-            baz: fuzz
+            foo:
+                bar: baz
+                fizz: fuzz
 
             $ yq .foo
-            bar
+            bar: baz
+            fizz: fuzz
 
-    if lhs_filter eq rhs_filter then true_filter else false_filter
-        If the lhs filter and rhs_filter are equal, return the true_filter,
-        otherwise return the false_filter.
-
-        For example
-
-            # INPUT
-            foo: bar
-            baz: fuzz
-
-            $ yq 'if .foo eq bar then .baz else .foo'
+            $ yq .foo.fizz
             fuzz
 
-            $ yq 'if .foo eq buzz then .baz else .foo'
-            bar
+    .[#]
+        Extract a single item out of an array.
 
-        The else false_filter is optional and defaults to returning
-        undefined.
+            # INPUT
+            - foo: fuzz
+            - bar: buzz
+            - baz:
+                good: bad
+                new: old
 
+            $ yq .[1]
+            bar: buzz
+
+            $ yq .[2]
+            baz:
+                good: bad
+                new: old
+
+            $ yq .[2].baz
+            good: bad
+            new: old
+
+            $ yq .[2].baz.new
+            old
+
+  VALUES
     empty
         The special value empty suppresses printing of a document. Normally,
         an undefined document will show up in the output as "--- ~". If your
@@ -82,6 +98,26 @@ FILTER SYNTAX
         Any bareword that is not recognized as a syntax element is treated
         as a value.
 
+  CONDITIONALS
+    if lhs_filter eq rhs_filter then true_filter else false_filter
+        If the lhs filter and rhs_filter are equal, return the true_filter,
+        otherwise return the false_filter.
+
+        For example
+
+            # INPUT
+            foo: bar
+            baz: fuzz
+
+            $ yq 'if .foo eq bar then .baz else .foo'
+            fuzz
+
+            $ yq 'if .foo eq buzz then .baz else .foo'
+            bar
+
+        The else false_filter is optional and defaults to returning
+        undefined.
+
 SEE ALSO
     jq  <http://stedolan.github.io/jq/> A filter for JSON documents. The
         inspiration for this project.
@@ -94,4 +130,13 @@ COPYRIGHT AND LICENSE
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 237:
+        You forgot a '=back' before '=head2'
+
+        You forgot a '=back' before '=head2'
 

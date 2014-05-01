@@ -4,7 +4,7 @@ yq - Filter YAML through a command-line program
 
 # VERSION
 
-version 0.001
+version 0.002
 
 # SYNOPSIS
 
@@ -21,11 +21,16 @@ writes the results to STDOUT.
 
 ## filter
 
-See ["FILTER SYNTAX"](#FILTER SYNTAX).
+See [SYNTAX](http://search.cpan.org/perldoc?SYNTAX).
 
 # OPTIONS
 
-# FILTER SYNTAX
+# SYNTAX
+
+## FILTERS
+
+Filters select a portion of the incoming documents. Filters can be combined
+to reach deep inside the documents you're working with.
 
 - .
 
@@ -41,33 +46,47 @@ See ["FILTER SYNTAX"](#FILTER SYNTAX).
 
 - .key
 
-    Extract a single key out of a hash document.
+    Extract a single item out of a hash.
 
         # INPUT
-        foo: bar
-        baz: fuzz
+        foo:
+            bar: baz
+            fizz: fuzz
 
         $ yq .foo
-        bar
+        bar: baz
+        fizz: fuzz
 
-- if lhs\_filter eq rhs\_filter then true\_filter else false\_filter
-
-    If the lhs filter and rhs\_filter are equal, return the true\_filter,
-    otherwise return the false\_filter.
-
-    For example
-
-        # INPUT
-        foo: bar
-        baz: fuzz
-
-        $ yq 'if .foo eq bar then .baz else .foo'
+        $ yq .foo.fizz
         fuzz
 
-        $ yq 'if .foo eq buzz then .baz else .foo'
-        bar
+- .\[\#\]
 
-    The else false\_filter is optional and defaults to returning undefined.
+    Extract a single item out of an array.
+
+        # INPUT
+        - foo: fuzz
+        - bar: buzz
+        - baz:
+            good: bad
+            new: old
+
+        $ yq .[1]
+        bar: buzz
+
+        $ yq .[2]
+        baz:
+            good: bad
+            new: old
+
+        $ yq .[2].baz
+        good: bad
+        new: old
+
+        $ yq .[2].baz.new
+        old
+
+## VALUES
 
 - empty
 
@@ -93,20 +112,41 @@ See ["FILTER SYNTAX"](#FILTER SYNTAX).
     Any bareword that is not recognized as a syntax element is treated
     as a value.
 
-# SEE ALSO
+        ## CONDITIONALS
 
-- jq
+        - if lhs\_filter eq rhs\_filter then true\_filter else false\_filter
 
-    [http://stedolan.github.io/jq/](http://stedolan.github.io/jq/) A filter for JSON documents. The inspiration
-    for this project.
+            If the lhs filter and rhs\_filter are equal, return the true\_filter,
+            otherwise return the false\_filter.
 
-# AUTHOR
+            For example
 
-Doug Bell <preaction@cpan.org>
+                # INPUT
+                foo: bar
+                baz: fuzz
 
-# COPYRIGHT AND LICENSE
+                $ yq 'if .foo eq bar then .baz else .foo'
+                fuzz
 
-This software is copyright (c) 2014 by Doug Bell.
+                $ yq 'if .foo eq buzz then .baz else .foo'
+                bar
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+            The else false\_filter is optional and defaults to returning undefined.
+
+        # SEE ALSO
+
+        - jq
+
+            [http://stedolan.github.io/jq/](http://stedolan.github.io/jq/) A filter for JSON documents. The inspiration
+            for this project.
+
+        # AUTHOR
+
+        Doug Bell <preaction@cpan.org>
+
+        # COPYRIGHT AND LICENSE
+
+        This software is copyright (c) 2014 by Doug Bell.
+
+        This is free software; you can redistribute it and/or modify it under
+        the same terms as the Perl 5 programming language system itself.
