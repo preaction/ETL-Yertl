@@ -18,6 +18,9 @@ ARGUMENTS
     See SYNTAX.
 
 OPTIONS
+  -h | --help
+    Show this help document.
+
 SYNTAX
   FILTERS
     Filters select a portion of the incoming documents. Filters can be

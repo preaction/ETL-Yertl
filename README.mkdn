@@ -25,6 +25,10 @@ See [SYNTAX](http://search.cpan.org/perldoc?SYNTAX).
 
 # OPTIONS
 
+## \-h | --help
+
+Show this help document.
+
 # SYNTAX
 
 ## FILTERS
