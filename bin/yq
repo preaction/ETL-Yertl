@@ -124,6 +124,10 @@ See L<SYNTAX>.
 
 =head1 OPTIONS
 
+=head2 -h | --help
+
+Show this help document.
+
 =head1 SYNTAX
 
 =head2 FILTERS
