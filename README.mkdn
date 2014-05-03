@@ -4,7 +4,7 @@ yq - Filter YAML through a command-line program
 
 # VERSION
 
-version 0.003
+version 0.004
 
 # SYNOPSIS
 

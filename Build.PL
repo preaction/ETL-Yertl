@@ -18,13 +18,13 @@ my %module_build_args = (
     "Doug Bell <preaction\@cpan.org>"
   ],
   "dist_name" => "App-YAML-Filter",
-  "dist_version" => "0.003",
+  "dist_version" => "0.004",
   "license" => "perl",
   "module_name" => "App::YAML::Filter",
   "recommends" => {},
   "recursive_test_files" => 1,
   "requires" => {
-    "Getopt::Long" => 0,
+    "Getopt::Long" => "2.36",
     "Import::Base" => 0,
     "Pod::Usage" => 0,
     "YAML" => 0
