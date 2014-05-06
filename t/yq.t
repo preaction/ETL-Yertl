@@ -114,4 +114,21 @@ subtest 'empty does not print' => sub {
     cmp_deeply \@got, [ $doc[0] ];
 };
 
+subtest 'single document with no --- separator' => sub {
+    my $doc = <<ENDYML;
+foo: bar
+baz: buzz
+flip:
+    - flop
+    - blip
+ENDYML
+    open my $stdin, '<', \$doc;
+    local *STDIN = $stdin;
+    my $filter = '.flip.[0]';
+    my ( $output, $stderr ) = capture { yq->main( $filter ) };
+    ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
+    my @got = YAML::Load( $output );
+    cmp_deeply \@got, [ 'flop' ];
+};
+
 done_testing;

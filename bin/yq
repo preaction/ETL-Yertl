@@ -27,12 +27,20 @@ sub main {
 
     my $buffer;
     while ( my $line = <STDIN> ) {
+        # --- is the start of a new document
         if ( $buffer && $line =~ /^---/ ) {
+            # Flush the previous document
             my $output = $class->filter( $filter, YAML::Load( $buffer ) );
             print YAML::Dump( $output ) unless is_empty( $output );
             $buffer = '';
         }
         $buffer .= $line;
+    }
+    # Flush the buffer in the case of a single document with no ---
+    if ( $buffer =~ /\S/ ) {
+        #print STDERR "Buffer is: $buffer\n";
+        my $output = $class->filter( $filter, YAML::Load( $buffer ) );
+        print YAML::Dump( $output ) unless is_empty( $output );
     }
 
     return 0;
