@@ -2,7 +2,7 @@
 use App::YAML::Filter::Base;
 use Test::Most;
 use YAML qw( Dump Load );
-use Capture::Tiny qw( capture_merged );
+use Capture::Tiny qw( capture );
 require 'bin/yq';
 
 subtest 'filter single hash key' => sub {
@@ -108,7 +108,8 @@ subtest 'empty does not print' => sub {
     open my $stdin, '<', \( YAML::Dump( @doc ) );
     local *STDIN = $stdin;
     my $filter = 'if .foo eq bar then . else empty';
-    my ( $output ) = capture_merged { yq->main( $filter ) };
+    my ( $output, $stderr ) = capture { yq->main( $filter ) };
+    ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
     my @got = YAML::Load( $output );
     cmp_deeply \@got, [ $doc[0] ];
 };
