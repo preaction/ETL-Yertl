@@ -76,7 +76,7 @@ sub filter {
         my $lhs_value = $class->filter( $lhs_filter, $doc );
         my $rhs_value = $class->filter( $rhs_filter, $doc );
         if ( $cond eq 'eq' ) {
-            if ( $lhs_value eq $rhs_value ) {
+            if ( defined $lhs_value == defined $rhs_value && $lhs_value eq $rhs_value ) {
                 return $class->filter( $true_filter, $doc );
             }
             elsif ( $false_filter ) {
