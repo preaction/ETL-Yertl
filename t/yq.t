@@ -67,6 +67,16 @@ subtest 'mixed array and hash keys' => sub {
     };
 };
 
+subtest ', emits multiple results' => sub {
+    my $doc = {
+        foo => 'bar',
+        baz => 'fuzz',
+    };
+    my $filter = '.foo, .baz';
+    my @out = yq->filter( $filter, $doc );
+    cmp_deeply \@out, [ 'bar', 'fuzz' ];
+};
+
 subtest 'conditional match single hash key and return full document' => sub {
     my $doc = {
         foo => 'bar',
@@ -140,6 +150,20 @@ subtest 'file in ARGV' => sub {
     ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
     my @got = YAML::Load( $output );
     cmp_deeply \@got, [ 'bar' ];
+};
+
+subtest 'multiple documents print properly' => sub {
+    my $doc = <<ENDYML;
+foo: bar
+baz: buzz
+ENDYML
+    open my $stdin, '<', \$doc;
+    local *STDIN = $stdin;
+    my $filter = '.foo, .baz';
+    my ( $output, $stderr ) = capture { yq->main( $filter ) };
+    ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
+    my @got = YAML::Load( $output );
+    cmp_deeply \@got, [ 'bar', 'buzz' ];
 };
 
 done_testing;

@@ -45,8 +45,8 @@ sub main {
             # --- is the start of a new document
             if ( $buffer && $line =~ /^---/ ) {
                 # Flush the previous document
-                my $output = $class->filter( $filter, YAML::Load( $buffer ) );
-                print YAML::Dump( $output ) unless is_empty( $output );
+                my @output = $class->filter( $filter, YAML::Load( $buffer ) );
+                print YAML::Dump( $_ ) for grep { !is_empty( $_ ) } @output;
                 $buffer = '';
             }
             $buffer .= $line;
@@ -54,8 +54,8 @@ sub main {
         # Flush the buffer in the case of a single document with no ---
         if ( $buffer =~ /\S/ ) {
             #print STDERR "Buffer is: $buffer\n";
-            my $output = $class->filter( $filter, YAML::Load( $buffer ) );
-            print YAML::Dump( $output ) unless is_empty( $output );
+            my @output = $class->filter( $filter, YAML::Load( $buffer ) );
+            print YAML::Dump( $_ ) for grep { !is_empty( $_ ) } @output;
         }
     }
 
@@ -65,8 +65,13 @@ sub main {
 # Filter MUST NOT mutate $doc!
 sub filter {
     my ( $class, $filter, $doc ) = @_;
+    # , does multiple filters, yielding multiple documents
+    if ( $filter =~ /,/ ) {
+        my @filters = split /\s*,\s*/, $filter;
+        return map { $class->filter( $_, $doc ) } @filters;
+    }
     # Whole document (needed for if/then)
-    if ( $filter =~ /^[.]$/ ) {
+    elsif ( $filter =~ /^[.]$/ ) {
         return $doc;
     }
     # Hash and array keys to traverse the data structure
@@ -219,6 +224,20 @@ Extract a single item out of an array.
 
     $ yq .[2].baz.new
     old
+
+=item ,
+
+Multiple filters may be separated by commas to yield multiple documents in the
+output.
+
+    # INPUT
+    foo: bar
+    baz: fuzz
+
+    $ yq '.foo, .baz'
+    bar
+    ---
+    fuzz
 
 =back
 
