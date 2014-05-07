@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "App::YAML::Filter",
   "PREREQ_PM" => {
+    "File::Spec" => 0,
     "Getopt::Long" => "2.36",
     "Import::Base" => 0,
     "Pod::Usage" => 0,
@@ -35,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::Compile" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }

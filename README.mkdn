@@ -4,24 +4,29 @@ yq - Filter YAML through a command-line program
 
 # VERSION
 
-version 0.004
+version 0.005
 
 # SYNOPSIS
 
-    yq <filter>
+    yq <filter> [<file>...]
 
     yq -h|--help
 
 # DESCRIPTION
 
-This program takes a stream of YAML documents on STDIN, applies a filter, then
-writes the results to STDOUT.
+This program takes a stream of YAML documents (on STDIN or file arguments),
+applies a filter, then writes the results to STDOUT.
 
 # ARGUMENTS
 
 ## filter
 
 See [SYNTAX](http://search.cpan.org/perldoc?SYNTAX).
+
+## <file>
+
+A YAML file to filter. The special file "-" refers to STDIN. If no files are
+specified, filter STDIN.
 
 # OPTIONS
 
@@ -89,6 +94,33 @@ to reach deep inside the documents you're working with.
 
         $ yq .[2].baz.new
         old
+
+- \[\]
+
+    Use \[\] with no index to flatten an array.
+
+        # INPUT
+        - foo: fuzz
+        - bar: buzz
+
+        $ yq '.[]'
+        foo: fuzz
+        ---
+        bar: buzz
+
+- ,
+
+    Multiple filters may be separated by commas to yield multiple documents in the
+    output.
+
+        # INPUT
+        foo: bar
+        baz: fuzz
+
+        $ yq '.foo, .baz'
+        bar
+        ---
+        fuzz
 
 ## VALUES
 
