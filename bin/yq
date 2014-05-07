@@ -75,11 +75,14 @@ sub filter {
         return $doc;
     }
     # Hash and array keys to traverse the data structure
-    elsif ( $filter =~ /^((?:[.](?:\w+|\[\d+\]))+)$/ ) {
+    elsif ( $filter =~ /^((?:[.](?:\w+|\[\d*\]))+)$/ ) {
         my @keys = split /[.]/, $1;
         my $subdoc = $doc;
         for my $key ( @keys[1..$#keys] ) {
-            if ( $key =~ /^\[(\d+)\]$/ ) {
+            if ( $key =~ /^\[\]$/ ) {
+                return @{ $subdoc };
+            }
+            elsif ( $key =~ /^\[(\d+)\]$/ ) {
                 $subdoc = $subdoc->[ $1 ];
             }
             elsif ( $key =~ /^\w+$/ ) {
@@ -224,6 +227,19 @@ Extract a single item out of an array.
 
     $ yq .[2].baz.new
     old
+
+=item []
+
+Use [] with no index to flatten an array.
+
+    # INPUT
+    - foo: fuzz
+    - bar: buzz
+
+    $ yq '.[]'
+    foo: fuzz
+    ---
+    bar: buzz
 
 =item ,
 

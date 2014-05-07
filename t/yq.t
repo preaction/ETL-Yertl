@@ -77,6 +77,16 @@ subtest ', emits multiple results' => sub {
     cmp_deeply \@out, [ 'bar', 'fuzz' ];
 };
 
+subtest '[] with no index flattens an array' => sub {
+    my $doc = {
+        foo => [ 1, 2, 3 ],
+        bar => [ 4, 5, 6 ],
+    };
+    my $filter = '.foo.[]';
+    my @out = yq->filter( $filter, $doc );
+    cmp_deeply \@out, [ 1, 2, 3 ];
+};
+
 subtest 'conditional match single hash key and return full document' => sub {
     my $doc = {
         foo => 'bar',
