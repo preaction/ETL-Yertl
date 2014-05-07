@@ -25,22 +25,38 @@ sub main {
     my $filter = shift @argv;
     pod2usage("ERROR: Must give a filter") unless $filter;
 
-    my $buffer;
-    while ( my $line = <STDIN> ) {
-        # --- is the start of a new document
-        if ( $buffer && $line =~ /^---/ ) {
-            # Flush the previous document
+    push @argv, "-" unless @argv;
+    for $ARGV ( @argv ) {
+        # We're doing a similar behavior to <>, but manually for easier testing.
+        my $fh;
+        if ( $ARGV eq '-' ) {
+            # Use the existing STDIN so tests can fake it
+            $fh = \*STDIN;
+        }
+        else {
+            unless ( open $fh, '<', $ARGV ) {
+                warn "Could not open file '$ARGV' for reading: $!\n";
+                next;
+            }
+        }
+
+        my $buffer;
+        while ( my $line = <$fh> ) {
+            # --- is the start of a new document
+            if ( $buffer && $line =~ /^---/ ) {
+                # Flush the previous document
+                my $output = $class->filter( $filter, YAML::Load( $buffer ) );
+                print YAML::Dump( $output ) unless is_empty( $output );
+                $buffer = '';
+            }
+            $buffer .= $line;
+        }
+        # Flush the buffer in the case of a single document with no ---
+        if ( $buffer =~ /\S/ ) {
+            #print STDERR "Buffer is: $buffer\n";
             my $output = $class->filter( $filter, YAML::Load( $buffer ) );
             print YAML::Dump( $output ) unless is_empty( $output );
-            $buffer = '';
         }
-        $buffer .= $line;
-    }
-    # Flush the buffer in the case of a single document with no ---
-    if ( $buffer =~ /\S/ ) {
-        #print STDERR "Buffer is: $buffer\n";
-        my $output = $class->filter( $filter, YAML::Load( $buffer ) );
-        print YAML::Dump( $output ) unless is_empty( $output );
     }
 
     return 0;
@@ -115,20 +131,25 @@ exit __PACKAGE__->main( @ARGV ) unless caller(0);
 
 =head1 SYNOPSIS
 
-    yq <filter>
+    yq <filter> [<file>...]
 
     yq -h|--help
 
 =head1 DESCRIPTION
 
-This program takes a stream of YAML documents on STDIN, applies a filter, then
-writes the results to STDOUT.
+This program takes a stream of YAML documents (on STDIN or file arguments),
+applies a filter, then writes the results to STDOUT.
 
 =head1 ARGUMENTS
 
 =head2 filter
 
 See L<SYNTAX>.
+
+=head2 <file>
+
+A YAML file to filter. The special file "-" refers to STDIN. If no files are
+specified, filter STDIN.
 
 =head1 OPTIONS
 

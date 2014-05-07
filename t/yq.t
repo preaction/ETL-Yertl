@@ -3,6 +3,8 @@ use App::YAML::Filter::Base;
 use Test::Most;
 use YAML qw( Dump Load );
 use Capture::Tiny qw( capture );
+use FindBin qw( $Bin );
+use File::Spec;
 require 'bin/yq';
 
 subtest 'filter single hash key' => sub {
@@ -129,6 +131,15 @@ ENDYML
     ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
     my @got = YAML::Load( $output );
     cmp_deeply \@got, [ 'flop' ];
+};
+
+subtest 'file in ARGV' => sub {
+    my $file = File::Spec->catfile( $Bin, 'share', 'foo.yml' );
+    my $filter = '.foo';
+    my ( $output, $stderr ) = capture { yq->main( $filter, $file ) };
+    ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
+    my @got = YAML::Load( $output );
+    cmp_deeply \@got, [ 'bar' ];
 };
 
 done_testing;
