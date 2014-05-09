@@ -4,7 +4,7 @@ yq - Filter YAML through a command-line program
 
 # VERSION
 
-version 0.005
+version 0.006
 
 # SYNOPSIS
 
@@ -21,7 +21,7 @@ applies a filter, then writes the results to STDOUT.
 
 ## filter
 
-See [SYNTAX](http://search.cpan.org/perldoc?SYNTAX).
+The filter to run. For the filter syntax, see [SYNTAX](http://search.cpan.org/perldoc?SYNTAX).
 
 ## <file>
 

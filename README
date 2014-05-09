@@ -2,7 +2,7 @@ NAME
     yq - Filter YAML through a command-line program
 
 VERSION
-    version 0.005
+    version 0.006
 
 SYNOPSIS
         yq <filter> [<file>...]
@@ -15,7 +15,7 @@ DESCRIPTION
 
 ARGUMENTS
   filter
-    See SYNTAX.
+    The filter to run. For the filter syntax, see SYNTAX.
 
   <file>
     A YAML file to filter. The special file "-" refers to STDIN. If no files
