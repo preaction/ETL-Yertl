@@ -18,7 +18,7 @@ my %module_build_args = (
     "Doug Bell <preaction\@cpan.org>"
   ],
   "dist_name" => "App-YAML-Filter",
-  "dist_version" => "0.006",
+  "dist_version" => "0.007",
   "license" => "perl",
   "module_name" => "App::YAML::Filter",
   "recommends" => {},
@@ -27,7 +27,7 @@ my %module_build_args = (
     "File::Spec" => 0,
     "Getopt::Long" => "2.36",
     "Import::Base" => 0,
-    "Pod::Usage" => 0,
+    "Pod::Usage::Return" => 0,
     "YAML" => 0
   },
   "script_files" => [

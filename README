@@ -2,7 +2,7 @@ NAME
     yq - Filter YAML through a command-line program
 
 VERSION
-    version 0.006
+    version 0.007
 
 SYNOPSIS
         yq <filter> [<file>...]
