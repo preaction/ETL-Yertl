@@ -18,7 +18,7 @@ sub main {
     my ( $class, @argv ) = @_;
     my %opt;
     GetOptionsFromArray( \@argv, \%opt,
-        'h|help',
+        'help|h',
     );
     pod2usage(0) if $opt{help};
 
@@ -152,7 +152,7 @@ applies a filter, then writes the results to STDOUT.
 
 =head2 filter
 
-See L<SYNTAX>.
+The filter to run. For the filter syntax, see L<SYNTAX>.
 
 =head2 <file>
 
