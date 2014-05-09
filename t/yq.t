@@ -5,7 +5,27 @@ use YAML qw( Dump Load );
 use Capture::Tiny qw( capture );
 use FindBin qw( $Bin );
 use File::Spec;
-require 'bin/yq';
+
+my $script = "$FindBin::Bin/../bin/yq";
+require $script;
+$0 = $script; # So pod2usage finds the right file
+
+subtest 'help options' => sub {
+    my ( $out, $err, $exit ) = capture { yq->main( '-h' ) };
+    is $exit, 0, 'successfully showed the help';
+    ok !$err, 'requested help is on stdout';
+    like $out, qr{Usage:}, 'synopsis is included';
+    like $out, qr{Arguments:}, 'arguments are included';
+    like $out, qr{Options:}, 'options are included';
+};
+
+subtest 'must provide a filter' => sub {
+    my ( $out, $err, $exit ) = capture { yq->main };
+    is $exit, 2, 'fatal error';
+    ok !$out, 'errors are on stderr';
+    like $err, qr{ERROR: Must give a filter};
+    like $err, qr{Usage:};
+};
 
 subtest 'filter single hash key' => sub {
     my $doc = {
