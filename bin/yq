@@ -8,6 +8,8 @@ use Getopt::Long qw( GetOptionsFromArray );
 use YAML;
 use boolean qw( :all );
 
+$|++; # no buffering
+
 sub empty() {
     bless {}, 'empty';
 }
