@@ -168,10 +168,28 @@ subtest 'conditional with else' => sub {
     cmp_deeply $out, $doc->{baz};
 };
 
-subtest 'empty' => sub {
-    my $filter = 'empty';
-    my $out = yq->filter( $filter, { foo => 'bar' } );
-    isa_ok $out, 'empty';
+subtest 'functions' => sub {
+    my $doc = {
+        foo => 'bar',
+        baz => 'fuzz',
+    };
+
+    subtest 'select( EXPR )' => sub {
+        my $filter = 'select( .foo eq bar )';
+        my $out = yq->filter( $filter, $doc );
+        cmp_deeply $out, $doc;
+    };
+
+    subtest 'grep( EXPR )' => sub {
+        my $filter = 'grep( .foo eq bar )';
+        my $out = yq->filter( $filter, $doc );
+        cmp_deeply $out, $doc;
+    };
+
+    subtest 'empty' => sub {
+        my $out = yq->filter( 'empty', $doc );
+        isa_ok $out, 'empty';
+    };
 };
 
 subtest 'empty does not print' => sub {

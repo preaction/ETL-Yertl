@@ -88,7 +88,8 @@ my $FILTER = qr{
         \w+ # Constant/bareword
     }x;
 my $OP = qr{eq|ne};
-my $EXPR = qr{$FILTER|$FILTER\s+$OP\s+$FILTER};
+my $FUNC_NAME = qr{empty|select|grep};
+my $EXPR = qr{$FUNC_NAME(?:\(\s*(?R)\s*\))?|$FILTER|$FILTER\s+$OP\s+$FILTER};
 
 # Filter MUST NOT mutate $doc!
 sub filter {
@@ -98,19 +99,30 @@ sub filter {
         my @filters = split /\s*,\s*/, $filter;
         return map { $class->filter( $_, $doc ) } @filters;
     }
+    elsif ( $filter =~ /^($FUNC_NAME)(?:\(\s*($EXPR)\s*\))?$/ ) {
+        my ( $func, $expr ) = ( $1, $2 );
+        if ( $func eq 'empty' ) {
+            if ( $expr ) {
+                warn "empty does not take arguments\n";
+            }
+            return empty;
+        }
+        elsif ( $func eq 'select' || $func eq 'grep' ) {
+            if ( !$expr ) {
+                warn "'$func' takes an expression argument";
+                return empty;
+            }
+            return $class->filter( $expr, $doc ) ? $doc : empty;
+        }
+    }
     # Hash and array keys to traverse the data structure
     elsif ( $filter =~ /^($FILTER)$/ ) {
         # Constants/barewords do not begin with .
         # Future: quoted strings with Text::Balanced maybe?
         if ( $filter !~ /^[.]/ ) {
-            if ( $filter eq 'empty' ) {
-                return empty;
-            }
             # If it's not a reserved word, it's a string
             # XXX: This is a very poor decision...
-            else {
-                return $filter;
-            }
+            return $filter;
         }
         my @keys = split /[.]/, $filter;
         my $subdoc = $doc;
@@ -172,7 +184,7 @@ exit __PACKAGE__->main( @ARGV ) unless caller(0);
 
 =head1 SYNOPSIS
 
-    yq <filter> [<file>...]
+    yq <script> [<file>...]
 
     yq -h|--help
 
@@ -183,9 +195,9 @@ applies a filter, then writes the results to STDOUT.
 
 =head1 ARGUMENTS
 
-=head2 filter
+=head2 script
 
-The filter to run. For the filter syntax, see L<SYNTAX>.
+The script to run. For the script syntax, see L<SYNTAX>.
 
 =head2 <file>
 
@@ -273,20 +285,6 @@ Use [] with no index to flatten an array.
     foo: fuzz
     ---
     bar: buzz
-
-=item ,
-
-Multiple filters may be separated by commas to yield multiple documents in the
-output.
-
-    # INPUT
-    foo: bar
-    baz: fuzz
-
-    $ yq '.foo, .baz'
-    bar
-    ---
-    fuzz
 
 =back
 
@@ -376,6 +374,30 @@ The two sides may be L<FILTERS> or L<VALUES>.
 YAML treats the string "true" as a true value, and the string "false" as a
 false value.
 
+=back
+
+=head2 EXPRESSIONS
+
+An C<EXPRESSION> is allowed to be either a L<FILTER>, L<VALUE>, or a L<COMPARISON>.
+
+=head2 FUNCTIONS
+
+=over
+
+=item grep( EXPRESSION )
+
+If C<EXPRESSION> is true, return the current document. Otherwise, return C<empty>.
+
+This is exactly the same as:
+
+    if EXPRESSION then . else empty
+
+=item select( EXPRESSION )
+
+Another name for C<grep()> to match C<jq>'s syntax.
+
+=back
+
 =head2 CONDITIONALS
 
 =over
@@ -385,7 +407,6 @@ false value.
 If the C<EXPRESSION> is true, return the result of C<TRUE_FILTER>, otherwise
 return the result of C<FALSE_FILTER>.
 
-C<EXPRESSION> is allowed to be either C<FILTERS>, L<VALUES>, or L<COMPARISONS>.
 
     # INPUT
     foo: bar
@@ -405,6 +426,29 @@ C<EXPRESSION> is allowed to be either C<FILTERS>, L<VALUES>, or L<COMPARISONS>.
     baz: fuzz
 
 The C<else FALSE_FILTER> is optional and defaults to returning undefined.
+
+=back
+
+=head2 COMBINATORS
+
+Combinators combine multiple expressions to yield one or more documents in the
+output stream.
+
+=over
+
+=item ,
+
+Multiple EXPRESSIONS may be separated by commas to yield multiple documents in the
+output.
+
+    # INPUT
+    foo: bar
+    baz: fuzz
+
+    $ yq '.foo, .baz'
+    bar
+    ---
+    fuzz
 
 =back
 
