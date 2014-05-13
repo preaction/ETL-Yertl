@@ -311,6 +311,8 @@ This is especially useful in conditionals:
     $ yq 'if .foo eq buzz then . else empty'
     $
 
+... though see the C<grep()> function for a shorter way of writing this.
+
 =item Values
 
 Any bareword that is not recognized as a syntax element is treated
