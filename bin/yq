@@ -6,6 +6,7 @@ use App::YAML::Filter::Base;
 use Pod::Usage::Return qw( pod2usage );
 use Getopt::Long qw( GetOptionsFromArray );
 use YAML;
+use boolean qw( :all );
 
 sub empty() {
     bless {}, 'empty';
@@ -46,7 +47,7 @@ sub main {
             if ( $buffer && $line =~ /^---/ ) {
                 # Flush the previous document
                 my @output = $class->filter( $filter, YAML::Load( $buffer ) );
-                print YAML::Dump( $_ ) for grep { !is_empty( $_ ) } @output;
+                $class->write( @output );
                 $buffer = '';
             }
             $buffer .= $line;
@@ -55,12 +56,39 @@ sub main {
         if ( $buffer =~ /\S/ ) {
             #print STDERR "Buffer is: $buffer\n";
             my @output = $class->filter( $filter, YAML::Load( $buffer ) );
-            print YAML::Dump( $_ ) for grep { !is_empty( $_ ) } @output;
+            $class->write( @output );
         }
     }
 
     return 0;
 }
+
+sub write {
+    my ( $class, @docs ) = @_;
+    for my $doc ( @docs ) {
+        next if is_empty( $doc );
+        if ( isTrue( $doc ) ) {
+            print YAML::Dump( "true" );
+        }
+        elsif ( isFalse( $doc ) ) {
+            print YAML::Dump( "false" );
+        }
+        else {
+            print YAML::Dump( $doc );
+        }
+    }
+}
+
+# Match a document path
+my $FILTER = qr{
+        [.] # entire document
+        |
+        (?:[.](?:\w+|\[\d*\]))+ # hash/array lookup
+        |
+        \w+ # Constant/bareword
+    }x;
+my $OP = qr{eq|ne};
+my $EXPR = qr{$FILTER|$FILTER\s+$OP\s+$FILTER};
 
 # Filter MUST NOT mutate $doc!
 sub filter {
@@ -70,13 +98,21 @@ sub filter {
         my @filters = split /\s*,\s*/, $filter;
         return map { $class->filter( $_, $doc ) } @filters;
     }
-    # Whole document (needed for if/then)
-    elsif ( $filter =~ /^[.]$/ ) {
-        return $doc;
-    }
     # Hash and array keys to traverse the data structure
-    elsif ( $filter =~ /^((?:[.](?:\w+|\[\d*\]))+)$/ ) {
-        my @keys = split /[.]/, $1;
+    elsif ( $filter =~ /^($FILTER)$/ ) {
+        # Constants/barewords do not begin with .
+        # Future: quoted strings with Text::Balanced maybe?
+        if ( $filter !~ /^[.]/ ) {
+            if ( $filter eq 'empty' ) {
+                return empty;
+            }
+            # If it's not a reserved word, it's a string
+            # XXX: This is a very poor decision...
+            else {
+                return $filter;
+            }
+        }
+        my @keys = split /[.]/, $filter;
         my $subdoc = $doc;
         for my $key ( @keys[1..$#keys] ) {
             if ( $key =~ /^\[\]$/ ) {
@@ -94,40 +130,37 @@ sub filter {
         }
         return $subdoc;
     }
-    # If/then (future: else, better conditions)
-    elsif ( $filter =~ /^if\s+(.+?)\s+(eq|ne)\s+(.+?)\s+then\s+(.+?)(?:\s+else\s+(.+?))?$/ ) {
-        my ( $lhs_filter, $cond, $rhs_filter, $true_filter, $false_filter ) = ( $1, $2, $3, $4, $5 );
+    elsif ( $filter =~ /^($FILTER)\s+($OP)\s+($FILTER)$/ ) {
+        my ( $lhs_filter, $cond, $rhs_filter ) = ( $1, $2, $3 );
         my $lhs_value = $class->filter( $lhs_filter, $doc );
         my $rhs_value = $class->filter( $rhs_filter, $doc );
         if ( $cond eq 'eq' ) {
             if ( defined $lhs_value == defined $rhs_value && $lhs_value eq $rhs_value ) {
-                return $class->filter( $true_filter, $doc );
-            }
-            elsif ( $false_filter ) {
-                return $class->filter( $false_filter, $doc );
+                return true;
             }
             else {
-                return;
+                return false;
             }
         }
         elsif ( $cond eq 'ne' ) {
             if ( $lhs_value ne $rhs_value ) {
-                return $class->filter( $true_filter, $doc );
-            }
-            elsif ( $false_filter ) {
-                return $class->filter( $false_filter, $doc );
+                return true;
             }
             else {
-                return;
+                return false;
             }
         }
     }
-    elsif ( $filter eq 'empty' ) {
-        return empty;
-    }
-    # Barewords (future: quoted strings)
-    elsif ( $filter !~ /^[.]/ ) {
-        return $filter;
+    # If/then (future: else, better conditions)
+    elsif ( $filter =~ /^if\s+($EXPR)\s+then\s+($FILTER)(?:\s+else\s+($FILTER))?$/ ) {
+        my ( $expr, $true_filter, $false_filter ) = ( $1, $2, $3, $4, $5 );
+        my $expr_value = $class->filter( $expr, $doc );
+        if ( $expr_value ) {
+            return $class->filter( $true_filter, $doc );
+        }
+        else {
+            return $false_filter ? $class->filter( $false_filter, $doc ) : ();
+        }
     }
     else {
         die "Could not parse filter '$filter'\n";
@@ -285,18 +318,74 @@ This is especially useful in conditionals:
 Any bareword that is not recognized as a syntax element is treated
 as a value.
 
+B<NOTE>: This may be subject to change to only allow quoted strings and bare
+numbers in a future version, even though quoted strings are not currently
+allowed.
+
 =back
+
+=head2 COMPARISONS
+
+=over
+
+=item eq
+
+String equals comparison. Returns true if both sides are equal to each other
+when treated as a string.
+
+The two sides may be L<FILTERS> or L<VALUES>.
+
+    # INPUT
+    foo: bar
+    baz: fuzz
+    buzz: fuzz
+
+    $ yq '.foo eq bar'
+    true
+
+    $ yq '.baz eq .buzz'
+    true
+
+    $ yq '.baz eq bar'
+    false
+
+YAML treats the string "true" as a true value, and the string "false" as a
+false value.
+
+=item ne
+
+String not equals comparison. Returns true if one side is not equal to the
+other side when compared as a string.
+
+The two sides may be L<FILTERS> or L<VALUES>.
+
+    # INPUT
+    foo: bar
+    baz: fuzz
+    buzz: fuzz
+
+    $ yq '.foo eq bar'
+    true
+
+    $ yq '.baz eq .buzz'
+    true
+
+    $ yq '.baz eq bar'
+    false
+
+YAML treats the string "true" as a true value, and the string "false" as a
+false value.
 
 =head2 CONDITIONALS
 
 =over
 
-=item if lhs_filter eq rhs_filter then true_filter else false_filter
+=item if EXPRESSION then TRUE_FILTER else FALSE_FILTER
 
-If the lhs filter and rhs_filter are equal, return the true_filter,
-otherwise return the false_filter.
+If the C<EXPRESSION> is true, return the result of C<TRUE_FILTER>, otherwise
+return the result of C<FALSE_FILTER>.
 
-For example
+C<EXPRESSION> is allowed to be either C<FILTERS>, L<VALUES>, or L<COMPARISONS>.
 
     # INPUT
     foo: bar
@@ -308,7 +397,14 @@ For example
     $ yq 'if .foo eq buzz then .baz else .foo'
     bar
 
-The else false_filter is optional and defaults to returning undefined.
+    $ yq 'if .foo then .baz'
+    fuzz
+
+    $ yq 'if .herp then .derp else .'
+    foo: bar
+    baz: fuzz
+
+The C<else FALSE_FILTER> is optional and defaults to returning undefined.
 
 =back
 

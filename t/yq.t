@@ -5,6 +5,7 @@ use YAML qw( Dump Load );
 use Capture::Tiny qw( capture );
 use FindBin qw( $Bin );
 use File::Spec;
+use boolean qw( :all );
 
 my $script = "$FindBin::Bin/../bin/yq";
 require $script;
@@ -105,6 +106,42 @@ subtest '[] with no index flattens an array' => sub {
     my $filter = '.foo.[]';
     my @out = yq->filter( $filter, $doc );
     cmp_deeply \@out, [ 1, 2, 3 ];
+};
+
+subtest 'binary comparison operators' => sub {
+    my $doc = {
+        foo => 'bar',
+        baz => 'fuzz',
+        buzz => 'bar',
+    };
+    subtest 'eq' => sub {
+        subtest 'FILTER eq CONSTANT' => sub {
+            my $out = yq->filter( '.foo eq bar', $doc );
+            ok isTrue( $out );
+            $out = yq->filter( '.foo eq jump', $doc );
+            ok isFalse( $out );
+        };
+        subtest 'FILTER eq FILTER' => sub {
+            my $out = yq->filter( '.foo eq .buzz', $doc );
+            ok isTrue( $out );
+            $out = yq->filter( '.foo eq .baz', $doc );
+            ok isFalse( $out );
+        };
+    };
+    subtest 'ne' => sub {
+        subtest 'FILTER ne CONSTANT' => sub {
+            my $out = yq->filter( '.foo ne bar', $doc );
+            ok isFalse( $out );
+            $out = yq->filter( '.foo ne jump', $doc );
+            ok isTrue( $out );
+        };
+        subtest 'FILTER ne FILTER' => sub {
+            my $out = yq->filter( '.foo ne .buzz', $doc );
+            ok isFalse( $out );
+            $out = yq->filter( '.foo ne .baz', $doc );
+            ok isTrue( $out );
+        };
+    };
 };
 
 subtest 'conditional match single hash key and return full document' => sub {
