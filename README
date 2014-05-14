@@ -2,10 +2,10 @@ NAME
     yq - Filter YAML through a command-line program
 
 VERSION
-    version 0.007
+    version 0.008
 
 SYNOPSIS
-        yq <filter> [<file>...]
+        yq <script> [<file>...]
 
         yq -h|--help
 
@@ -14,8 +14,8 @@ DESCRIPTION
     arguments), applies a filter, then writes the results to STDOUT.
 
 ARGUMENTS
-  filter
-    The filter to run. For the filter syntax, see SYNTAX.
+  script
+    The script to run. For the script syntax, see SYNTAX.
 
   <file>
     A YAML file to filter. The special file "-" refers to STDIN. If no files
@@ -92,18 +92,6 @@ SYNTAX
             ---
             bar: buzz
 
-    ,   Multiple filters may be separated by commas to yield multiple
-        documents in the output.
-
-            # INPUT
-            foo: bar
-            baz: fuzz
-
-            $ yq '.foo, .baz'
-            bar
-            ---
-            fuzz
-
   VALUES
     empty
         The special value empty suppresses printing of a document. Normally,
@@ -124,16 +112,82 @@ SYNTAX
             $ yq 'if .foo eq buzz then . else empty'
             $
 
+        ... though see the "grep()" function for a shorter way of writing
+        this.
+
     Values
         Any bareword that is not recognized as a syntax element is treated
         as a value.
 
-  CONDITIONALS
-    if lhs_filter eq rhs_filter then true_filter else false_filter
-        If the lhs filter and rhs_filter are equal, return the true_filter,
-        otherwise return the false_filter.
+        NOTE: This may be subject to change to only allow quoted strings and
+        bare numbers in a future version, even though quoted strings are not
+        currently allowed.
 
-        For example
+  COMPARISONS
+    eq  String equals comparison. Returns true if both sides are equal to
+        each other when treated as a string.
+
+        The two sides may be FILTERS or VALUES.
+
+            # INPUT
+            foo: bar
+            baz: fuzz
+            buzz: fuzz
+
+            $ yq '.foo eq bar'
+            true
+
+            $ yq '.baz eq .buzz'
+            true
+
+            $ yq '.baz eq bar'
+            false
+
+        YAML treats the string "true" as a true value, and the string
+        "false" as a false value.
+
+    ne  String not equals comparison. Returns true if one side is not equal
+        to the other side when compared as a string.
+
+        The two sides may be FILTERS or VALUES.
+
+            # INPUT
+            foo: bar
+            baz: fuzz
+            buzz: fuzz
+
+            $ yq '.foo eq bar'
+            true
+
+            $ yq '.baz eq .buzz'
+            true
+
+            $ yq '.baz eq bar'
+            false
+
+        YAML treats the string "true" as a true value, and the string
+        "false" as a false value.
+
+  EXPRESSIONS
+    An "EXPRESSION" is allowed to be either a FILTER, VALUE, or a
+    COMPARISON.
+
+  FUNCTIONS
+    grep( EXPRESSION )
+        If "EXPRESSION" is true, return the current document. Otherwise,
+        return "empty".
+
+        This is exactly the same as:
+
+            if EXPRESSION then . else empty
+
+    select( EXPRESSION )
+        Another name for "grep()" to match "jq"'s syntax.
+
+  CONDITIONALS
+    if EXPRESSION then TRUE_FILTER else FALSE_FILTER
+        If the "EXPRESSION" is true, return the result of "TRUE_FILTER",
+        otherwise return the result of "FALSE_FILTER".
 
             # INPUT
             foo: bar
@@ -145,8 +199,31 @@ SYNTAX
             $ yq 'if .foo eq buzz then .baz else .foo'
             bar
 
-        The else false_filter is optional and defaults to returning
+            $ yq 'if .foo then .baz'
+            fuzz
+
+            $ yq 'if .herp then .derp else .'
+            foo: bar
+            baz: fuzz
+
+        The "else FALSE_FILTER" is optional and defaults to returning
         undefined.
+
+  COMBINATORS
+    Combinators combine multiple expressions to yield one or more documents
+    in the output stream.
+
+    ,   Multiple EXPRESSIONS may be separated by commas to yield multiple
+        documents in the output.
+
+            # INPUT
+            foo: bar
+            baz: fuzz
+
+            $ yq '.foo, .baz'
+            bar
+            ---
+            fuzz
 
 SEE ALSO
     jq  <http://stedolan.github.io/jq/> A filter for JSON documents. The

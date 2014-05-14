@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010;
 
 use ExtUtils::MakeMaker 6.30;
 
@@ -29,14 +29,15 @@ my %WriteMakefileArgs = (
     "Getopt::Long" => "2.36",
     "Import::Base" => 0,
     "Pod::Usage::Return" => 0,
-    "YAML" => 0
+    "YAML" => 0,
+    "boolean" => 0
   },
   "TEST_REQUIRES" => {
     "Capture::Tiny" => 0,
     "Test::Compile" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
