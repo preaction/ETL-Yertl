@@ -111,12 +111,25 @@ my $EXPR = qr{
     |
     $FILTER
 }x;
+my $PIPE = qr{[|]};
 
 # Filter MUST NOT mutate $doc!
 sub filter {
     my ( $class, $filter, $doc, $scope ) = @_;
+    if ( $filter =~ $PIPE ) {
+        my @exprs = split /\s*$PIPE\s*/, $filter;
+        my @in = ( $doc );
+        for my $expr ( @exprs ) {
+            my @out = ();
+            for my $doc ( @in ) {
+                push @out, $class->filter( $expr, $doc, $scope );
+            }
+            @in = @out;
+        }
+        return @in;
+    }
     # Hash constructor
-    if ( $filter =~ /^{/ ) {
+    elsif ( $filter =~ /^{/ ) {
         my %out;
         my ( $inner ) = $filter =~ /^\{\s*([^\}]+?)\s*\}$/;
         for my $pair ( split /\s*,\s*/, $inner ) {
@@ -575,6 +588,33 @@ output.
     bar
     ---
     fuzz
+
+=item |
+
+Multiple EXPRESSIONS may be separated by pipes to give the output of the left
+expression as the input of the right expression (much like how shell pipes
+work).
+
+    # INPUT
+    foo: bar
+    baz: fuzz
+    pop: more
+    ---
+    foo: buzz
+    baz: fizz
+    pop: jump
+
+    $ yq '{ foo: .foo, val: .pop } | group_by( .foo )'
+    bar:
+        - foo: bar
+          val: more
+    buzz:
+        - foo: buzz
+          val: jump
+
+The above example can be useful to avoid C<group_by> memory issues when dealing
+with very large streams: Reduce the size of the working document by keeping
+only the keys you want, then group those documents.
 
 =back
 
