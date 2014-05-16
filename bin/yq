@@ -95,13 +95,42 @@ my $FILTER = qr{
     }x;
 my $OP = qr{eq|ne};
 my $FUNC_NAME = qr{empty|select|grep|group_by};
-my $EXPR = qr{$FUNC_NAME(?:\(\s*(?R)\s*\))?|$FILTER|$FILTER\s+$OP\s+$FILTER};
+my $EXPR = qr{
+    \{(\s*$FILTER\s*:\s*(?0)\s*(?:,(?-1))*)\} # Hash constructor
+    |
+    \[(\s*(?0)\s*(?:,(?-1))*)\] # Array constructor
+    |
+    $FUNC_NAME(?:\(\s*(?0)\s*\))? # Function with optional argument
+    |
+    $FILTER\s+$OP\s+$FILTER # Binary operator
+    |
+    $FILTER
+}x;
 
 # Filter MUST NOT mutate $doc!
 sub filter {
     my ( $class, $filter, $doc, $scope ) = @_;
+    # Hash constructor
+    if ( $filter =~ /^{/ ) {
+        my %out;
+        my ( $inner ) = $filter =~ /^\{\s*([^\}]+?)\s*\}$/;
+        for my $pair ( split /\s*,\s*/, $inner ) {
+            my ( $key_filter, $value_expr ) = split /\s*:\s*/, $pair;
+            my $key = $class->filter( $key_filter, $doc );
+            $out{ $key } = $class->filter( $value_expr, $doc );
+        }
+        return \%out;
+    }
+    elsif ( $filter =~ /^\[/ ) {
+        my @out;
+        my ( $inner ) = $filter =~ /^\[\s*([^\]]+?)\s*\]$/;
+        for my $value_expr ( split /\s*,\s*/, $inner ) {
+            push @out, $class->filter( $value_expr, $doc );
+        }
+        return \@out;
+    }
     # , does multiple filters, yielding multiple documents
-    if ( $filter =~ /,/ ) {
+    elsif ( $filter =~ /,/ ) {
         my @filters = split /\s*,\s*/, $filter;
         return map { $class->filter( $_, $doc ) } @filters;
     }
@@ -175,8 +204,10 @@ sub filter {
         }
     }
     # If/then (future: else, better conditions)
-    elsif ( $filter =~ /^if\s+($EXPR)\s+then\s+($FILTER)(?:\s+else\s+($FILTER))?$/ ) {
-        my ( $expr, $true_filter, $false_filter ) = ( $1, $2, $3, $4, $5 );
+    # NOTE: If we're capturing using $EXPR, then we _must_ use named captures,
+    # because $EXPR has captures in itself
+    elsif ( $filter =~ /^if\s+(?<expr>$EXPR)\s+then\s+(?<true>$FILTER)(?:\s+else\s+(?<false>$FILTER))?$/ ) {
+        my ( $expr, $true_filter, $false_filter ) = @+{qw( expr true false )};
         my $expr_value = $class->filter( $expr, $doc );
         if ( $expr_value ) {
             return $class->filter( $true_filter, $doc );
@@ -228,6 +259,10 @@ specified, filter STDIN.
 Show this help document.
 
 =head1 SYNTAX
+
+=head2 EXPRESSIONS
+
+An C<EXPRESSION> is allowed to be either a L<FILTER>, L<VALUE>, or a L<COMPARISON>.
 
 =head2 FILTERS
 
@@ -308,6 +343,42 @@ Use [] with no index to flatten an array.
 =head2 VALUES
 
 =over
+
+=item { KEY: EXPRESSION, ... }
+
+The hash constructor. C<KEY> may be any C<FILTER> or a bare value.
+
+    # INPUT
+    foo: bar
+    baz: fuzz
+    ---
+    foo: 1
+    baz: 2
+
+    $ yq '{ bar: .foo, .baz: foo }'
+    bar: bar
+    fuzz: foo
+    ---
+    2: foo
+    bar: 1
+
+=item [ EXPRESSION, ... ]
+
+The array constructor.
+
+    # INPUT
+    foo: bar
+    baz: fuzz
+    ---
+    foo: 1
+    baz: 2
+
+    $ yq '[ .foo, .baz ]'
+    - bar
+    - fuzz
+    ---
+    - 1
+    - 2
 
 =item empty
 
@@ -394,10 +465,6 @@ YAML treats the string "true" as a true value, and the string "false" as a
 false value.
 
 =back
-
-=head2 EXPRESSIONS
-
-An C<EXPRESSION> is allowed to be either a L<FILTER>, L<VALUE>, or a L<COMPARISON>.
 
 =head2 FUNCTIONS
 
