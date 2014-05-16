@@ -190,6 +190,38 @@ subtest 'functions' => sub {
         my $out = yq->filter( 'empty', $doc );
         isa_ok $out, 'empty';
     };
+
+    subtest 'group_by( EXPR )' => sub {
+        my @docs = (
+            {
+                foo => 'bar',
+                baz => 1,
+            },
+            {
+                foo => 'bar',
+                baz => 2,
+            },
+            {
+                foo => 'baz',
+                baz => 3,
+            },
+        );
+        my $scope = {};
+        for my $doc ( @docs ) {
+            my $out = yq->filter( 'group_by( .foo )', $doc, $scope );
+            ok !$out, 'group_by delays output';
+        }
+
+        cmp_deeply $scope, {
+            group_by => {
+                bar => [ @docs[0..1] ],
+                baz => [ $docs[2] ],
+            },
+        };
+
+        my @out = yq->finish( $scope );
+        cmp_deeply $out[0], { bar => [ @docs[0..1] ], baz => [ $docs[2] ] };
+    };
 };
 
 subtest 'empty does not print' => sub {
@@ -249,6 +281,47 @@ ENDYML
     ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
     my @got = YAML::Load( $output );
     cmp_deeply \@got, [ 'bar', 'buzz' ];
+};
+
+subtest 'finish() gets called' => sub {
+    my $docs = <<ENDYML;
+---
+foo: 'bar'
+baz: 1
+---
+foo: 'bar'
+baz: 2
+---
+foo: 'baz'
+baz: 3
+ENDYML
+    open my $stdin, '<', \$docs;
+    local *STDIN = $stdin;
+    my $filter = 'group_by( .foo )';
+    my ( $output, $stderr ) = capture { yq->main( $filter ) };
+    ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
+    my @got = YAML::Load( $output );
+
+    cmp_deeply \@got, [
+        {
+            bar => [
+                {
+                    foo => 'bar',
+                    baz => 1,
+                },
+                {
+                    foo => 'bar',
+                    baz => 2,
+                },
+            ],
+            baz => [
+                {
+                    foo => 'baz',
+                    baz => 3,
+                },
+            ],
+        },
+    ];
 };
 
 done_testing;
