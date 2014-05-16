@@ -2,7 +2,7 @@ NAME
     yq - Filter YAML through a command-line program
 
 VERSION
-    version 0.009
+    version 0.010
 
 SYNOPSIS
         yq <script> [<file>...]
@@ -97,6 +97,10 @@ SYNTAX
             bar: buzz
 
   VALUES
+    'STRING' "STRING"
+        Both single- and double-quoted strings are allowed. Using \ will
+        escape the string delimiter.
+
     { KEY: EXPRESSION, ... }
         The hash constructor. "KEY" may be any "FILTER" or a bare value.
 
@@ -155,11 +159,11 @@ SYNTAX
 
     Values
         Any bareword that is not recognized as a syntax element is treated
-        as a value.
+        as a value. These barewords may only contain letters, numbers, and
+        underscore.
 
         NOTE: This may be subject to change to only allow quoted strings and
-        bare numbers in a future version, even though quoted strings are not
-        currently allowed.
+        bare numbers in a future version.
 
   COMPARISONS
     eq  String equals comparison. Returns true if both sides are equal to

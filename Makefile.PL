@@ -29,6 +29,7 @@ my %WriteMakefileArgs = (
     "Getopt::Long" => "2.36",
     "Import::Base" => 0,
     "Pod::Usage::Return" => 0,
+    "Text::Balanced" => 0,
     "YAML" => 0,
     "boolean" => 0
   },
@@ -37,7 +38,7 @@ my %WriteMakefileArgs = (
     "Test::Compile" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }
