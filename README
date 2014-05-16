@@ -2,7 +2,7 @@ NAME
     yq - Filter YAML through a command-line program
 
 VERSION
-    version 0.008
+    version 0.009
 
 SYNOPSIS
         yq <script> [<file>...]
@@ -26,6 +26,10 @@ OPTIONS
     Show this help document.
 
 SYNTAX
+  EXPRESSIONS
+    An "EXPRESSION" is allowed to be either a FILTER, VALUE, or a
+    COMPARISON.
+
   FILTERS
     Filters select a portion of the incoming documents. Filters can be
     combined to reach deep inside the documents you're working with.
@@ -93,6 +97,40 @@ SYNTAX
             bar: buzz
 
   VALUES
+    { KEY: EXPRESSION, ... }
+        The hash constructor. "KEY" may be any "FILTER" or a bare value.
+
+            # INPUT
+            foo: bar
+            baz: fuzz
+            ---
+            foo: 1
+            baz: 2
+
+            $ yq '{ bar: .foo, .baz: foo }'
+            bar: bar
+            fuzz: foo
+            ---
+            2: foo
+            bar: 1
+
+    [ EXPRESSION, ... ]
+        The array constructor.
+
+            # INPUT
+            foo: bar
+            baz: fuzz
+            ---
+            foo: 1
+            baz: 2
+
+            $ yq '[ .foo, .baz ]'
+            - bar
+            - fuzz
+            ---
+            - 1
+            - 2
+
     empty
         The special value empty suppresses printing of a document. Normally,
         an undefined document will show up in the output as "--- ~". If your
@@ -168,10 +206,6 @@ SYNTAX
         YAML treats the string "true" as a true value, and the string
         "false" as a false value.
 
-  EXPRESSIONS
-    An "EXPRESSION" is allowed to be either a FILTER, VALUE, or a
-    COMPARISON.
-
   FUNCTIONS
     grep( EXPRESSION )
         If "EXPRESSION" is true, return the current document. Otherwise,
@@ -183,6 +217,34 @@ SYNTAX
 
     select( EXPRESSION )
         Another name for "grep()" to match "jq"'s syntax.
+
+    group_by( EXPRESSION )
+        Group incoming documents based on the result of "EXPRESSION",
+        yielding a single document containing a hash of arrays.
+
+            # INPUT
+            ---
+            foo: 'bar'
+            baz: 1
+            ---
+            foo: 'bar'
+            baz: 2
+            ---
+            foo: 'baz'
+            baz: 3
+
+            $ yq 'group_by( .foo )'
+            bar:
+                - foo: bar
+                  baz: 1
+                - foo: bar
+                  baz: 2
+            baz:
+                - foo: baz
+                  baz: 3
+
+        NOTE: If you are filtering a lot of documents, this will consume a
+        lot of memory.
 
   CONDITIONALS
     if EXPRESSION then TRUE_FILTER else FALSE_FILTER
