@@ -93,9 +93,9 @@ subtest ', emits multiple results' => sub {
         foo => 'bar',
         baz => 'fuzz',
     };
-    my $filter = '.foo, .baz';
+    my $filter = ".foo, .baz, 'fizz'";
     my @out = yq->filter( $filter, $doc );
-    cmp_deeply \@out, [ 'bar', 'fuzz' ];
+    cmp_deeply \@out, [ 'bar', 'fuzz', 'fizz' ];
 };
 
 subtest '[] with no index flattens an array' => sub {
@@ -114,11 +114,11 @@ subtest 'hash constructor' => sub {
         baz => 'fuzz',
         buzz => 'bar',
     };
-    my @out = yq->filter( '{ bar: .foo, .buzz: far, doc: .baz }', $doc );
+    my @out = yq->filter( '{ bar: .foo, .buzz: "far/", doc: .baz }', $doc );
     cmp_deeply \@out, [
         {
             bar => $doc->{foo},
-            $doc->{buzz} => 'far',
+            $doc->{buzz} => 'far/',
             doc => $doc->{baz},
         },
     ] or diag explain \@out;
@@ -130,13 +130,14 @@ subtest 'array constructor' => sub {
         baz => 'fuzz',
         buzz => 'bar',
     };
-    my @out = yq->filter( '[ .foo, .buzz, doc, .baz ]', $doc );
+    my @out = yq->filter( '[ .foo, .buzz, doc, .baz, "bo/ck" ]', $doc );
     cmp_deeply \@out, [
         [
             $doc->{foo},
             $doc->{buzz},
             'doc',
             $doc->{baz},
+            "bo/ck",
         ],
     ] or diag explain \@out;
 };
@@ -151,7 +152,7 @@ subtest 'binary comparison operators' => sub {
         subtest 'FILTER eq CONSTANT' => sub {
             my $out = yq->filter( '.foo eq bar', $doc );
             ok isTrue( $out );
-            $out = yq->filter( '.foo eq jump', $doc );
+            $out = yq->filter( '.foo eq "jump"', $doc );
             ok isFalse( $out );
         };
         subtest 'FILTER eq FILTER' => sub {
@@ -163,7 +164,7 @@ subtest 'binary comparison operators' => sub {
     };
     subtest 'ne' => sub {
         subtest 'FILTER ne CONSTANT' => sub {
-            my $out = yq->filter( '.foo ne bar', $doc );
+            my $out = yq->filter( ".foo ne 'bar'", $doc );
             ok isFalse( $out );
             $out = yq->filter( '.foo ne jump', $doc );
             ok isTrue( $out );
@@ -196,7 +197,7 @@ subtest 'conditional with else' => sub {
     my $out = yq->filter( $filter, $doc );
     cmp_deeply $out, $doc->{foo};
 
-    $filter = 'if .foo eq buzz then .foo else .baz';
+    $filter = 'if .foo eq "buzz" then .foo else .baz';
     $out = yq->filter( $filter, $doc );
     cmp_deeply $out, $doc->{baz};
 };
@@ -214,7 +215,7 @@ subtest 'functions' => sub {
     };
 
     subtest 'grep( EXPR )' => sub {
-        my $filter = 'grep( .foo eq bar )';
+        my $filter = "grep( .foo eq 'bar' )";
         my $out = yq->filter( $filter, $doc );
         cmp_deeply $out, $doc;
     };

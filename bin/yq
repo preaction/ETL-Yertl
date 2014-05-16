@@ -7,6 +7,7 @@ use Pod::Usage::Return qw( pod2usage );
 use Getopt::Long qw( GetOptionsFromArray );
 use YAML;
 use boolean qw( :all );
+use Text::Balanced qw( extract_delimited gen_delimited_pat );
 
 $|++; # no buffering
 
@@ -85,11 +86,15 @@ sub write {
     }
 }
 
+my $QUOTE_STRING = gen_delimited_pat(q{'"}, q{\\});
+
 # Match a document path
 my $FILTER = qr{
         [.] # entire document
         |
         (?:[.](?:\w+|\[\d*\]))+ # hash/array lookup
+        |
+        $QUOTE_STRING
         |
         \w+ # Constant/bareword
     }x;
@@ -157,9 +162,12 @@ sub filter {
     }
     # Hash and array keys to traverse the data structure
     elsif ( $filter =~ /^($FILTER)$/ ) {
+        # Extract quoted strings
+        if ( $filter =~ /^(['"])(.+)(\1)$/ ) {
+            return $2;
+        }
         # Constants/barewords do not begin with .
-        # Future: quoted strings with Text::Balanced maybe?
-        if ( $filter !~ /^[.]/ ) {
+        elsif ( $filter !~ /^[.]/ ) {
             # If it's not a reserved word, it's a string
             # XXX: This is a very poor decision...
             return $filter;
@@ -344,6 +352,11 @@ Use [] with no index to flatten an array.
 
 =over
 
+=item 'STRING' "STRING"
+
+Both single- and double-quoted strings are allowed. Using \ will escape
+the string delimiter.
+
 =item { KEY: EXPRESSION, ... }
 
 The hash constructor. C<KEY> may be any C<FILTER> or a bare value.
@@ -403,12 +416,11 @@ This is especially useful in conditionals:
 
 =item Values
 
-Any bareword that is not recognized as a syntax element is treated
-as a value.
+Any bareword that is not recognized as a syntax element is treated as a value.
+These barewords may only contain letters, numbers, and underscore.
 
 B<NOTE>: This may be subject to change to only allow quoted strings and bare
-numbers in a future version, even though quoted strings are not currently
-allowed.
+numbers in a future version.
 
 =back
 
