@@ -125,4 +125,12 @@ ENDYML
     ];
 };
 
+subtest 'version check' => sub {
+    local $yq::VERSION = '1.00';
+    my ( $output, $stderr, $exit ) = capture { yq->main( '--version' ) };
+    is $exit, 0;
+    ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
+    is $output, "yq version 1.00 (Perl $^V)\n";
+};
+
 done_testing;

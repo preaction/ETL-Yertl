@@ -26,8 +26,13 @@ sub main {
     GetOptionsFromArray( \@argv, \%opt,
         'help|h',
         'verbose|v+',
+        'version',
     );
     return pod2usage(0) if $opt{help};
+    if ( $opt{version} ) {
+        print "yq version $yq::VERSION (Perl $^V)\n";
+        return 0;
+    }
 
     $VERBOSE = $opt{verbose};
 
@@ -298,6 +303,10 @@ with debugging.
 =head2 -h | --help
 
 Show this help document.
+
+=head2 --version
+
+Print the current yq and Perl versions.
 
 =head1 SYNTAX
 
