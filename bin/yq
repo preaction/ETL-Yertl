@@ -134,6 +134,7 @@ my $PIPE = qr{[|]};
 # Filter MUST NOT mutate $doc!
 sub filter {
     my ( $class, $filter, $doc, $scope ) = @_;
+    # Pipes: LEFT | RIGHT pipes the output of LEFT to the input of RIGHT
     if ( $filter =~ $PIPE ) {
         my @exprs = split /\s*$PIPE\s*/, $filter;
         my @in = ( $doc );
@@ -157,6 +158,7 @@ sub filter {
         }
         return \%out;
     }
+    # Array constructor
     elsif ( $filter =~ /^\[/ ) {
         my @out;
         my ( $inner ) = $filter =~ /^\[\s*([^\]]+?)\s*\]$/;
@@ -170,6 +172,7 @@ sub filter {
         my @filters = split /\s*,\s*/, $filter;
         return map { $class->filter( $_, $doc ) } @filters;
     }
+    # Function calls
     elsif ( $filter =~ /^($FUNC_NAME)(?:\(\s*($EXPR)\s*\))?$/ ) {
         my ( $func, $expr ) = ( $1, $2 );
         if ( $func eq 'empty' ) {
@@ -226,6 +229,7 @@ sub filter {
         }
         return $subdoc;
     }
+    # Binary operators
     elsif ( $filter =~ /^($FILTER)\s+($OP)\s+($FILTER)$/ ) {
         my ( $lhs_filter, $cond, $rhs_filter ) = ( $1, $2, $3 );
         my $lhs_value = $class->filter( $lhs_filter, $doc );
@@ -249,7 +253,7 @@ sub filter {
                 || $lhs_value != $rhs_value ? true : false;
         }
     }
-    # If/then (future: else, better conditions)
+    # Conditional (if/then/else)
     # NOTE: If we're capturing using $EXPR, then we _must_ use named captures,
     # because $EXPR has captures in itself
     elsif ( $filter =~ /^if\s+(?<expr>$EXPR)\s+then\s+(?<true>$FILTER)(?:\s+else\s+(?<false>$FILTER))?$/ ) {
