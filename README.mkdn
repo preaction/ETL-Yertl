@@ -4,13 +4,13 @@ yq - Filter YAML through a command-line program
 
 # VERSION
 
-version 0.010
+version 0.011
 
 # SYNOPSIS
 
-    yq <script> [<file>...]
+    yq [-v] <script> [<file>...]
 
-    yq -h|--help
+    yq -h|--help|--version
 
 # DESCRIPTION
 
@@ -30,9 +30,18 @@ specified, filter STDIN.
 
 # OPTIONS
 
+## \-v | --verbose
+
+Set verbose mode to print out some internal program messages on STDERR to help
+with debugging.
+
 ## \-h | --help
 
 Show this help document.
+
+## \--version
+
+Print the current yq and Perl versions.
 
 # SYNTAX
 
@@ -320,6 +329,39 @@ output stream.
         bar
         ---
         fuzz
+
+- |
+
+    Multiple EXPRESSIONS may be separated by pipes to give the output of the left
+    expression as the input of the right expression (much like how shell pipes
+    work).
+
+        # INPUT
+        foo: bar
+        baz: fuzz
+        pop: more
+        ---
+        foo: buzz
+        baz: fizz
+        pop: jump
+
+        $ yq '{ foo: .foo, val: .pop } | group_by( .foo )'
+        bar:
+            - foo: bar
+              val: more
+        buzz:
+            - foo: buzz
+              val: jump
+
+    The above example can be useful to avoid `group_by` memory issues when dealing
+    with very large streams: Reduce the size of the working document by keeping
+    only the keys you want, then group those documents.
+
+# ENVIRONMENT
+
+- YQ\_VERBOSE
+
+    Set the verbosity level. Useful when running the tests.
 
 # SEE ALSO
 
