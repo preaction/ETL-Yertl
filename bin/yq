@@ -34,7 +34,7 @@ sub main {
         return 0;
     }
 
-    $VERBOSE = $opt{verbose};
+    $VERBOSE //= $opt{verbose};
 
     my $filter = shift @argv;
     return pod2usage("ERROR: Must give a filter") unless $filter;
@@ -230,18 +230,23 @@ sub filter {
         my ( $lhs_filter, $cond, $rhs_filter ) = ( $1, $2, $3 );
         my $lhs_value = $class->filter( $lhs_filter, $doc );
         my $rhs_value = $class->filter( $rhs_filter, $doc );
-        diag( 1, join " ", "BINOP:", $lhs_value, $cond, $rhs_value );
+        diag( 1, join " ", "BINOP:", $lhs_value // '<undef>', $cond, $rhs_value // '<undef>' );
         if ( $cond eq 'eq' ) {
-            return $lhs_value eq $rhs_value ? true : false;
+            return defined $lhs_value == defined $rhs_value 
+                && $lhs_value eq $rhs_value
+                ? true : false;
         }
         elsif ( $cond eq 'ne' ) {
-            return $lhs_value ne $rhs_value ? true : false;
+            return defined $lhs_value != defined $rhs_value
+                || $lhs_value ne $rhs_value ? true : false;
         }
         elsif ( $cond eq '==' ) {
-            return $lhs_value == $rhs_value ? true : false;
+            return defined $lhs_value == defined $rhs_value
+                && $lhs_value == $rhs_value ? true : false;
         }
         elsif ( $cond eq '!=' ) {
-            return $lhs_value != $rhs_value ? true : false;
+            return defined $lhs_value != defined $rhs_value
+                || $lhs_value != $rhs_value ? true : false;
         }
     }
     # If/then (future: else, better conditions)
