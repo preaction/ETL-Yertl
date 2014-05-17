@@ -97,6 +97,7 @@ sub diag {
 }
 
 my $QUOTE_STRING = $RE{delimited}{-delim=>q{'"}};
+my $EVAL_NUMS = qr{(?:0b$RE{num}{bin}|0$RE{num}{oct}|0x$RE{num}{hex})};
 
 # Match a document path
 my $FILTER = qr{
@@ -106,9 +107,11 @@ my $FILTER = qr{
         |
         $QUOTE_STRING
         |
+        $RE{num}{real}|$EVAL_NUMS
+        |
         \w+ # Constant/bareword
     }x;
-my $OP = qr{eq|ne};
+my $OP = qr{eq|ne|==|!=};
 my $FUNC_NAME = qr{empty|select|grep|group_by};
 my $EXPR = qr{
     \{(\s*$FILTER\s*:\s*(?0)\s*(?:,(?-1))*)\} # Hash constructor
@@ -189,6 +192,11 @@ sub filter {
         if ( $filter =~ /^(['"])(.+)(\1)$/ ) {
             return $2;
         }
+        # Eval numbers to allow bin, hex, and oct
+        elsif ( $filter =~ /^$EVAL_NUMS$/ ) {
+            ## no critic ( ProhibitStringyEval )
+            return eval $filter;
+        }
         # Constants/barewords do not begin with .
         elsif ( $filter !~ /^[.]/ ) {
             # If it's not a reserved word, it's a string
@@ -217,21 +225,18 @@ sub filter {
         my ( $lhs_filter, $cond, $rhs_filter ) = ( $1, $2, $3 );
         my $lhs_value = $class->filter( $lhs_filter, $doc );
         my $rhs_value = $class->filter( $rhs_filter, $doc );
+        diag( 1, join " ", "BINOP:", $lhs_value, $cond, $rhs_value );
         if ( $cond eq 'eq' ) {
-            if ( defined $lhs_value == defined $rhs_value && $lhs_value eq $rhs_value ) {
-                return true;
-            }
-            else {
-                return false;
-            }
+            return $lhs_value eq $rhs_value ? true : false;
         }
         elsif ( $cond eq 'ne' ) {
-            if ( $lhs_value ne $rhs_value ) {
-                return true;
-            }
-            else {
-                return false;
-            }
+            return $lhs_value ne $rhs_value ? true : false;
+        }
+        elsif ( $cond eq '==' ) {
+            return $lhs_value == $rhs_value ? true : false;
+        }
+        elsif ( $cond eq '!=' ) {
+            return $lhs_value != $rhs_value ? true : false;
         }
     }
     # If/then (future: else, better conditions)
