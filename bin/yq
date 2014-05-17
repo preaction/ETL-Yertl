@@ -273,9 +273,9 @@ exit __PACKAGE__->main( @ARGV ) unless caller(0);
 
 =head1 SYNOPSIS
 
-    yq <script> [<file>...]
+    yq [-v] <script> [<file>...]
 
-    yq -h|--help
+    yq -h|--help|--version
 
 =head1 DESCRIPTION
 
