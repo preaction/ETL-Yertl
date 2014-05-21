@@ -559,6 +559,50 @@ The two sides may be L<FILTERS> or L<VALUES>.
 YAML treats the string "true" as a true value, and the string "false" as a
 false value.
 
+=item ==
+
+Numeric equals comparison. Returns true if both sides are equal to each other
+when treated as numbers. If one of the items is not a number, will print a
+warning to STDERR but try to compare anyway.
+
+The two sides may be L<FILTERS> or L<VALUES>.
+
+    # INPUT
+    one: 1
+    two: 2
+    uno: 1
+
+    $ yq '.one == 1'
+    true
+
+    $ yq '.one == 2'
+    false
+
+    $ yq '.one == .uno'
+    true
+
+=item !=
+
+Numeric not equals comparison. Returns true if both sides are equal to each
+other when treated as numbers. If one of the items is not a number, will print
+a warning to STDERR but try to compare anyway.
+
+The two sides may be L<FILTERS> or L<VALUES>.
+
+    # INPUT
+    one: 1
+    two: 2
+    uno: 1
+
+    $ yq '.two != 1'
+    true
+
+    $ yq '.two != 2'
+    false
+
+    $ yq '.one != .uno'
+    false
+
 =back
 
 =head2 FUNCTIONS

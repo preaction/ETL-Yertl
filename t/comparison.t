@@ -7,6 +7,9 @@ my $doc = {
     foo => 'bar',
     baz => 'fuzz',
     buzz => 'bar',
+    one => 1,
+    two => 2,
+    uno => 1,
 };
 
 subtest 'eq' => sub {
@@ -36,6 +39,36 @@ subtest 'ne' => sub {
         ok isFalse( $out );
         $out = yq->filter( '.foo ne .baz', $doc );
         ok isTrue( $out );
+    };
+};
+
+subtest '==' => sub {
+    subtest 'FILTER == CONSTANT' => sub {
+        my $out = yq->filter( ".one == 1", $doc );
+        ok isTrue( $out );
+        $out = yq->filter( '.one == 2', $doc );
+        ok isFalse( $out );
+    };
+    subtest 'FILTER == FILTER' => sub {
+        my $out = yq->filter( ".one == .uno", $doc );
+        ok isTrue( $out );
+        $out = yq->filter( '.one == .two', $doc );
+        ok isFalse( $out );
+    };
+};
+
+subtest '!=' => sub {
+    subtest 'FILTER != CONSTANT' => sub {
+        my $out = yq->filter( ".one != 2", $doc );
+        ok isTrue( $out );
+        $out = yq->filter( '.one != 1', $doc );
+        ok isFalse( $out );
+    };
+    subtest 'FILTER != FILTER' => sub {
+        my $out = yq->filter( ".one != .two", $doc );
+        ok isTrue( $out );
+        $out = yq->filter( '.one != .uno', $doc );
+        ok isFalse( $out );
     };
 };
 
