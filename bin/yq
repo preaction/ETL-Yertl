@@ -116,7 +116,7 @@ my $FILTER = qr{
         |
         \w+ # Constant/bareword
     }x;
-my $OP = qr{eq|ne|==|!=};
+my $OP = qr{eq|ne|==|!=|>=?|<=?};
 my $FUNC_NAME = qr{empty|select|grep|group_by|keys|length};
 my $EXPR = qr{
     \{(\s*$FILTER\s*:\s*(?0)\s*(?:,(?-1))*)\} # Hash constructor
@@ -267,10 +267,11 @@ sub filter {
         my $lhs_value = $class->filter( $lhs_filter, $doc );
         my $rhs_value = $class->filter( $rhs_filter, $doc );
         diag( 1, join " ", "BINOP:", $lhs_value // '<undef>', $cond, $rhs_value // '<undef>' );
+        # These operators suppress undef warnings, treating undef as just
+        # another value. Undef will never be treated as '' or 0 here.
         if ( $cond eq 'eq' ) {
             return defined $lhs_value == defined $rhs_value 
-                && $lhs_value eq $rhs_value
-                ? true : false;
+                && $lhs_value eq $rhs_value ? true : false;
         }
         elsif ( $cond eq 'ne' ) {
             return defined $lhs_value != defined $rhs_value
@@ -283,6 +284,20 @@ sub filter {
         elsif ( $cond eq '!=' ) {
             return defined $lhs_value != defined $rhs_value
                 || $lhs_value != $rhs_value ? true : false;
+        }
+        # These operators allow undef warnings, since equating undef to 0 or ''
+        # can be a cause of problems.
+        elsif ( $cond eq '>' ) {
+            return $lhs_value > $rhs_value ? true : false;
+        }
+        elsif ( $cond eq '>=' ) {
+            return $lhs_value >= $rhs_value ? true : false;
+        }
+        elsif ( $cond eq '<' ) {
+            return $lhs_value < $rhs_value ? true : false;
+        }
+        elsif ( $cond eq '<=' ) {
+            return $lhs_value <= $rhs_value ? true : false;
         }
     }
     # Conditional (if/then/else)
@@ -602,6 +617,50 @@ The two sides may be L<FILTERS> or L<VALUES>.
 
     $ yq '.one != .uno'
     false
+
+=item > / >=
+
+Numeric greater-than (or equal-to) comparison. Returns true if the left side is
+greater than (or equal-to) the right side. If one of the items is not a number,
+will print a warning to STDERR but try to compare anyway.
+
+The two sides may be L<FILTERS> or L<VALUES>.
+
+    # INPUT
+    one: 1
+    two: 2
+    uno: 1
+
+    $ yq '.two >= 1'
+    true
+
+    $ yq '.two > 2'
+    false
+
+    $ yq '.one >= .uno'
+    true
+
+=item < / <=
+
+Numeric less-than (or equal-to) comparison. Returns true if the left side is
+less than (or equal-to) the right side. If one of the items is not a number,
+will print a warning to STDERR but try to compare anyway.
+
+The two sides may be L<FILTERS> or L<VALUES>.
+
+    # INPUT
+    one: 1
+    two: 2
+    uno: 1
+
+    $ yq '.two <= 1'
+    false
+
+    $ yq '.two < 2'
+    false
+
+    $ yq '.one <= .uno'
+    true
 
 =back
 

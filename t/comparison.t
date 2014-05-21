@@ -72,4 +72,74 @@ subtest '!=' => sub {
     };
 };
 
+subtest '>|>=' => sub {
+    subtest 'FILTER > CONSTANT' => sub {
+        my $out = yq->filter( ".one > 2", $doc );
+        ok isFalse( $out );
+        $out = yq->filter( ".one > 0", $doc );
+        ok isTrue( $out );
+        $out = yq->filter( '.one > 1', $doc );
+        ok isFalse( $out );
+    };
+    subtest 'FILTER > FILTER' => sub {
+        my $out = yq->filter( ".one > .two", $doc );
+        ok isFalse( $out );
+        $out = yq->filter( ".two > .one", $doc );
+        ok isTrue( $out );
+        $out = yq->filter( '.one > .uno', $doc );
+        ok isFalse( $out );
+    };
+    subtest 'FILTER >= CONSTANT' => sub {
+        my $out = yq->filter( ".one >= 2", $doc );
+        ok isFalse( $out );
+        $out = yq->filter( ".one >= 0", $doc );
+        ok isTrue( $out );
+        $out = yq->filter( '.one >= 1', $doc );
+        ok isTrue( $out );
+    };
+    subtest 'FILTER >= FILTER' => sub {
+        my $out = yq->filter( ".one >= .two", $doc );
+        ok isFalse( $out );
+        $out = yq->filter( ".two >= .one", $doc );
+        ok isTrue( $out );
+        $out = yq->filter( '.one >= .uno', $doc );
+        ok isTrue( $out );
+    };
+};
+
+subtest '<|<=' => sub {
+    subtest 'FILTER < CONSTANT' => sub {
+        my $out = yq->filter( ".one < 2", $doc );
+        ok isTrue( $out );
+        $out = yq->filter( ".one < 0", $doc );
+        ok isFalse( $out );
+        $out = yq->filter( '.one < 1', $doc );
+        ok isFalse( $out );
+    };
+    subtest 'FILTER < FILTER' => sub {
+        my $out = yq->filter( ".one < .two", $doc );
+        ok isTrue( $out );
+        $out = yq->filter( ".two < .one", $doc );
+        ok isFalse( $out );
+        $out = yq->filter( '.one < .uno', $doc );
+        ok isFalse( $out );
+    };
+    subtest 'FILTER <= CONSTANT' => sub {
+        my $out = yq->filter( ".one <= 2", $doc );
+        ok isTrue( $out );
+        $out = yq->filter( ".one <= 0", $doc );
+        ok isFalse( $out );
+        $out = yq->filter( '.one <= 1', $doc );
+        ok isTrue( $out );
+    };
+    subtest 'FILTER <= FILTER' => sub {
+        my $out = yq->filter( ".one <= .two", $doc );
+        ok isTrue( $out );
+        $out = yq->filter( ".two <= .one", $doc );
+        ok isFalse( $out );
+        $out = yq->filter( '.one <= .uno', $doc );
+        ok isTrue( $out );
+    };
+};
+
 done_testing;
