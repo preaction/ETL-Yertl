@@ -57,4 +57,40 @@ subtest 'group_by( EXPR )' => sub {
     cmp_deeply $out[0], { bar => [ @docs[0..1] ], baz => [ $docs[2] ] };
 };
 
+subtest 'keys( EXPR )' => sub {
+    my $doc = {
+        foo => {
+            one => 1,
+            two => 2,
+            three => 3,
+        },
+        baz => [ 3, 2, 1 ],
+    };
+
+    subtest 'keys of whole document' => sub {
+        my $out = yq->filter( 'keys( . )', $doc );
+        cmp_deeply $out, bag(qw( foo baz ));
+    };
+
+    subtest 'keys of hash inside document' => sub {
+        my $out = yq->filter( 'keys( .foo )', $doc );
+        cmp_deeply $out, bag(qw( one two three ));
+    };
+
+    subtest 'keys of array inside document' => sub {
+        my $out = yq->filter( 'keys( .baz )', $doc );
+        cmp_deeply $out, bag(qw( 0 1 2 ));
+    };
+
+    subtest 'keys with no args -> keys(.)' => sub {
+        my $out = yq->filter( 'keys', $doc );
+        cmp_deeply $out, bag(qw( foo baz ));
+    };
+
+    subtest 'allow assignment' => sub {
+        my $out = yq->filter( '{ k: keys( .foo ) }', $doc );
+        cmp_deeply $out, { k => bag(qw( one two three )) };
+    };
+};
+
 done_testing;
