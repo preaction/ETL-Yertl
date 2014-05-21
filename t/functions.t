@@ -93,4 +93,44 @@ subtest 'keys( EXPR )' => sub {
     };
 };
 
+subtest 'length( EXPR )' => sub {
+    my $doc = {
+        foo => {
+            one => 1,
+            two => 'onetwothreefourfive',
+            three => 3,
+        },
+        baz => [ 3, 2, 1 ],
+    };
+
+    subtest 'length of whole document (hash)' => sub {
+        my $out = yq->filter( 'length(.)', $doc );
+        is $out, 2;
+    };
+    subtest 'length with no args -> length(.)' => sub {
+        my $out = yq->filter( 'length', $doc );
+        is $out, 2;
+    };
+    subtest 'length of inner hash (# of pairs)' => sub {
+        my $out = yq->filter( 'length( .foo )', $doc );
+        is $out, 3;
+    };
+    subtest 'length of array' => sub {
+        my $out = yq->filter( 'length( .baz )', $doc );
+        is $out, 3;
+    };
+    subtest 'length of string' => sub {
+        my $out = yq->filter( 'length( .foo.two )', $doc );
+        is $out, 19;
+    };
+    subtest 'length of number' => sub {
+        my $out = yq->filter( 'length( .baz.[0] )', $doc );
+        is $out, 1;
+    };
+    subtest 'allow assignment' => sub {
+        my $out = yq->filter( '{ l: length( .foo.two ) }', $doc );
+        cmp_deeply $out, { l => 19 };
+    };
+};
+
 done_testing;

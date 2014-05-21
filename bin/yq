@@ -117,7 +117,7 @@ my $FILTER = qr{
         \w+ # Constant/bareword
     }x;
 my $OP = qr{eq|ne|==|!=};
-my $FUNC_NAME = qr{empty|select|grep|group_by|keys};
+my $FUNC_NAME = qr{empty|select|grep|group_by|keys|length};
 my $EXPR = qr{
     \{(\s*$FILTER\s*:\s*(?0)\s*(?:,(?-1))*)\} # Hash constructor
     |
@@ -175,6 +175,7 @@ sub filter {
     # Function calls
     elsif ( $filter =~ /^($FUNC_NAME)(?:\(\s*($EXPR)\s*\))?$/ ) {
         my ( $func, $expr ) = ( $1, $2 );
+        diag( 1, "F: $func, ARG: " . ( $expr || '' ) );
         if ( $func eq 'empty' ) {
             if ( $expr ) {
                 warn "empty does not take arguments\n";
@@ -204,6 +205,23 @@ sub filter {
             }
             else {
                 warn "keys() requires a hash or array";
+                return empty;
+            }
+        }
+        elsif ( $func eq 'length' ) {
+            $expr ||= '.';
+            my $value = $class->filter( $expr, $doc );
+            if ( ref $value eq 'HASH' ) {
+                return scalar keys %$value;
+            }
+            elsif ( ref $value eq 'ARRAY' ) {
+                return scalar @$value;
+            }
+            elsif ( !ref $value ) {
+                return length $value;
+            }
+            else {
+                warn "length() requires a hash, array, string, or number";
                 return empty;
             }
         }
@@ -547,10 +565,54 @@ false value.
 
 =over
 
+=item length( EXPRESSION )
+
+Returns the length of the thing returned by EXPRESSION. Depending on what type
+of thing that is:
+
+    string/number   - Returns the number of characters
+    array           - Returns the number of items
+    hash            - Returns the number of pairs
+
+If EXPRESSION is missing, gives the length of the entire document (C<length(.)>).
+Returns a number suitable for assignment.
+
+Although length() takes an expression, certain constructs are redundant:
+
+    length( keys( EXPRESSION ) ) -> length( EXPRESSION )
+    # length() works on hashes
+
+A future version may optimize these away, or warn you of their redundancy.
+
+    # INPUT
+    foo:
+        one: 1
+        two: onetwothreefourfive
+        three: 3
+    baz: [ 3, 2, 1 ],
+
+    $ yq 'length(.)'
+    2
+
+    $ yq 'length'
+    2
+
+    $ yq 'length( .foo )'
+    3
+
+    $ yq 'length( .baz )'
+    3
+
+    $ yq 'length( .foo.two )'
+    19
+
+    $ yq '{ l: length( .foo.two ) }'
+    l: 19
+
 =item keys( EXPRESSION )
 
-Return the keys of the hash or the indicies of the array pointed at by EXPRESSION.
-If EXPRESSION is missing, gives the keys of the entire document C<keys(.)>.
+Return the keys of the hash or the indicies of the array returned by EXPRESSION.
+If EXPRESSION is missing, gives the keys of the entire document (C<keys(.)>).
 
 Returns an array suitable for assignment.
 
