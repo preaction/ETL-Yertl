@@ -27,7 +27,7 @@ my $FILTER = qr{
         \w+ # Constant/bareword
     }x;
 my $OP = qr{eq|ne|==|!=|>=?|<=?};
-my $FUNC_NAME = qr{empty|select|grep|group_by|keys|length};
+my $FUNC_NAME = qr{empty|select|grep|group_by|keys|length|sort};
 my $EXPR = qr{
     \{(\s*$FILTER\s*:\s*(?0)\s*(?:,(?-1))*)\} # Hash constructor
     |
@@ -103,6 +103,12 @@ sub filter {
         elsif ( $func eq 'group_by' ) {
             my $grouping = $class->filter( $expr, $doc );
             push @{ $scope->{ group_by }{ $grouping } }, $doc;
+            return;
+        }
+        elsif ( $func eq 'sort' ) {
+            $expr ||= '.';
+            my $value = $class->filter( $expr, $doc );
+            push @{ $scope->{sort} }, [ "$value", $doc ];
             return;
         }
         elsif ( $func eq 'keys' ) {

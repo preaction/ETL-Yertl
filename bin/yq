@@ -102,7 +102,12 @@ use App::YAML::Filter::Regex;
 
 sub finish {
     my ( $class, $scope ) = @_;
-    return $scope->{group_by} if ( $scope->{group_by} );
+    if ( $scope->{sort} ) {
+        return map { $_->[1] } sort { $a->[0] cmp $b->[0] } @{ $scope->{sort} };
+    }
+    elsif ( $scope->{group_by} ) {
+        return $scope->{group_by};
+    }
     return;
 }
 

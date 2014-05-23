@@ -57,6 +57,32 @@ subtest 'group_by( EXPR )' => sub {
     cmp_deeply $out[0], { bar => [ @docs[0..1] ], baz => [ $docs[2] ] };
 };
 
+subtest 'sort( EXPR )' => sub {
+    my @docs = (
+        {
+            foo => 'bar',
+            baz => 1,
+        },
+        {
+            foo => 'baq',
+            baz => 2,
+        },
+        {
+            foo => 'baz',
+            baz => 3,
+        },
+    );
+    subtest 'sort by string' => sub {
+        my $scope = {};
+        for my $doc ( @docs ) {
+            my $out = yq->filter( 'sort( .foo )', $doc, $scope );
+            ok !$out, 'sort delays output';
+        }
+        my @out = yq->finish( $scope );
+        cmp_deeply \@out, [ @docs[1,0,2] ]
+    };
+};
+
 subtest 'keys( EXPR )' => sub {
     my $doc = {
         foo => {
