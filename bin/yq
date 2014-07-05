@@ -7,6 +7,7 @@ use Pod::Usage::Return qw( pod2usage );
 use Getopt::Long qw( GetOptionsFromArray );
 use YAML;
 use boolean qw( :all );
+use Module::Runtime qw( use_module );
 
 $|++; # no buffering
 
@@ -97,8 +98,12 @@ sub diag {
     print STDERR "$text\n" if $VERBOSE >= $level;
 }
 
-use App::YAML::Filter::Regex;
-*filter = *App::YAML::Filter::Regex::filter;
+$ENV{YQ_CLASS} ||= 'App::YAML::Filter::Regex';
+use_module( $ENV{YQ_CLASS} );
+{
+    no strict 'refs';
+    *filter = *{ $ENV{YQ_CLASS} . "::filter" };
+}
 
 sub finish {
     my ( $class, $scope ) = @_;
