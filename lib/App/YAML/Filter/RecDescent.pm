@@ -8,6 +8,8 @@ use Parse::RecDescent;
 $::RD_HINT = 1;
 
 my $grammar = q{
+    { sub one { return ref $_[0] eq 'ARRAY' ? $_[0]->[0] : $_[0] } }
+
     program: statement ( comb statement )(s?)
         {
             use Data::Dumper;
@@ -67,13 +69,7 @@ my $grammar = q{
             use Data::Dumper;
             yq::diag( 1, "Binop: " . Dumper( \@item ) );
             use boolean qw( true false );
-            my ( $lhs_value, $cond, $rhs_value ) = ( $item[1], $item[2], $item[3] );
-            if ( ref $lhs_value eq 'ARRAY' ) {
-                $lhs_value = $lhs_value->[0];
-            }
-            if ( ref $rhs_value eq 'ARRAY' ) {
-                $rhs_value = $rhs_value->[0];
-            }
+            my ( $lhs_value, $cond, $rhs_value ) = ( one($item[1]), $item[2], one($item[3]) );
             # These operators suppress undef warnings, treating undef as just
             # another value. Undef will never be treated as '' or 0 here.
             if ( $cond eq 'eq' ) {
@@ -106,7 +102,6 @@ my $grammar = q{
             elsif ( $cond eq '<=' ) {
                 $return = $lhs_value <= $rhs_value ? true : false;
             }
-            $return = [ $return ];
         }
 
     function_call: function_name arguments(?)
@@ -216,17 +211,21 @@ my $parser = Parse::RecDescent->new( $grammar );
 
 sub filter {
     my ( $class, $filter, $doc, $scope ) = @_;
-    ; $yq::VERBOSE = 1;
+    $yq::VERBOSE = 1;
     $::document = $doc;
     $::scope = $scope;
     my $output = $parser->program( $filter );
-    ; use Data::Dumper;
-    ; print "OUTPUT: " . Dumper $output;
-    if ( wantarray ) {
+    #; use Data::Dumper;
+    #; print "Want array: " . wantarray;
+    #; print "OUTPUT: " . Dumper $output;
+    if ( wantarray && ref $output eq 'ARRAY' ) {
         return @$output;
     }
-    else {
+    elsif ( ref $output eq 'ARRAY' ) {
         return $output->[-1];
+    }
+    else {
+        return $output;
     }
 }
 
