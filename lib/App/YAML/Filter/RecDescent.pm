@@ -13,6 +13,7 @@ my $grammar = q{
         sub is_list { return ref $_[0] eq 'list' }
         sub flatten { map { is_list( $_ ) ? @$_ : $_ } @_ }
         sub list { return bless [ flatten( @_ ) ], 'list' }
+        sub empty { return bless {}, 'empty' }
     }
 
     program: statement ( comb statement )(s?)
@@ -129,7 +130,7 @@ my $grammar = q{
                 if ( @$args ) {
                     warn "empty does not take arguments\n";
                 }
-                $return = list( undef );
+                $return = list( empty );
             }
             elsif ( $func eq 'select' || $func eq 'grep' ) {
                 if ( !@$args ) {
