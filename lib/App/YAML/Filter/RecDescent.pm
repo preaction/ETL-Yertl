@@ -140,11 +140,11 @@ my $grammar = q{
             }
             elsif ( $func eq 'group_by' ) {
                 push @{ $::scope->{ group_by }{ one( $args->[0] ) } }, $::document;
-                $return = list( undef );
+                $return = list();
             }
             elsif ( $func eq 'sort' ) {
                 push @{ $::scope->{ sort } }, [ one( @$args ), $::document ];
-                $return = list( undef );
+                $return = list();
             }
             elsif ( $func eq 'keys' ) {
                 my $value = @$args ? one( $args->[0] ) : $::document;
@@ -172,7 +172,7 @@ my $grammar = q{
                 }
                 else {
                     warn "length() requires a hash, array, string, or number";
-                    $return = undef;
+                    $return = list( undef );
                 }
             }
         }
@@ -259,14 +259,14 @@ sub is_list {
 
 sub filter {
     my ( $class, $filter, $doc, $scope ) = @_;
-    $yq::VERBOSE = 1;
+    #$yq::VERBOSE = 1;
     $::document = $doc;
     $::scope = $scope;
     my $output = $parser->program( $filter );
-    ; use Data::Dumper;
-    ; print "Want array: " . wantarray;
-    ; print "OUTPUT: " . Dumper $output;
-    ; print "SCOPE: " . Dumper $scope;
+    #; use Data::Dumper;
+    #; print "Want array: " . wantarray;
+    #; print "OUTPUT: " . Dumper $output;
+    #; print "SCOPE: " . Dumper $scope;
     if ( wantarray && is_list( $output ) ) {
         return @$output;
     }
