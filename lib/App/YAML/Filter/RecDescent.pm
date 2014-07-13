@@ -145,6 +145,10 @@ my $grammar = q{
                 push @{ $::scope->{ group_by }{ one( $args->[0] ) } }, $::document;
                 $return = list( undef );
             }
+            elsif ( $func eq 'sort' ) {
+                push @{ $::scope->{ sort } }, [ one( @$args ), $::document ];
+                $return = list( undef );
+            }
             elsif ( $func eq 'keys' ) {
                 my $value = @$args ? one( $args->[0] ) : $::document;
                 if ( ref $value eq 'HASH' ) {
@@ -251,7 +255,7 @@ my $grammar = q{
 
     non_quote: /(?:[^'"]|(?<=\\\\)['"])+/
 
-    function_name: "empty" | "select" | "grep" | "group_by" | "keys" | "length"
+    function_name: "empty" | "select" | "grep" | "group_by" | "keys" | "length" | "sort"
 
     op: "eq" | "ne" | "==" | "!=" | ">" | ">=" | "<" | "<="
 
