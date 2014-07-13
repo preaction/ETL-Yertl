@@ -5,10 +5,15 @@ use App::YAML::Filter::Base;
 use boolean qw( :all );
 use Parse::RecDescent;
 
+$::RD_ERRORS = 1;
+$::RD_WARN = 1;
 $::RD_HINT = 1;
+#$::RD_TRACE = 1;
 
 my $grammar = q{
     {
+        use Data::Dumper;
+        use boolean qw( true false );
         sub one { return is_list( $_[0] ) ? $_[0]->[0] : $_[0] }
         sub is_list { return ref $_[0] eq 'list' }
         sub flatten { map { is_list( $_ ) ? @$_ : $_ } @_ }
@@ -18,21 +23,18 @@ my $grammar = q{
 
     program: statement ( comb statement )(s?)
         {
-            use Data::Dumper;
             yq::diag( 1, "Program: " . Dumper( \@item ) );
             $return = list( $item[1] );
         }
 
     statement: conditional | expr
         {
-            use Data::Dumper;
             yq::diag( 1, "Statement: " . Dumper( \@item ) );
             $return = $item[1];
         }
 
     conditional: 'if' expr 'then' expr ( 'else' expr )(?)
         {
-            use Data::Dumper;
             yq::diag( 1, "Conditional: " . Dumper( \@item ) );
             $return = list( one( $item[2] ) ? $item[4] : $item[5][0] );
         }
@@ -40,13 +42,11 @@ my $grammar = q{
     expr: function_call | hash | array | binop | filter | quote_string | number | word
         {
             $return = list( $item[1] );
-            use Data::Dumper;
             yq::diag( 1, "Expr: " . Dumper( \@item ) );
         }
 
     filter: '.' <skip:""> filter_part(s? /[.]/)
         {
-            use Data::Dumper;
             yq::diag( 1, "Filter: " . Dumper( \@item ) );
             my @keys = @{$item[3]};
             $return = list( $::document );
@@ -81,9 +81,7 @@ my $grammar = q{
 
     binop: (filter|quote_string|number|word) op (filter|quote_string|number|word)
         {
-            use Data::Dumper;
             yq::diag( 1, "Binop: " . Dumper( [ one($item[1]), $item[2], one($item[3]) ] ) );
-            use boolean qw( true false );
             my ( $lhs_value, $cond, $rhs_value ) = ( one($item[1]), $item[2], one($item[3]) );
             # These operators suppress undef warnings, treating undef as just
             # another value. Undef will never be treated as '' or 0 here.
@@ -122,7 +120,6 @@ my $grammar = q{
 
     function_call: function_name arguments(?)
         {
-            use Data::Dumper;
             yq::diag( 1, "FCall: " . Dumper( \@item ) );
             my $func = $item[1];
             my $args = $item[2];
@@ -182,7 +179,6 @@ my $grammar = q{
 
     hash: '{' pair(s /,/) '}'
         {
-            use Data::Dumper;
             yq::diag( 1, "Hash: " . Dumper \@item );
             $return = {};
             for my $i ( @{$item[2]} ) {
@@ -193,7 +189,6 @@ my $grammar = q{
 
     array: '[' expr(s /,/) ']'
         {
-            use Data::Dumper;
             yq::diag( 1, "Array: " . Dumper( \@item ) );
             $return = [ flatten( @{ $item[2] } ) ];
         }
@@ -201,7 +196,6 @@ my $grammar = q{
     arguments: '(' expr(s /,/) ')'
         {
             $return = list( @{ $item[2] } );
-            use Data::Dumper;
             yq::diag( 1, "Args: " . Dumper( \@item ) );
         }
 
@@ -215,35 +209,30 @@ my $grammar = q{
 
     number: binnum | hexnum | octnum | float | int
         {
-            use Data::Dumper;
             yq::diag( 1, "number: " . Dumper \@item );
         }
 
     binnum: /0b[01]+/
         {
             $return = eval $item[1];
-            use Data::Dumper;
             yq::diag( 1, "binnum: " . Dumper \@item );
         }
 
     hexnum: /0x[0-9A-Fa-f]+/
         {
             $return = eval $item[1];
-            use Data::Dumper;
             yq::diag( 1, "hexnum: " . Dumper \@item );
         }
 
     octnum: /0o?\d+/
         {
             $return = eval $item[1];
-            use Data::Dumper;
             yq::diag( 1, "octnum: " . Dumper \@item );
         }
 
     float: /-?\d+(?:[.]\d+)?(?:e\d+)?/
         {
             $return = $item[1];
-            use Data::Dumper;
             yq::diag( 1, "float: " . Dumper \@item );
         }
 
