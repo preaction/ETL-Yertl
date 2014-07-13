@@ -21,10 +21,10 @@ my $grammar = q{
         sub empty { return bless {}, 'empty' }
     }
 
-    program: statement ( comb statement )(s?)
+    program: <leftop: statement ',' statement>
         {
             yq::diag( 1, "Program: " . Dumper( \@item ) );
-            $return = list( $item[1] );
+            $return = list( @{ $item[1] } );
         }
 
     statement: conditional | expr
