@@ -211,7 +211,7 @@ my $grammar = q{
     key: filter | quote_string | word
 
     quote_string: quote non_quote quote
-        { $return = join "", @item[1..$#item] }
+        { $return = eval join "", @item[1..$#item] }
 
     number: binnum | hexnum | octnum | float | int
         {
