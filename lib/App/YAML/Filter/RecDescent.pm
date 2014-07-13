@@ -36,7 +36,7 @@ my $grammar = q{
             $return = list( one( $item[2] ) ? $item[4] : $item[5][0] );
         }
 
-    expr: function_call | hash | array | binop | filter | quote_string | word
+    expr: function_call | hash | array | binop | filter | quote_string | number | word
         {
             $return = list( $item[1] );
             use Data::Dumper;
@@ -78,7 +78,7 @@ my $grammar = q{
             }
         }
 
-    binop: (filter|word|quote_string) op (filter|word|quote_string)
+    binop: (filter|quote_string|number|word) op (filter|quote_string|number|word)
         {
             use Data::Dumper;
             yq::diag( 1, "Binop: " . Dumper( [ one($item[1]), $item[2], one($item[3]) ] ) );
@@ -208,7 +208,41 @@ my $grammar = q{
     quote_string: quote non_quote quote
         { $return = join "", @item[1..$#item] }
 
-    number: /\d+(?:[.]\d+)?(?:e\d+)?/
+    number: binnum | hexnum | octnum | float | int
+        {
+            use Data::Dumper;
+            yq::diag( 1, "number: " . Dumper \@item );
+        }
+
+    binnum: /0b[01]+/
+        {
+            $return = eval $item[1];
+            use Data::Dumper;
+            yq::diag( 1, "binnum: " . Dumper \@item );
+        }
+
+    hexnum: /0x[0-9A-Fa-f]+/
+        {
+            $return = eval $item[1];
+            use Data::Dumper;
+            yq::diag( 1, "hexnum: " . Dumper \@item );
+        }
+
+    octnum: /0o?\d+/
+        {
+            $return = eval $item[1];
+            use Data::Dumper;
+            yq::diag( 1, "octnum: " . Dumper \@item );
+        }
+
+    float: /-?\d+(?:[.]\d+)?(?:e\d+)?/
+        {
+            $return = $item[1];
+            use Data::Dumper;
+            yq::diag( 1, "float: " . Dumper \@item );
+        }
+
+    int: /-?\d+/
 
     word: /\w+/
 
