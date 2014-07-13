@@ -257,7 +257,7 @@ my $grammar = q{
 
     function_name: "empty" | "select" | "grep" | "group_by" | "keys" | "length" | "sort"
 
-    op: "eq" | "ne" | "==" | "!=" | ">" | ">=" | "<" | "<="
+    op: "eq" | "ne" | "==" | "!=" | ">=" | ">" | "<=" | "<"
 
     comb: ',' | '|'
 };
