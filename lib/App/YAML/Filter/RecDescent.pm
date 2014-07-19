@@ -259,23 +259,35 @@ sub is_list {
 
 sub filter {
     my ( $class, $filter, $doc, $scope ) = @_;
+
     #$yq::VERBOSE = 1;
-    $::document = $doc;
+    my @input = ( $doc );
+    my $output;
     $::scope = $scope;
-    my $output = $parser->program( $filter );
-    #; use Data::Dumper;
-    #; print "Want array: " . wantarray;
-    #; print "OUTPUT: " . Dumper $output;
-    #; print "SCOPE: " . Dumper $scope;
-    if ( wantarray && is_list( $output ) ) {
-        return @$output;
+
+    # We cannot interpret with |, because the right side of the pipe
+    # gets interpreted before the left side can change the document.
+    my @pipes = split /\s*[|]\s*/, $filter;
+    my @output;
+    for my $part ( @pipes ) {
+        @output = ();
+        for my $input ( @input ) {
+            $::document = $input;
+            my $output = $parser->program( $part );
+            #; use Data::Dumper;
+            #; print "Want array: " . wantarray;
+            #; print "OUTPUT: " . Dumper $output;
+            #; print "SCOPE: " . Dumper $scope;
+            if ( is_list( $output ) ) {
+                push @output, @$output;
+            }
+            else {
+                push @output, $output;
+            }
+        }
+        @input = @output;
     }
-    elsif ( is_list( $output ) ) {
-        return $output->[-1];
-    }
-    else {
-        return $output;
-    }
+    return wantarray ? @output : $output[0];
 }
 
 1;
