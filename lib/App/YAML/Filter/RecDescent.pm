@@ -207,7 +207,7 @@ my $grammar = q{
     quote_string: quote non_quote quote
         { $return = eval join "", @item[1..$#item] }
 
-    number: binnum | hexnum | octnum | float | int
+    number: binnum | hexnum | octnum | float
         {
             yq::diag( 1, "number: " . Dumper \@item );
         }
@@ -235,8 +235,6 @@ my $grammar = q{
             $return = $item[1];
             yq::diag( 1, "float: " . Dumper \@item );
         }
-
-    int: /-?\d+/
 
     word: /\w+/
 
