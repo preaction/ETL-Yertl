@@ -1,0 +1,168 @@
+#!/usr/bin/env perl
+package yfrom;
+# ABSTRACT: Build YAML from another format (like JSON or CSV)
+
+use App::YAML::Filter::Base;
+use Pod::Usage::Return qw( pod2usage );
+use Getopt::Long qw( GetOptionsFromArray );
+use YAML;
+use Module::Runtime qw( use_module );
+
+$|++; # no buffering
+
+sub main {
+    my ( $class, @argv ) = @_;
+    my %opt;
+    GetOptionsFromArray( \@argv, \%opt,
+        'help|h',
+        'version',
+    );
+    return pod2usage(0) if $opt{help};
+    if ( $opt{version} ) {
+        print "yfrom version $yfrom::VERSION (Perl $^V)\n";
+        return 0;
+    }
+
+    my $format = shift @argv;
+    return pod2usage("ERROR: Must give a format") unless $format;
+    return pod2usage("ERROR: Unknown format '$format'")
+        unless $class->format_modules( $format );
+
+    push @argv, "-" unless @argv;
+    for $ARGV ( @argv ) {
+        # We're doing a similar behavior to <>, but manually for easier testing.
+        my $fh;
+        if ( $ARGV eq '-' ) {
+            # Use the existing STDIN so tests can fake it
+            $fh = \*STDIN;
+        }
+        else {
+            unless ( open $fh, '<', $ARGV ) {
+                warn "Could not open file '$ARGV' for reading: $!\n";
+                next;
+            }
+        }
+
+        my $f = $class->can_format( $format )
+            or die "Could not load format module for '$format' (tried: "
+                . ( join ", ", $class->format_modules( $format ) )
+                . ")\n";
+
+        while ( my $line = <$fh> ) {
+            my @docs = $f->( $line );
+            print YAML::Dump( @docs ) if @docs;
+        }
+    }
+
+    return 0;
+}
+
+my %formatter;
+
+# Hash of "format" => [ MODULE... ]
+# The modules are in order we should try to load them, so put the better ones first
+my %FORMAT_MODULES = (
+    json => [qw( JSON::XS JSON::PP )],
+    csv => [qw( Text::CSV_XS Text::CSV )],
+);
+
+# Hash of MODULE => formatter sub
+sub format_sub {
+    my ( $class, $module ) = @_;
+
+    # Do this to reset the state() variables every time
+    my %FORMAT_SUB = (
+        'JSON::XS' => sub {
+            state $json = JSON::XS->new->relaxed;
+            return $json->incr_parse( @_ );
+        },
+        'JSON::PP' => sub {
+            state $json = JSON::PP->new->relaxed;
+            return $json->incr_parse( @_ );
+        },
+        'Text::CSV_XS' => sub {
+            state $csv = Text::CSV_XS->new;
+            state @names;
+            if ( !@names ) {
+                $csv->parse( shift );
+                @names = $csv->fields;
+                return;
+            }
+            $csv->parse( shift );
+            my @values = $csv->fields;
+            return { map {; $names[ $_ ] => $values[ $_ ] } 0..$#values };
+        },
+        'Text::CSV' => sub {
+            state $csv = Text::CSV->new;
+            state @names;
+            if ( !@names ) {
+                $csv->parse( shift );
+                @names = $csv->fields;
+                return;
+            }
+            $csv->parse( shift );
+            my @values = $csv->fields;
+            return { map {; $names[ $_ ] => $values[ $_ ] } 0..$#values };
+        },
+    );
+
+    return $FORMAT_SUB{ $module };
+}
+
+sub format_modules {
+    my ( $class, $format ) = @_;
+    return unless $FORMAT_MODULES{ $format };
+    return @{ $FORMAT_MODULES{ $format } };
+}
+
+sub can_format {
+    my ( $class, $format ) = @_;
+    my $m = $formatter{ $format };
+    if ( !$m ) {
+        my @modules = $class->format_modules( $format );
+        for my $module ( @modules ) {
+            if ( eval { use_module( $module ); 1 } ) {
+                $m = $module;
+                last;
+            }
+        }
+    }
+    return $class->format_sub( $m );
+}
+
+exit __PACKAGE__->main( @ARGV ) unless caller(0);
+
+__END__
+
+=head1 SYNOPSIS
+
+    yfrom <format> [<file>...]
+
+    yfrom -h|--help|--version
+
+=head1 DESCRIPTION
+
+This program takes a stream of documents in the given format (on STDIN or file arguments),
+and prints them as YAML.
+
+=head1 ARGUMENTS
+
+=head2 format
+
+The format to read. Currently supported formats: JSON, CSV
+
+=head2 <file>
+
+A file to read. The special file "-" refers to STDIN. If no files are
+specified, read STDIN.
+
+=head1 OPTIONS
+
+=head2 -h | --help
+
+Show this help document.
+
+=head2 --version
+
+Print the current yfrom and Perl versions.
+
