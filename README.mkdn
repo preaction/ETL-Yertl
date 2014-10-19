@@ -4,7 +4,7 @@ yq - Filter YAML through a command-line program
 
 # VERSION
 
-version 0.011
+version 0.012
 
 # SYNOPSIS
 
@@ -21,7 +21,7 @@ applies a filter, then writes the results to STDOUT.
 
 ## script
 
-The script to run. For the script syntax, see [SYNTAX](http://search.cpan.org/perldoc?SYNTAX).
+The script to run. For the script syntax, see [SYNTAX](https://metacpan.org/pod/SYNTAX).
 
 ## <file>
 
@@ -30,16 +30,16 @@ specified, filter STDIN.
 
 # OPTIONS
 
-## \-v | --verbose
+## -v | --verbose
 
 Set verbose mode to print out some internal program messages on STDERR to help
 with debugging.
 
-## \-h | --help
+## -h | --help
 
 Show this help document.
 
-## \--version
+## --version
 
 Print the current yq and Perl versions.
 
@@ -47,7 +47,7 @@ Print the current yq and Perl versions.
 
 ## EXPRESSIONS
 
-An `EXPRESSION` is allowed to be either a [FILTER](http://search.cpan.org/perldoc?FILTER), [VALUE](http://search.cpan.org/perldoc?VALUE), or a [COMPARISON](http://search.cpan.org/perldoc?COMPARISON).
+An `EXPRESSION` is allowed to be either a [FILTER](https://metacpan.org/pod/FILTER), [VALUE](https://metacpan.org/pod/VALUE), or a [COMPARISON](https://metacpan.org/pod/COMPARISON).
 
 ## FILTERS
 
@@ -82,7 +82,7 @@ to reach deep inside the documents you're working with.
         $ yq .foo.fizz
         fuzz
 
-- .\[\#\]
+- .\[#\]
 
     Extract a single item out of an array.
 
@@ -190,7 +190,7 @@ to reach deep inside the documents you're working with.
     Any bareword that is not recognized as a syntax element is treated as a value.
     These barewords may only contain letters, numbers, and underscore.
 
-    __NOTE__: This may be subject to change to only allow quoted strings and bare
+    **NOTE**: This may be subject to change to only allow quoted strings and bare
     numbers in a future version.
 
 ## COMPARISONS
@@ -200,7 +200,7 @@ to reach deep inside the documents you're working with.
     String equals comparison. Returns true if both sides are equal to each other
     when treated as a string.
 
-    The two sides may be [FILTERS](http://search.cpan.org/perldoc?FILTERS) or [VALUES](http://search.cpan.org/perldoc?VALUES).
+    The two sides may be [FILTERS](https://metacpan.org/pod/FILTERS) or [VALUES](https://metacpan.org/pod/VALUES).
 
         # INPUT
         foo: bar
@@ -224,7 +224,7 @@ to reach deep inside the documents you're working with.
     String not equals comparison. Returns true if one side is not equal to the
     other side when compared as a string.
 
-    The two sides may be [FILTERS](http://search.cpan.org/perldoc?FILTERS) or [VALUES](http://search.cpan.org/perldoc?VALUES).
+    The two sides may be [FILTERS](https://metacpan.org/pod/FILTERS) or [VALUES](https://metacpan.org/pod/VALUES).
 
         # INPUT
         foo: bar
@@ -243,7 +243,177 @@ to reach deep inside the documents you're working with.
     YAML treats the string "true" as a true value, and the string "false" as a
     false value.
 
+- ==
+
+    Numeric equals comparison. Returns true if both sides are equal to each other
+    when treated as numbers. If one of the items is not a number, will print a
+    warning to STDERR but try to compare anyway.
+
+    The two sides may be [FILTERS](https://metacpan.org/pod/FILTERS) or [VALUES](https://metacpan.org/pod/VALUES).
+
+        # INPUT
+        one: 1
+        two: 2
+        uno: 1
+
+        $ yq '.one == 1'
+        true
+
+        $ yq '.one == 2'
+        false
+
+        $ yq '.one == .uno'
+        true
+
+- !=
+
+    Numeric not equals comparison. Returns true if both sides are equal to each
+    other when treated as numbers. If one of the items is not a number, will print
+    a warning to STDERR but try to compare anyway.
+
+    The two sides may be [FILTERS](https://metacpan.org/pod/FILTERS) or [VALUES](https://metacpan.org/pod/VALUES).
+
+        # INPUT
+        one: 1
+        two: 2
+        uno: 1
+
+        $ yq '.two != 1'
+        true
+
+        $ yq '.two != 2'
+        false
+
+        $ yq '.one != .uno'
+        false
+
+- > / >=
+
+    Numeric greater-than (or equal-to) comparison. Returns true if the left side is
+    greater than (or equal-to) the right side. If one of the items is not a number,
+    will print a warning to STDERR but try to compare anyway.
+
+    The two sides may be [FILTERS](https://metacpan.org/pod/FILTERS) or [VALUES](https://metacpan.org/pod/VALUES).
+
+        # INPUT
+        one: 1
+        two: 2
+        uno: 1
+
+        $ yq '.two >= 1'
+        true
+
+        $ yq '.two > 2'
+        false
+
+        $ yq '.one >= .uno'
+        true
+
+- < / <=
+
+    Numeric less-than (or equal-to) comparison. Returns true if the left side is
+    less than (or equal-to) the right side. If one of the items is not a number,
+    will print a warning to STDERR but try to compare anyway.
+
+    The two sides may be [FILTERS](https://metacpan.org/pod/FILTERS) or [VALUES](https://metacpan.org/pod/VALUES).
+
+        # INPUT
+        one: 1
+        two: 2
+        uno: 1
+
+        $ yq '.two <= 1'
+        false
+
+        $ yq '.two < 2'
+        false
+
+        $ yq '.one <= .uno'
+        true
+
 ## FUNCTIONS
+
+- length( EXPRESSION )
+
+    Returns the length of the thing returned by EXPRESSION. Depending on what type
+    of thing that is:
+
+        string/number   - Returns the number of characters
+        array           - Returns the number of items
+        hash            - Returns the number of pairs
+
+    If EXPRESSION is missing, gives the length of the entire document (`length(.)`).
+    Returns a number suitable for assignment.
+
+    Although length() takes an expression, certain constructs are redundant:
+
+        length( keys( EXPRESSION ) ) -> length( EXPRESSION )
+        # length() works on hashes
+
+    A future version may optimize these away, or warn you of their redundancy.
+
+        # INPUT
+        foo:
+            one: 1
+            two: onetwothreefourfive
+            three: 3
+        baz: [ 3, 2, 1 ],
+
+        $ yq 'length(.)'
+        2
+
+        $ yq 'length'
+        2
+
+        $ yq 'length( .foo )'
+        3
+
+        $ yq 'length( .baz )'
+        3
+
+        $ yq 'length( .foo.two )'
+        19
+
+        $ yq '{ l: length( .foo.two ) }'
+        l: 19
+
+- keys( EXPRESSION )
+
+    Return the keys of the hash or the indicies of the array returned by EXPRESSION.
+    If EXPRESSION is missing, gives the keys of the entire document (`keys(.)`).
+
+    Returns an array suitable for assignment.
+
+        # INPUT
+        foo:
+            one: 1
+            two: 2
+            three: 3
+        baz: [ 3, 2, 1 ]
+
+        $ yq 'keys( .foo )'
+        - one
+        - two
+        - three
+
+        $ yq 'keys( .baz )'
+        - 0
+        - 1
+        - 2
+
+        $ yq 'keys( . )'
+        - foo
+        - baz
+
+        $ yq 'keys'
+        - foo
+        - baz
+
+        $ yq '{ k: keys( .foo ) }'
+        k:
+            - one
+            - two
+            - three
 
 - grep( EXPRESSION )
 
