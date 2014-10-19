@@ -10,8 +10,8 @@ sub modules {
     my @modules = $class->SUPER::modules( %args );
     return (
         @modules,
+        qw( Test::More Test::Deep Test::Exception Test::Differences ),
         FindBin => [ '$Bin' ],
-        'Test::Most' => [],
         boolean => [':all'],
     );
 }
