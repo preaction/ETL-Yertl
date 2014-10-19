@@ -10,6 +10,7 @@ sub modules {
     return (
         strict => [],
         warnings => [],
+        feature => [qw( :5.10 )],
     );
 }
 
