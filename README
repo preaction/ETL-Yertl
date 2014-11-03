@@ -2,7 +2,7 @@ NAME
     yq - Filter YAML through a command-line program
 
 VERSION
-    version 0.012
+    version 0.013
 
 SYNOPSIS
         yq [-v] <script> [<file>...]

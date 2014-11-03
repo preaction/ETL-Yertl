@@ -4,7 +4,11 @@ yq - Filter YAML through a command-line program
 
 # VERSION
 
-version 0.012
+version 0.013
+
+# STATUS
+
+<a href="https://travis-ci.org/preaction/App-YAML-Filter"><img src="https://travis-ci.org/preaction/App-YAML-Filter.svg?branch=master"></a><a href="https://coveralls.io/r/preaction/App-YAML-Filter"><img src="https://coveralls.io/repos/preaction/App-YAML-Filter/badge.png" alt="Coverage Status" /></a>
 
 # SYNOPSIS
 
