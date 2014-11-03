@@ -1,0 +1,112 @@
+Changelog for App-YAML-Filter
+
+0.013 2014-11-03T00:34:41
+ - No changes found
+
+0.012 2014-10-19T22:25:41
+ - release v0.012
+ - add yfrom script to output YAML from JSON or CSV
+ - remove references to Test::Most
+ - add Marpa::R2 prereq
+ - add travis config
+ - add yto script to convert from YAML to other formats
+ - always use 5.10 features
+ - move away from Test::Most
+ - add an initial Marpa::R2 parser
+ - start on a parse-tree-based P::RD implementation
+ - int rule is unnecessary since float covers ints
+ - add some preprocessing to fix pipes
+ - fix comma combinator
+ - undef is a valid value, so return an empty list
+ - put use lines at the top of the parse
+ - fix the order of <|> and <=|>=
+ - use eval to get rid of the literal quote characters
+ - add the missing sort function
+ - fix the missing empty function
+ - fix number parsing (int, float, bin, hex, oct)
+ - add list object to differentiate arrays
+ - SurgicalPodWeaver -> PodWeaver
+ - initial test Parse::RecDescent implementation
+ - load the underlying interpreter at runtime
+ - add sort(EXPR) function to sort by string
+ - move the interpreter to a module
+ - add <,<=,>,>= numeric comparison operators
+ - test and document the == and != operators
+ - add length( EXPR ) function
+ - add keys(EXPR) function
+ - clarify and add some comments during the parsing
+
+0.011 2014-05-17T06:42:15
+ - release v0.011
+ - prevent undefined warnings
+ - add missing options to SYNOPSIS
+ - add --version option
+ - add raw numbers (int, dec, e, bin, oct, hex)
+ - add verbose flag to start writing diagnostics
+ - switch to using Regexp::Common for delimited text
+ - add pipe to use output from EXPR as input to next
+ - break tests out into individual categories
+
+0.010 2014-05-16T15:30:07
+ - add quoted strings using Text::Balanced
+
+0.009 2014-05-16T06:22:49
+ - release 0.009
+ - add hash and array constructors
+ - add group_by( EXPR ) function
+
+0.008 2014-05-14T05:05:14
+ - release v0.008
+ - turn off STDOUT buffering
+ - add note to grep() instead of using `if/else empty`
+ - implement grep(EXPR)
+ - allow `if .foo then .bar` for truthiness checking
+
+0.007 2014-05-09T04:27:11
+ - update build artifacts for v0.007
+ - test that -h and error messages are correct
+
+0.006 2014-05-09T02:41:31
+ - update build artifacts
+ - fix -h and --help option
+
+0.005 2014-05-07T03:45:17
+ - update build artifacts
+ - add .[] to flatten an array
+ - add , operator to join multiple filters
+ - forgot the test file needed for filename arg test
+ - allow filenames to be given as further arguments
+ - prevent "undefined" warnings
+ - filter documents that have no document separator
+ - prepare for using STDERR as an error channel
+
+0.004 2014-05-03T03:30:31
+ - increase required Getopt::Long version
+
+0.003 2014-05-01T05:54:23
+ - update build artifacts
+ - document the help option
+ - fix POD errors
+
+0.002 2014-05-01T05:34:09
+ - update build artifacts
+ - add array filters and allow combining filters
+
+0.001 2014-04-30T05:55:50
+ - fix gitignore for the app rename
+ - update build artifacts
+ - migrate to Import::Base
+ - rename to App-YAML-Filter
+ - document the else clause and the empty value
+ - add "empty" special value to suppress printing undef documents
+ - support else clauses in if statements
+ - don't need to collect output as we're only working with one document
+ - mark executables as executable
+ - forgot to import pod2usage
+ - add shebang line and remove modeline
+ - add URL for jq project
+ - remove <> because it's POD syntax and markdown thinks it's HTML
+ - add build artifacts
+ - add initial use-case - filtering documents based on a hash key
+ - initial skeleton
+
