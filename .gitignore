@@ -1,4 +1,4 @@
 .build
 *.swp
 *.tar.gz
-App-YAML-Filter-*
+/App-YAML-Filter-*
