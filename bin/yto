@@ -77,11 +77,11 @@ my %FORMAT_MODULES = (
 # Hash of MODULE => formatter sub
 my %FORMAT_SUB = (
     'JSON::XS' => sub {
-        state $json = JSON::XS->new->canonical->pretty->indent_length(2)->allow_nonref;
-        return join "\n", map { $json->encode( $_ ) } @_;
+        state $json = JSON::XS->new->canonical->pretty->allow_nonref;
+        return join( "\n", map { $json->encode( $_ ) } @_ ) . "\n";
     },
     'JSON::PP' => sub {
-        state $json = JSON::PP->new->canonical->pretty->indent_length(2)->allow_nonref;
+        state $json = JSON::PP->new->canonical->pretty->indent_length(3)->allow_nonref;
         return join "\n", map { $json->encode( $_ ) } @_;
     },
 );

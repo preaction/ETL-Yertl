@@ -20,14 +20,14 @@ ENDYML
 
 my $json = <<'ENDJSON';
 {
-  "baz" : "buzz",
-  "foo" : "bar"
+   "baz" : "buzz",
+   "foo" : "bar"
 }
 {
-  "flip" : [
-    "flop",
-    "blip"
-  ]
+   "flip" : [
+      "flop",
+      "blip"
+   ]
 }
 ENDJSON
 my @docs = Load( $text );
