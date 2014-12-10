@@ -102,6 +102,7 @@ $ENV{YQ_CLASS} ||= 'App::YAML::Filter::Regex';
 use_module( $ENV{YQ_CLASS} );
 {
     no strict 'refs';
+    no warnings 'once';
     *filter = *{ $ENV{YQ_CLASS} . "::filter" };
 }
 
