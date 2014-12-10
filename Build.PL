@@ -25,10 +25,10 @@ my %module_build_args = (
   "recommends" => {},
   "recursive_test_files" => 1,
   "requires" => {
+    "Data::Partial::Google" => 0,
     "File::Spec" => 0,
     "Getopt::Long" => "2.36",
     "Import::Base" => 0,
-    "Marpa::R2" => 0,
     "Module::Runtime" => 0,
     "Parse::RecDescent" => 0,
     "Pod::Usage::Return" => 0,
@@ -39,6 +39,7 @@ my %module_build_args = (
   },
   "script_files" => [
     "bin/yfrom",
+    "bin/ypick",
     "bin/yq",
     "bin/yto"
   ],

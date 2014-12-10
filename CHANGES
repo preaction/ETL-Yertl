@@ -1,7 +1,20 @@
 Changelog for App-YAML-Filter
 
-0.013 2014-11-03T00:34:41
- - No changes found
+0.013 2014-12-10T08:04:25
+ - remove the Marpa version for now
+ - fix test failures due to whitespace differences
+ - add IRC link
+ - add ypick for simple field picking
+ - fix "yq::filter used only once" warning
+ - fix differences between JSON::PP and JSON::XS
+ - remove dependency on Marpa for now
+ - only ignore bundles in the dist root
+ - only remove .ini files from the dist root
+ - add dzil tag annotation with name, date, and changelog
+ - update weaver.ini from new defaults
+ - commit new build artifacts
+ - update generated READMEs for status badges
+ - update dist.ini for new best practices
 
 0.012 2014-10-19T22:25:41
  - release v0.012
