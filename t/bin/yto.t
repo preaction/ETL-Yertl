@@ -18,18 +18,17 @@ flip:
   - blip
 ENDYML
 
-my $json = <<'ENDJSON';
-{
+my $json = qr{\Q{
    "baz" : "buzz",
    "foo" : "bar"
-}
+}\E\n*\Q
 {
    "flip" : [
       "flop",
       "blip"
    ]
-}
-ENDJSON
+}\E};
+
 my @docs = Load( $text );
 
 my ( $doc_fh, $doc_fn ) = tempfile();
@@ -57,7 +56,7 @@ subtest 'DOC -> JSON' => sub {
         my ( $stdout, $stderr, $exit ) = capture { yto->main( 'json', $doc_fn ) };
         is $exit, 0, 'exit 0';
         ok !$stderr, 'nothing on stderr';
-        eq_or_diff $stdout, $json;
+        like $stdout, $json;
     };
     subtest 'stdin' => sub {
         local *STDIN = $doc_fh;
@@ -65,7 +64,7 @@ subtest 'DOC -> JSON' => sub {
         my ( $stdout, $stderr, $exit ) = capture { yto->main( 'json' ) };
         is $exit, 0, 'exit 0';
         ok !$stderr, 'nothing on stderr';
-        eq_or_diff $stdout, $json;
+        like $stdout, $json;
 
         seek $doc_fh, 0, 0;
     };
