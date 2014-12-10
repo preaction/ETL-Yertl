@@ -1,0 +1,102 @@
+#!/usr/bin/env perl
+package ypick;
+# ABSTRACT: pick a data structure to display only the desired fields
+
+use App::YAML::Filter::Base;
+use Pod::Usage::Return qw( pod2usage );
+use Getopt::Long qw( GetOptionsFromArray );
+use YAML;
+use Data::Partial::Google;
+
+$|++; # no buffering
+
+sub main {
+    my ( $class, @argv ) = @_;
+    my %opt;
+    GetOptionsFromArray( \@argv, \%opt,
+        'help|h',
+        'version',
+    );
+    return pod2usage(0) if $opt{help};
+    if ( $opt{version} ) {
+        print "ypick version $ypick::VERSION (Perl $^V)\n";
+        return 0;
+    }
+
+    my $pick = shift @argv;
+    return pod2usage("ERROR: Must give a pick") unless $pick;
+
+    my $filter = Data::Partial::Google->new( $pick );
+
+    push @argv, "-" unless @argv;
+    for $ARGV ( @argv ) {
+        # We're doing a similar behavior to <>, but manually for easier testing.
+        my $fh;
+        if ( $ARGV eq '-' ) {
+            # Use the existing STDIN so tests can fake it
+            $fh = \*STDIN;
+        }
+        else {
+            unless ( open $fh, '<', $ARGV ) {
+                warn "Could not open file '$ARGV' for reading: $!\n";
+                next;
+            }
+        }
+
+        my $buffer;
+        my $scope = {};
+        while ( my $line = <$fh> ) {
+            # --- is the start of a new document
+            if ( $buffer && $line =~ /^---/ ) {
+                # Flush the previous document
+                print YAML::Dump( $filter->mask( YAML::Load( $buffer ) ) );
+                $buffer = '';
+            }
+            $buffer .= $line;
+        }
+        # Flush the buffer in the case of a single document with no ---
+        if ( $buffer =~ /\S/ ) {
+            #print STDERR "Buffer is: $buffer\n";
+            print YAML::Dump( $filter->mask( YAML::Load( $buffer ) ) );
+        }
+    }
+
+    return 0;
+}
+
+exit __PACKAGE__->main( @ARGV ) unless caller(0);
+
+__END__
+
+=head1 SYNOPSIS
+
+    ypick <pick> [<file>...]
+
+    ypick -h|--help|--version
+
+=head1 DESCRIPTION
+
+This program takes a stream of YAML documents (on STDIN or file arguments),
+and prints only the fields specified by the C<pick>.
+
+=head1 ARGUMENTS
+
+=head2 pick
+
+See L<Data::Partial::Google/Rules> for more information
+
+=head2 <file>
+
+A YAML file to read. The special file "-" refers to STDIN. If no files are
+specified, read STDIN.
+
+=head1 OPTIONS
+
+=head2 -h | --help
+
+Show this help document.
+
+=head2 --version
+
+Print the current ypick and Perl versions.
+
