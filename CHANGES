@@ -1,6 +1,11 @@
 Changelog for App-YAML-Filter
 
-0.013 2014-12-10T08:04:25
+0.014 2014-12-12T07:28:39
+ - trim leading whitespace from CSV cells by default
+ - rename ypick back to ymask
+
+0.013 2014-12-10T08:05:32
+ - release v0.013
  - remove the Marpa version for now
  - fix test failures due to whitespace differences
  - add IRC link

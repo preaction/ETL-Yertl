@@ -6,6 +6,7 @@ requires "Module::Runtime" => "0";
 requires "Parse::RecDescent" => "0";
 requires "Pod::Usage::Return" => "0";
 requires "Regexp::Common" => "0";
+requires "Text::Trim" => "0";
 requires "YAML" => "0";
 requires "boolean" => "0";
 requires "perl" => "5.010";

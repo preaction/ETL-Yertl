@@ -19,7 +19,7 @@ my %module_build_args = (
     "Doug Bell <preaction\@cpan.org>"
   ],
   "dist_name" => "App-YAML-Filter",
-  "dist_version" => "0.013",
+  "dist_version" => "0.014",
   "license" => "perl",
   "module_name" => "App::YAML::Filter",
   "recommends" => {},
@@ -33,13 +33,14 @@ my %module_build_args = (
     "Parse::RecDescent" => 0,
     "Pod::Usage::Return" => 0,
     "Regexp::Common" => 0,
+    "Text::Trim" => 0,
     "YAML" => 0,
     "boolean" => 0,
     "perl" => "5.010"
   },
   "script_files" => [
     "bin/yfrom",
-    "bin/ypick",
+    "bin/ymask",
     "bin/yq",
     "bin/yto"
   ],

@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-YAML-Filter",
   "EXE_FILES" => [
     "bin/yfrom",
-    "bin/ypick",
+    "bin/ymask",
     "bin/yq",
     "bin/yto"
   ],
@@ -38,6 +38,7 @@ my %WriteMakefileArgs = (
     "Parse::RecDescent" => 0,
     "Pod::Usage::Return" => 0,
     "Regexp::Common" => 0,
+    "Text::Trim" => 0,
     "YAML" => 0,
     "boolean" => 0
   },
@@ -49,7 +50,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.013",
+  "VERSION" => "0.014",
   "test" => {
     "TESTS" => "t/*.t t/bin/*.t"
   }
@@ -73,6 +74,7 @@ my %FallbackPrereqs = (
   "Test::Differences" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
+  "Text::Trim" => 0,
   "YAML" => 0,
   "boolean" => 0
 );
