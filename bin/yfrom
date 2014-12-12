@@ -7,6 +7,7 @@ use Pod::Usage::Return qw( pod2usage );
 use Getopt::Long qw( GetOptionsFromArray );
 use YAML;
 use Module::Runtime qw( use_module );
+use Text::Trim qw( ltrim );
 
 $|++; # no buffering
 
@@ -16,12 +17,17 @@ sub main {
     GetOptionsFromArray( \@argv, \%opt,
         'help|h',
         'version',
+        'trim!',
     );
     return pod2usage(0) if $opt{help};
     if ( $opt{version} ) {
         print "yfrom version $yfrom::VERSION (Perl $^V)\n";
         return 0;
     }
+
+    # Have to set the default like this, because it doesn't seem to work in the %opt
+    # hash
+    $opt{trim} //= 1;
 
     my $format = shift @argv;
     return pod2usage("ERROR: Must give a format") unless $format;
@@ -43,7 +49,7 @@ sub main {
             }
         }
 
-        my $f = $class->can_format( $format )
+        my $f = $class->can_format( $format, %opt )
             or die "Could not load format module for '$format' (tried: "
                 . ( join ", ", $class->format_modules( $format ) )
                 . ")\n";
@@ -68,7 +74,7 @@ my %FORMAT_MODULES = (
 
 # Hash of MODULE => formatter sub
 sub format_sub {
-    my ( $class, $module ) = @_;
+    my ( $class, $module, %opt ) = @_;
 
     # Do this to reset the state() variables every time
     my %FORMAT_SUB = (
@@ -76,10 +82,12 @@ sub format_sub {
             state $json = JSON::XS->new->relaxed;
             return $json->incr_parse( @_ );
         },
+
         'JSON::PP' => sub {
             state $json = JSON::PP->new->relaxed;
             return $json->incr_parse( @_ );
         },
+
         'Text::CSV_XS' => sub {
             state $csv = Text::CSV_XS->new;
             state @names;
@@ -90,8 +98,13 @@ sub format_sub {
             }
             $csv->parse( shift );
             my @values = $csv->fields;
-            return { map {; $names[ $_ ] => $values[ $_ ] } 0..$#values };
+            my $doc = { map {; $names[ $_ ] => $values[ $_ ] } 0..$#values };
+            if ( $opt{trim} ) {
+                ltrim for values %$doc;
+            }
+            return $doc;
         },
+
         'Text::CSV' => sub {
             state $csv = Text::CSV->new;
             state @names;
@@ -102,8 +115,13 @@ sub format_sub {
             }
             $csv->parse( shift );
             my @values = $csv->fields;
-            return { map {; $names[ $_ ] => $values[ $_ ] } 0..$#values };
+            my $doc = { map {; $names[ $_ ] => $values[ $_ ] } 0..$#values };
+            if ( $opt{trim} ) {
+                ltrim for values %$doc;
+            }
+            return $doc;
         },
+
     );
 
     return $FORMAT_SUB{ $module };
@@ -116,7 +134,7 @@ sub format_modules {
 }
 
 sub can_format {
-    my ( $class, $format ) = @_;
+    my ( $class, $format, %opt ) = @_;
     my $m = $formatter{ $format };
     if ( !$m ) {
         my @modules = $class->format_modules( $format );
@@ -127,7 +145,7 @@ sub can_format {
             }
         }
     }
-    return $class->format_sub( $m );
+    return $class->format_sub( $m, %opt );
 }
 
 exit __PACKAGE__->main( @ARGV ) unless caller(0);
@@ -165,4 +183,10 @@ Show this help document.
 =head2 --version
 
 Print the current yfrom and Perl versions.
+
+=head2 --no-trim
+
+For CSV documents, trim any leading whitespace from each cell. Some CSV documents are
+formatted to line up the commas for easy visual scanning. By default, yfrom will remove
+leading whitespace in a cell. Setting C<--no-trim> will disable trimming.
 
