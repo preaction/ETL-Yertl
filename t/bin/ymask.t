@@ -5,7 +5,7 @@ use Capture::Tiny qw( capture );
 use File::Spec;
 use File::Temp qw( tempfile );
 
-my $script = "$FindBin::Bin/../../bin/ypick";
+my $script = "$FindBin::Bin/../../bin/ymask";
 require $script;
 $0 = $script; # So pod2usage finds the right file
 
@@ -36,16 +36,16 @@ seek $doc_fh, 0, 0;
 
 subtest 'error checking' => sub {
     subtest 'no arguments' => sub {
-        my ( $stdout, $stderr, $exit ) = capture { ypick->main() };
+        my ( $stdout, $stderr, $exit ) = capture { ymask->main() };
         isnt $exit, 0, 'error status';
-        like $stderr, qr{ERROR: Must give a pick}, 'contains error message';
+        like $stderr, qr{ERROR: Must give a mask}, 'contains error message';
     };
 };
 
 subtest 'input' => sub {
 
     subtest 'filename' => sub {
-        my ( $stdout, $stderr, $exit ) = capture { ypick->main( 'foo,flip/flop', $doc_fn ) };
+        my ( $stdout, $stderr, $exit ) = capture { ymask->main( 'foo,flip/flop', $doc_fn ) };
         is $exit, 0, 'exit 0';
         ok !$stderr, 'nothing on stderr';
         eq_or_diff $stdout, $expect;
@@ -54,7 +54,7 @@ subtest 'input' => sub {
     subtest 'stdin' => sub {
         local *STDIN = $doc_fh;
 
-        my ( $stdout, $stderr, $exit ) = capture { ypick->main( 'foo,flip/flop' ) };
+        my ( $stdout, $stderr, $exit ) = capture { ymask->main( 'foo,flip/flop' ) };
         is $exit, 0, 'exit 0';
         ok !$stderr, 'nothing on stderr';
         eq_or_diff $stdout, $expect;
