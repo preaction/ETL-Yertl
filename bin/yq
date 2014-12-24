@@ -2,7 +2,7 @@
 package yq;
 # ABSTRACT: Filter YAML through a command-line program
 
-use App::YAML::Filter::Base;
+use ETL::Yertl::Base;
 use Pod::Usage::Return qw( pod2usage );
 use Getopt::Long qw( GetOptionsFromArray );
 use YAML;
@@ -98,7 +98,7 @@ sub diag {
     print STDERR "$text\n" if $VERBOSE >= $level;
 }
 
-$ENV{YQ_CLASS} ||= 'App::YAML::Filter::Regex';
+$ENV{YQ_CLASS} ||= 'ETL::Yertl::Filter::Regex';
 use_module( $ENV{YQ_CLASS} );
 {
     no strict 'refs';

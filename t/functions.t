@@ -1,5 +1,5 @@
 
-use App::YAML::Filter::Test;
+use ETL::Yertl::Test;
 my $script = "$FindBin::Bin/../bin/yq";
 require $script;
 

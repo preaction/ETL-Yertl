@@ -1,7 +1,7 @@
-package App::YAML::Filter::RecDescentTree;
+package ETL::Yertl::Filter::RecDescentTree;
 # ABSTRACT: A Parse::RecDescent-based parser using a parse tree
 
-use App::YAML::Filter::Base;
+use ETL::Yertl::Base;
 use boolean qw( :all );
 use Parse::RecDescent;
 

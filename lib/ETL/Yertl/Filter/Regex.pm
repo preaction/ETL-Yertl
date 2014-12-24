@@ -1,7 +1,7 @@
-package App::YAML::Filter::Regex;
+package ETL::Yertl::Filter::Regex;
 # ABSTRACT: A regex-based parser for programs
 
-use App::YAML::Filter::Base;
+use ETL::Yertl::Base;
 use boolean qw( :all );
 use Regexp::Common;
 

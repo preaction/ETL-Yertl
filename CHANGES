@@ -1,6 +1,10 @@
-Changelog for App-YAML-Filter
+Changelog for ETL-Yertl
 
-0.014 2014-12-12T07:28:39
+0.015 2014-12-24T04:53:25
+ - No changes found
+
+0.014 2014-12-12T07:28:58
+ - release v0.014
  - trim leading whitespace from CSV cells by default
  - rename ypick back to ymask
 

@@ -18,10 +18,10 @@ my %module_build_args = (
   "dist_author" => [
     "Doug Bell <preaction\@cpan.org>"
   ],
-  "dist_name" => "App-YAML-Filter",
-  "dist_version" => "0.014",
+  "dist_name" => "ETL-Yertl",
+  "dist_version" => "0.015",
   "license" => "perl",
-  "module_name" => "App::YAML::Filter",
+  "module_name" => "ETL::Yertl",
   "recommends" => {},
   "recursive_test_files" => 1,
   "requires" => {

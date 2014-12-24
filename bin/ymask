@@ -2,7 +2,7 @@
 package ymask;
 # ABSTRACT: Mask a data structure to display only the desired fields
 
-use App::YAML::Filter::Base;
+use ETL::Yertl::Base;
 use Pod::Usage::Return qw( pod2usage );
 use Getopt::Long qw( GetOptionsFromArray );
 use YAML;

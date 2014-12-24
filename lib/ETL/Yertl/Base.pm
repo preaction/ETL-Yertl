@@ -1,5 +1,5 @@
-package App::YAML::Filter::Base;
-# ABSTRACT: Base module for App::YAML::Filter
+package ETL::Yertl::Base;
+# ABSTRACT: Base module for ETL::Yertl
 
 use strict;
 use warnings;

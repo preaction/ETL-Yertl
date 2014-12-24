@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0,
     "Module::Build" => "0.28"
   },
-  "DISTNAME" => "App-YAML-Filter",
+  "DISTNAME" => "ETL-Yertl",
   "EXE_FILES" => [
     "bin/yfrom",
     "bin/ymask",
@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010",
-  "NAME" => "App::YAML::Filter",
+  "NAME" => "ETL::Yertl",
   "PREREQ_PM" => {
     "Data::Partial::Google" => 0,
     "File::Spec" => 0,
@@ -50,7 +50,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.014",
+  "VERSION" => "0.015",
   "test" => {
     "TESTS" => "t/*.t t/bin/*.t"
   }

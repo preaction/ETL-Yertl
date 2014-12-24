@@ -1,9 +1,9 @@
-package App::YAML::Filter::Test;
-# ABSTRACT: Base module for App::YAML::Filter tests
+package ETL::Yertl::Test;
+# ABSTRACT: Base module for ETL::Yertl tests
 
 use strict;
 use warnings;
-use base 'App::YAML::Filter::Base';
+use base 'ETL::Yertl::Base';
 
 sub modules {
     my ( $class, %args ) = @_;

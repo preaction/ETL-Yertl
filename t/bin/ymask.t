@@ -1,5 +1,5 @@
 
-use App::YAML::Filter::Test;
+use ETL::Yertl::Test;
 use YAML qw( Dump Load );
 use Capture::Tiny qw( capture );
 use File::Spec;
