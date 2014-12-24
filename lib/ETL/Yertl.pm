@@ -11,12 +11,27 @@ our @IMPORT_MODULES = (
     feature => [qw( :5.10 )],
 );
 
+my @class_modules = (
+    'Types::Standard' => [qw( :all )],
+);
+
 our %IMPORT_BUNDLES = (
     Test => [
         qw( Test::More Test::Deep Test::Exception Test::Differences ),
         FindBin => [ '$Bin' ],
         boolean => [':all'],
     ],
+
+    Class => [
+        '<Moo::Lax',
+        @class_modules,
+    ],
+
+    Role => [
+        '<Moo::Role::Lax',
+        @class_modules,
+    ],
+
 );
 
 
