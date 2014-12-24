@@ -61,10 +61,12 @@ my %FORMAT_SUB = (
 
     'JSON::XS' => {
         to => sub {
+            my $self = shift;
             state $json = JSON::XS->new->canonical->pretty->allow_nonref;
             return join( "", map { $json->encode( $_ ) } @_ );
         },
         from => sub {
+            my $self = shift;
             state $json = JSON::XS->new->relaxed;
             return $json->incr_parse( @_ );
         },
@@ -72,10 +74,12 @@ my %FORMAT_SUB = (
 
     'JSON::PP' => {
         to => sub {
+            my $self = shift;
             state $json = JSON::PP->new->canonical->pretty->indent_length(3)->allow_nonref;
             return join "", map { $json->encode( $_ ) } @_;
         },
         from => sub {
+            my $self = shift;
             state $json = JSON::PP->new->relaxed;
             require Storable;
             local $Storable::canonical = 1;
@@ -106,7 +110,7 @@ Convert the given C<DOCUMENTS> to JSON. Returns a JSON string.
 
 sub to {
     my $self = shift;
-    return $FORMAT_SUB{ $self->format_module }{to}->( @_ );
+    return $FORMAT_SUB{ $self->format_module }{to}->( $self, @_ );
 }
 
 =method from( JSON )
@@ -117,7 +121,7 @@ Convert the given C<JSON> string into documents. Returns the list of values extr
 
 sub from {
     my $self = shift;
-    return $FORMAT_SUB{ $self->format_module }{from}->( @_ );
+    return $FORMAT_SUB{ $self->format_module }{from}->( $self, @_ );
 }
 
 1;
