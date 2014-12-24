@@ -10,7 +10,7 @@ use ExtUtils::MakeMaker;
 
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Filter YAML through a command-line program",
+  "ABSTRACT" => "ETL with a Shell",
   "AUTHOR" => "Doug Bell <preaction\@cpan.org>",
   "BUILD_REQUIRES" => {
     "Module::Build" => "0.28"

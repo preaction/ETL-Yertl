@@ -2,7 +2,7 @@
 package yq;
 # ABSTRACT: Filter YAML through a command-line program
 
-use ETL::Yertl::Base;
+use ETL::Yertl;
 use Pod::Usage::Return qw( pod2usage );
 use Getopt::Long qw( GetOptionsFromArray );
 use YAML;
@@ -672,16 +672,5 @@ only the keys you want, then group those documents.
 =item YQ_VERBOSE
 
 Set the verbosity level. Useful when running the tests.
-
-=back
-
-=head1 SEE ALSO
-
-=over
-
-=item jq
-
-L<http://stedolan.github.io/jq/> A filter for JSON documents. The inspiration
-for this project.
 
 =back

@@ -1,7 +1,7 @@
 package ETL::Yertl::Filter::Regex;
 # ABSTRACT: A regex-based parser for programs
 
-use ETL::Yertl::Base;
+use ETL::Yertl;
 use boolean qw( :all );
 use Regexp::Common;
 

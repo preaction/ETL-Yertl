@@ -14,7 +14,7 @@ my %module_build_args = (
     "ExtUtils::MakeMaker" => 0,
     "Module::Build" => "0.28"
   },
-  "dist_abstract" => "Filter YAML through a command-line program",
+  "dist_abstract" => "ETL with a Shell",
   "dist_author" => [
     "Doug Bell <preaction\@cpan.org>"
   ],

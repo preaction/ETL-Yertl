@@ -2,7 +2,7 @@
 package yfrom;
 # ABSTRACT: Build YAML from another format (like JSON or CSV)
 
-use ETL::Yertl::Base;
+use ETL::Yertl;
 use Pod::Usage::Return qw( pod2usage );
 use Getopt::Long qw( GetOptionsFromArray );
 use YAML;
