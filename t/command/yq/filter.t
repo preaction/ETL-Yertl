@@ -1,7 +1,7 @@
 
 use ETL::Yertl 'Test';
-my $script = "$FindBin::Bin/../../../bin/yq";
-require $script;
+use ETL::Yertl::Command::yq;
+my $class = 'ETL::Yertl::Command::yq';
 
 subtest 'filter single hash key' => sub {
     my $doc = {
@@ -9,7 +9,7 @@ subtest 'filter single hash key' => sub {
         baz => 'fuzz',
     };
     my $filter = '.foo';
-    my $out = yq->filter( $filter, $doc );
+    my $out = $class->filter( $filter, $doc );
     cmp_deeply $out, 'bar';
 };
 
@@ -21,12 +21,12 @@ subtest 'deep hash key' => sub {
     };
     subtest 'one level' => sub {
         my $filter = '.foo';
-        my $out = yq->filter( $filter, $doc );
+        my $out = $class->filter( $filter, $doc );
         cmp_deeply $out, { bar => 'baz' };
     };
     subtest 'two levels' => sub {
         my $filter = '.foo.bar';
-        my $out = yq->filter( $filter, $doc );
+        my $out = $class->filter( $filter, $doc );
         cmp_deeply $out, 'baz';
     };
 };
@@ -34,7 +34,7 @@ subtest 'deep hash key' => sub {
 subtest 'array key' => sub {
     my $doc = [qw( foo bar baz )];
     my $filter = '.[1]';
-    my $out = yq->filter( $filter, $doc );
+    my $out = $class->filter( $filter, $doc );
     cmp_deeply $out, 'bar';
 };
 
@@ -48,17 +48,17 @@ subtest 'mixed array and hash keys' => sub {
     };
     subtest 'hash level' => sub {
         my $filter = '.foo';
-        my $out = yq->filter( $filter, $doc );
+        my $out = $class->filter( $filter, $doc );
         cmp_deeply $out, [ { bar => 'baz' } ];
     };
     subtest 'hash,array level' => sub {
         my $filter = '.foo.[0]';
-        my $out = yq->filter( $filter, $doc );
+        my $out = $class->filter( $filter, $doc );
         cmp_deeply $out, { bar => 'baz' };
     };
     subtest 'hash,array,hash level' => sub {
         my $filter = '.foo.[0].bar';
-        my $out = yq->filter( $filter, $doc );
+        my $out = $class->filter( $filter, $doc );
         cmp_deeply $out, 'baz';
     };
 };
@@ -69,7 +69,7 @@ subtest '[] with no index flattens an array' => sub {
         bar => [ 4, 5, 6 ],
     };
     my $filter = '.foo.[]';
-    my @out = yq->filter( $filter, $doc );
+    my @out = $class->filter( $filter, $doc );
     cmp_deeply \@out, [ 1, 2, 3 ];
 };
 

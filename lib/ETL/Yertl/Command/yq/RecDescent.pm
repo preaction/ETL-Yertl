@@ -23,35 +23,35 @@ my $grammar = q{
 
     program: <leftop: statement ',' statement>
         {
-            yq::diag( 1, "Program: " . Dumper( \@item ) );
+            yertl::diag( 1, "Program: " . Dumper( \@item ) );
             $return = list( @{ $item[1] } );
         }
 
     statement: conditional | expr
         {
-            yq::diag( 1, "Statement: " . Dumper( \@item ) );
+            yertl::diag( 1, "Statement: " . Dumper( \@item ) );
             $return = $item[1];
         }
 
     conditional: 'if' expr 'then' expr ( 'else' expr )(?)
         {
-            yq::diag( 1, "Conditional: " . Dumper( \@item ) );
+            yertl::diag( 1, "Conditional: " . Dumper( \@item ) );
             $return = list( one( $item[2] ) ? $item[4] : $item[5][0] );
         }
 
     expr: function_call | hash | array | binop | filter | quote_string | number | word
         {
             $return = list( $item[1] );
-            yq::diag( 1, "Expr: " . Dumper( \@item ) );
+            yertl::diag( 1, "Expr: " . Dumper( \@item ) );
         }
 
     filter: '.' <skip:""> filter_part(s? /[.]/)
         {
-            yq::diag( 1, "Filter: " . Dumper( \@item ) );
+            yertl::diag( 1, "Filter: " . Dumper( \@item ) );
             my @keys = @{$item[3]};
             $return = list( $::document );
             for my $key ( @keys ) {
-                yq::diag( 1, "Key: " . Dumper( $key ) );
+                yertl::diag( 1, "Key: " . Dumper( $key ) );
                 if ( $key =~ /^\[\]$/ ) {
                     $return = list( @{ $return->[0] } );
                 }
@@ -81,7 +81,7 @@ my $grammar = q{
 
     binop: (filter|quote_string|number|word) op (filter|quote_string|number|word)
         {
-            yq::diag( 1, "Binop: " . Dumper( [ one($item[1]), $item[2], one($item[3]) ] ) );
+            yertl::diag( 1, "Binop: " . Dumper( [ one($item[1]), $item[2], one($item[3]) ] ) );
             my ( $lhs_value, $cond, $rhs_value ) = ( one($item[1]), $item[2], one($item[3]) );
             # These operators suppress undef warnings, treating undef as just
             # another value. Undef will never be treated as '' or 0 here.
@@ -120,7 +120,7 @@ my $grammar = q{
 
     function_call: function_name arguments(?)
         {
-            yq::diag( 1, "FCall: " . Dumper( \@item ) );
+            yertl::diag( 1, "FCall: " . Dumper( \@item ) );
             my $func = $item[1];
             my $args = $item[2];
             if ( $func eq 'empty' ) {
@@ -179,7 +179,7 @@ my $grammar = q{
 
     hash: '{' pair(s /,/) '}'
         {
-            yq::diag( 1, "Hash: " . Dumper \@item );
+            yertl::diag( 1, "Hash: " . Dumper \@item );
             $return = {};
             for my $i ( @{$item[2]} ) {
                 $return->{ one( $i->[0] ) } = one( $i->[1] );
@@ -189,14 +189,14 @@ my $grammar = q{
 
     array: '[' expr(s /,/) ']'
         {
-            yq::diag( 1, "Array: " . Dumper( \@item ) );
+            yertl::diag( 1, "Array: " . Dumper( \@item ) );
             $return = [ flatten( @{ $item[2] } ) ];
         }
 
     arguments: '(' expr(s /,/) ')'
         {
             $return = list( @{ $item[2] } );
-            yq::diag( 1, "Args: " . Dumper( \@item ) );
+            yertl::diag( 1, "Args: " . Dumper( \@item ) );
         }
 
     pair: key ':' expr
@@ -209,31 +209,31 @@ my $grammar = q{
 
     number: binnum | hexnum | octnum | float
         {
-            yq::diag( 1, "number: " . Dumper \@item );
+            yertl::diag( 1, "number: " . Dumper \@item );
         }
 
     binnum: /0b[01]+/
         {
             $return = eval $item[1];
-            yq::diag( 1, "binnum: " . Dumper \@item );
+            yertl::diag( 1, "binnum: " . Dumper \@item );
         }
 
     hexnum: /0x[0-9A-Fa-f]+/
         {
             $return = eval $item[1];
-            yq::diag( 1, "hexnum: " . Dumper \@item );
+            yertl::diag( 1, "hexnum: " . Dumper \@item );
         }
 
     octnum: /0o?\d+/
         {
             $return = eval $item[1];
-            yq::diag( 1, "octnum: " . Dumper \@item );
+            yertl::diag( 1, "octnum: " . Dumper \@item );
         }
 
     float: /-?\d+(?:[.]\d+)?(?:e\d+)?/
         {
             $return = $item[1];
-            yq::diag( 1, "float: " . Dumper \@item );
+            yertl::diag( 1, "float: " . Dumper \@item );
         }
 
     word: /\w+/
@@ -258,7 +258,7 @@ sub is_list {
 sub filter {
     my ( $class, $filter, $doc, $scope ) = @_;
 
-    #$yq::VERBOSE = 1;
+    #$ETL::Yertl::VERBOSE = 1;
     my @input = ( $doc );
     my $output;
     $::scope = $scope;

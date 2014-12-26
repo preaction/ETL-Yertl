@@ -1,7 +1,7 @@
 
 use ETL::Yertl 'Test';
-my $script = "$FindBin::Bin/../../../bin/yq";
-require $script;
+use ETL::Yertl::Command::yq;
+my $class = 'ETL::Yertl::Command::yq';
 
 subtest ', emits multiple results' => sub {
     subtest 'simple filters' => sub {
@@ -10,7 +10,7 @@ subtest ', emits multiple results' => sub {
             baz => 'fuzz',
         };
         my $filter = ".foo, .baz, 'fizz'";
-        my @out = yq->filter( $filter, $doc );
+        my @out = $class->filter( $filter, $doc );
         cmp_deeply \@out, [ 'bar', 'fuzz', 'fizz' ];
     };
 };
@@ -25,8 +25,8 @@ subtest '| gives output of one EXPR as input to another' => sub {
         my $filter = '{ foo: .foo } | group_by( .foo )';
         my $scope = {};
         my @out;
-        push @out, yq->filter( $filter, $_, $scope ) for @docs;
-        push @out, yq->finish( $scope );
+        push @out, $class->filter( $filter, $_, $scope ) for @docs;
+        push @out, $class->finish( $scope );
         cmp_deeply \@out, [
             {
                 bar => [

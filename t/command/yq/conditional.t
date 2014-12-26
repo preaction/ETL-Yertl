@@ -1,7 +1,7 @@
 
 use ETL::Yertl 'Test';
-my $script = "$FindBin::Bin/../../../bin/yq";
-require $script;
+use ETL::Yertl::Command::yq;
+my $class = 'ETL::Yertl::Command::yq';
 
 subtest 'conditional match single hash key and return full document' => sub {
     my $doc = {
@@ -9,7 +9,7 @@ subtest 'conditional match single hash key and return full document' => sub {
         baz => 'fuzz',
     };
     my $filter = 'if .foo eq bar then .';
-    my $out = yq->filter( $filter, $doc );
+    my $out = $class->filter( $filter, $doc );
     cmp_deeply $out, $doc;
 };
 
@@ -19,11 +19,11 @@ subtest 'conditional with else' => sub {
         baz => 'fuzz',
     };
     my $filter = 'if .foo eq bar then .foo else .baz';
-    my $out = yq->filter( $filter, $doc );
+    my $out = $class->filter( $filter, $doc );
     cmp_deeply $out, $doc->{foo};
 
     $filter = 'if .foo eq "buzz" then .foo else .baz';
-    $out = yq->filter( $filter, $doc );
+    $out = $class->filter( $filter, $doc );
     cmp_deeply $out, $doc->{baz};
 };
 

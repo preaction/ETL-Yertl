@@ -34,6 +34,11 @@ our %IMPORT_BUNDLES = (
 
 );
 
+$ETL::Yertl::VERBOSE = $ENV{YERTL_VERBOSE} || 0;
+sub yertl::diag {
+    my ( $level, $text ) = @_;
+    print STDERR "$text\n" if $ETL::Yertl::VERBOSE >= $level;
+}
 
 1;
 __END__

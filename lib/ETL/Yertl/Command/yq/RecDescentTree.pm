@@ -90,7 +90,7 @@ my $parser = Parse::RecDescent->new( $grammar );
 
 sub filter {
     my ( $class, $filter, $doc, $scope ) = @_;
-    $yq::VERBOSE = 1;
+    $ETL::Yertl::VERBOSE = 1;
 
     my $tree = $parser->program( $filter );
     #use Data::Dumper;
@@ -162,7 +162,7 @@ sub run_expr {
 
 sub run_filter {
     my ( $filter, $document, $scope ) = @_;
-    yq::diag( 1, "Filter: " . Dumper $filter );
+    yertl::diag( 1, "Filter: " . Dumper $filter );
     if ( !$filter->{'filter_part(s?)'} ) {
         return $document;
     }
@@ -179,13 +179,13 @@ sub run_filter {
             }
         }
     }
-    yq::diag( 1, "Filter returns: " . Dumper $document );
+    yertl::diag( 1, "Filter returns: " . Dumper $document );
     return $document;
 }
 
 sub run_binop {
     my $binop = shift;
-    yq::diag( 1, 'binop: ' . Dumper $binop );
+    yertl::diag( 1, 'binop: ' . Dumper $binop );
     my $lhs_value = run_expr( $binop->{'_alternation_1_of_production_1_of_rule_binop'}, @_ );
     my $rhs_value = run_expr( $binop->{'_alternation_2_of_production_1_of_rule_binop'}, @_ );
     my $op = $binop->{op}{__VALUE__};
@@ -229,7 +229,7 @@ sub run_binop {
 sub run_hash {
     my $hash = shift;
     my $return = {};
-    yq::diag( 1, "Hash: " . Dumper $hash );
+    yertl::diag( 1, "Hash: " . Dumper $hash );
     for my $pair ( @{ $hash->{'pair(s /,/)'} } ) {
         $return->{ run_expr( $pair->{key}, @_ ) } = run_expr( $pair->{expr}, @_ );
     }

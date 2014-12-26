@@ -9,7 +9,7 @@ sub empty() {
     bless {}, 'empty';
 }
 
-*diag = *yq::diag;
+*diag = *yertl::diag;
 
 my $QUOTE_STRING = $RE{delimited}{-delim=>q{'"}};
 my $EVAL_NUMS = qr{(?:0b$RE{num}{bin}|0$RE{num}{oct}|0x$RE{num}{hex})};

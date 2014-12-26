@@ -1,7 +1,7 @@
 
 use ETL::Yertl 'Test';
-my $script = "$FindBin::Bin/../../../bin/yq";
-require $script;
+use ETL::Yertl::Command::yq;
+my $class = 'ETL::Yertl::Command::yq';
 
 subtest 'raw numbers' => sub {
     my $doc = {
@@ -14,31 +14,31 @@ subtest 'raw numbers' => sub {
         minus => -0.123,
     };
     subtest 'integers' => sub {
-        my $out = yq->filter( '.foo == 3', $doc );
+        my $out = $class->filter( '.foo == 3', $doc );
         ok isTrue( $out ) or diag $out;
     };
     subtest 'decimals' => sub {
-        my $out = yq->filter( '.bar == 2.482', $doc );
+        my $out = $class->filter( '.bar == 2.482', $doc );
         ok isTrue( $out ) or diag $out;
     };
     subtest 'exponential' => sub {
-        my $out = yq->filter( '.baz == 1.345e10', $doc );
+        my $out = $class->filter( '.baz == 1.345e10', $doc );
         ok isTrue( $out ) or diag $out;
     };
     subtest 'binary' => sub {
-        my $out = yq->filter( '.fuzz == 0b0010', $doc );
+        my $out = $class->filter( '.fuzz == 0b0010', $doc );
         ok isTrue( $out ) or diag $out;
     };
     subtest 'octal' => sub {
-        my $out = yq->filter( '.fizz == 037', $doc );
+        my $out = $class->filter( '.fizz == 037', $doc );
         ok isTrue( $out ) or diag $out;
     };
     subtest 'hex' => sub {
-        my $out = yq->filter( '.trap == 0xab3', $doc );
+        my $out = $class->filter( '.trap == 0xab3', $doc );
         ok isTrue( $out ) or diag $out;
     };
     subtest 'negative' => sub {
-        my $out = yq->filter( '.minus == -0.123', $doc );
+        my $out = $class->filter( '.minus == -0.123', $doc );
         ok isTrue( $out ) or diag $out;
     };
 };
@@ -49,7 +49,7 @@ subtest 'hash constructor' => sub {
         baz => 'fuzz',
         buzz => 'bar',
     };
-    my @out = yq->filter( '{ bar: .foo, .buzz: "far/", doc: .baz }', $doc );
+    my @out = $class->filter( '{ bar: .foo, .buzz: "far/", doc: .baz }', $doc );
     cmp_deeply \@out, [
         {
             bar => $doc->{foo},
@@ -65,7 +65,7 @@ subtest 'array constructor' => sub {
         baz => 'fuzz',
         buzz => 'bar',
     };
-    my @out = yq->filter( '[ .foo, .buzz, doc, .baz, "bo/ck" ]', $doc );
+    my @out = $class->filter( '[ .foo, .buzz, doc, .baz, "bo/ck" ]', $doc );
     cmp_deeply \@out, [
         [
             $doc->{foo},

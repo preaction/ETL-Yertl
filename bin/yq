@@ -5,21 +5,17 @@ package yq;
 use ETL::Yertl;
 use Pod::Usage::Return qw( pod2usage );
 use Getopt::Long qw( GetOptionsFromArray );
-use YAML;
-use boolean qw( :all );
-use Module::Runtime qw( use_module );
+use ETL::Yertl::Command::yq;
 
 $|++; # no buffering
 
-our $VERBOSE = $ENV{YQ_VERBOSE} // 0;
-
-sub is_empty {
-    return ref $_[0] eq 'empty';
-}
-
 sub main {
     my ( $class, @argv ) = @_;
-    my %opt;
+
+    my %opt = (
+        verbose => $ENV{YERTL_VERBOSE},
+    );
+
     GetOptionsFromArray( \@argv, \%opt,
         'help|h',
         'verbose|v+',
@@ -31,90 +27,13 @@ sub main {
         return 0;
     }
 
-    $VERBOSE //= $opt{verbose};
-
-    my $filter = shift @argv;
-    return pod2usage("ERROR: Must give a filter") unless $filter;
-
-    push @argv, "-" unless @argv;
-    for $ARGV ( @argv ) {
-        # We're doing a similar behavior to <>, but manually for easier testing.
-        my $fh;
-        if ( $ARGV eq '-' ) {
-            # Use the existing STDIN so tests can fake it
-            $fh = \*STDIN;
-        }
-        else {
-            unless ( open $fh, '<', $ARGV ) {
-                warn "Could not open file '$ARGV' for reading: $!\n";
-                next;
-            }
-        }
-
-        my $buffer;
-        my $scope = {};
-        while ( my $line = <$fh> ) {
-            # --- is the start of a new document
-            if ( $buffer && $line =~ /^---/ ) {
-                # Flush the previous document
-                my @output = $class->filter( $filter, YAML::Load( $buffer ), $scope );
-                $class->write( @output );
-                $buffer = '';
-            }
-            $buffer .= $line;
-        }
-        # Flush the buffer in the case of a single document with no ---
-        if ( $buffer =~ /\S/ ) {
-            #print STDERR "Buffer is: $buffer\n";
-            my @output = $class->filter( $filter, YAML::Load( $buffer ), $scope );
-            $class->write( @output );
-        }
-
-        # Finish the scope, cleaning up any collections
-        $class->write( $class->finish( $scope ) );
+    eval {
+        ETL::Yertl::Command::yq->main( @argv, \%opt );
+    };
+    if ( $@ ) {
+        return pod2usage( "ERROR: $@" );
     }
-
     return 0;
-}
-
-sub write {
-    my ( $class, @docs ) = @_;
-    for my $doc ( @docs ) {
-        next if is_empty( $doc );
-        if ( isTrue( $doc ) ) {
-            print YAML::Dump( "true" );
-        }
-        elsif ( isFalse( $doc ) ) {
-            print YAML::Dump( "false" );
-        }
-        else {
-            print YAML::Dump( $doc );
-        }
-    }
-}
-
-sub diag {
-    my ( $level, $text ) = @_;
-    print STDERR "$text\n" if $VERBOSE >= $level;
-}
-
-$ENV{YQ_CLASS} ||= 'ETL::Yertl::Command::yq::Regex';
-use_module( $ENV{YQ_CLASS} );
-{
-    no strict 'refs';
-    no warnings 'once';
-    *filter = *{ $ENV{YQ_CLASS} . "::filter" };
-}
-
-sub finish {
-    my ( $class, $scope ) = @_;
-    if ( $scope->{sort} ) {
-        return map { $_->[1] } sort { $a->[0] cmp $b->[0] } @{ $scope->{sort} };
-    }
-    elsif ( $scope->{group_by} ) {
-        return $scope->{group_by};
-    }
-    return;
 }
 
 exit __PACKAGE__->main( @ARGV ) unless caller(0);
