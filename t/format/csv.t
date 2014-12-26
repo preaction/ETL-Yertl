@@ -11,6 +11,12 @@ bar,baz,foo
 4,5,two
 ENDJSON
 
+my $EXPECT_TO_NOTRIM = <<ENDJSON;
+bar,baz,foo
+  2,  3,one
+  4,  5,two
+ENDJSON
+
 my @EXPECT_FROM = (
     {
         bar => 2,
@@ -20,6 +26,19 @@ my @EXPECT_FROM = (
     {
         bar => 4,
         baz => 5,
+        foo => 'two',
+    },
+);
+
+my @EXPECT_NOTRIM = (
+    {
+        bar => '  2',
+        baz => '  3',
+        foo => 'one',
+    },
+    {
+        bar => '  4',
+        baz => '  5',
         foo => 'two',
     },
 );
@@ -51,6 +70,22 @@ subtest 'default' => sub {
     eq_or_diff $formatter->to( @EXPECT_FROM ), $EXPECT_TO;
     my $got = [ $formatter->from( split /\n/, $EXPECT_TO ) ];
     cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
+};
+
+subtest 'format options' => sub {
+
+    subtest 'trim (default)' => sub {
+        my $formatter = $CLASS->new;
+        my $got = [ $formatter->from( split /\n/, $EXPECT_TO_NOTRIM ) ];
+        cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
+    };
+
+    subtest 'no trim' => sub {
+        my $formatter = $CLASS->new( trim => 0 );
+        my $got = [ $formatter->from( split /\n/, $EXPECT_TO_NOTRIM ) ];
+        cmp_deeply $got, \@EXPECT_NOTRIM or diag explain $got;
+    };
+
 };
 
 subtest 'no formatter available' => sub {

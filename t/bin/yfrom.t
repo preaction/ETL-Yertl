@@ -23,9 +23,6 @@ subtest 'error checking' => sub {
 };
 
 subtest 'JSON -> DOC' => sub {
-    plan skip_all => 'No JSON module installed (' . ( join ", ", yfrom->format_modules( 'json' ) ) . ')'
-        unless yfrom->can_format( 'json' );
-
     my $text = <<ENDYML;
 ---
 baz: buzz
@@ -68,97 +65,6 @@ ENDJSON
         eq_or_diff $stdout, $text;
 
         seek $json_fh, 0, 0;
-    };
-};
-
-subtest 'CSV -> DOC' => sub {
-    plan skip_all => 'No CSV module installed (' . ( join ", ", yfrom->format_modules( 'csv' ) ) . ')'
-        unless yfrom->can_format( 'csv' );
-
-    my $text = <<ENDYML;
----
-bar: 2
-baz: 3
-foo: 1
----
-bar: 5
-baz: 6
-foo: 4
----
-bar: 8
-baz: 9
-foo: 7
-ENDYML
-
-    my $csv = <<'ENDJSON';
-foo,bar,baz
-1,2,3
-4,5,6
-7,8,9
-ENDJSON
-
-    my ( $csv_fh, $csv_fn ) = tempfile();
-    print {$csv_fh} $csv;
-    seek $csv_fh, 0, 0;
-
-    subtest 'filename' => sub {
-        my ( $stdout, $stderr, $exit ) = capture { yfrom->main( 'csv', $csv_fn ) };
-        is $exit, 0, 'exit 0';
-        ok !$stderr, 'nothing on stderr' or diag $stderr;
-        eq_or_diff $stdout, $text;
-    };
-    subtest 'stdin' => sub {
-        local *STDIN = $csv_fh;
-
-        my ( $stdout, $stderr, $exit ) = capture { yfrom->main( 'csv' ) };
-        is $exit, 0, 'exit 0';
-        ok !$stderr, 'nothing on stderr' or diag $stderr;
-        eq_or_diff $stdout, $text;
-
-        seek $csv_fh, 0, 0;
-    };
-
-    subtest '--no-trim' => sub {
-        my $csv_notrim = <<ENDCSV;
-foo,bar,baz
-  1,  2,  3
-  4,  5,  6
-  7,  8,  9
-ENDCSV
-
-        my $text_notrim = <<ENDYML;
----
-bar: '  2'
-baz: '  3'
-foo: '  1'
----
-bar: '  5'
-baz: '  6'
-foo: '  4'
----
-bar: '  8'
-baz: '  9'
-foo: '  7'
-ENDYML
-
-        my ( $csv_fh, $csv_fn ) = tempfile();
-        print {$csv_fh} $csv_notrim;
-        seek $csv_fh, 0, 0;
-
-        subtest 'default behavior is to trim' => sub {
-            my ( $stdout, $stderr, $exit ) = capture { yfrom->main( 'csv', $csv_fn ) };
-            is $exit, 0, 'exit 0';
-            ok !$stderr, 'nothing on stderr' or diag $stderr;
-            eq_or_diff $stdout, $text;
-        };
-
-        subtest 'explicitly prevent trimming' => sub {
-            my ( $stdout, $stderr, $exit ) = capture { yfrom->main( 'csv', '--no-trim', $csv_fn ) };
-            is $exit, 0, 'exit 0';
-            ok !$stderr, 'nothing on stderr' or diag $stderr;
-            eq_or_diff $stdout, $text_notrim;
-        };
-
     };
 };
 
