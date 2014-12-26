@@ -20,6 +20,8 @@ our %IMPORT_BUNDLES = (
         qw( Test::More Test::Deep Test::Exception Test::Differences ),
         FindBin => [ '$Bin' ],
         boolean => [':all'],
+        'Path::Tiny' => [qw( path cwd )],
+        'Dir::Self' => [qw( __DIR__ )],
     ],
 
     Class => [

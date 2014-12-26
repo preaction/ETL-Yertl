@@ -3,22 +3,11 @@ use ETL::Yertl 'Test';
 use Test::Lib;
 use YAML;
 use ETL::Yertl::Format::yaml;
+my $SHARE_DIR = path( __DIR__, '..', 'share' );
 
 my $CLASS = 'ETL::Yertl::Format::yaml';
 
-my $EXPECT_TO = <<ENDYAML;
----
-baz: buzz
-foo: bar
----
-flip:
-  - flop
-  - blip
----
-- foo
-- bar
-- baz
-ENDYAML
+my $EXPECT_TO = $SHARE_DIR->child( yaml => 'test.yaml' )->slurp;
 
 my @EXPECT_FROM = (
     {

@@ -2,27 +2,12 @@
 use ETL::Yertl 'Test';
 use Test::Lib;
 use ETL::Yertl::Format::json;
+my $SHARE_DIR = path( __DIR__, '..', 'share' );
 
 my $CLASS = 'ETL::Yertl::Format::json';
 
 # 3-space indents because JSON::XS provides no other option
-my $EXPECT_TO = <<ENDJSON;
-{
-   "baz" : "buzz",
-   "foo" : "bar"
-}
-{
-   "flip" : [
-      "flop",
-      "blip"
-   ]
-}
-[
-   "foo",
-   "bar",
-   "baz"
-]
-ENDJSON
+my $EXPECT_TO = $SHARE_DIR->child( json => 'test.json' )->slurp;
 
 my @EXPECT_FROM = (
     {

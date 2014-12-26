@@ -1,0 +1,15 @@
+{
+   "baz" : "buzz",
+   "foo" : "bar"
+}
+{
+   "flip" : [
+      "flop",
+      "blip"
+   ]
+}
+[
+   "foo",
+   "bar",
+   "baz"
+]

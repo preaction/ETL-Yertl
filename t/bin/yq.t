@@ -3,6 +3,7 @@ use ETL::Yertl 'Test';
 use YAML qw( Dump Load );
 use Capture::Tiny qw( capture );
 use File::Spec;
+my $SHARE_DIR = path( __DIR__, '..', 'share' );
 
 my $script = "$FindBin::Bin/../../bin/yq";
 require $script;
@@ -26,34 +27,16 @@ subtest 'must provide a filter' => sub {
 };
 
 subtest 'empty does not print' => sub {
-    my @doc = (
-        {
-            foo => 'bar',
-        },
-        {
-            bar => 'baz',
-        },
-    );
-
-    open my $stdin, '<', \( YAML::Dump( @doc ) );
-    local *STDIN = $stdin;
-    my $filter = 'if .foo eq bar then . else empty';
+    local *STDIN = $SHARE_DIR->child( yaml => 'noseperator.yaml' )->openr;
+    my $filter = 'if .foo eq bar then .foo else empty';
     my ( $output, $stderr ) = capture { yq->main( $filter ) };
     ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
     my @got = YAML::Load( $output );
-    cmp_deeply \@got, [ $doc[0] ];
+    cmp_deeply \@got, [ 'bar' ];
 };
 
 subtest 'single document with no --- separator' => sub {
-    my $doc = <<ENDYML;
-foo: bar
-baz: buzz
-flip:
-    - flop
-    - blip
-ENDYML
-    open my $stdin, '<', \$doc;
-    local *STDIN = $stdin;
+    local *STDIN = $SHARE_DIR->child( yaml => 'noseperator.yaml' )->openr;
     my $filter = '.flip.[0]';
     my ( $output, $stderr ) = capture { yq->main( $filter ) };
     ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
@@ -62,21 +45,16 @@ ENDYML
 };
 
 subtest 'file in ARGV' => sub {
-    my $file = File::Spec->catfile( $Bin, '..', 'share', 'foo.yml' );
+    my $file = $SHARE_DIR->child( yaml => 'foo.yaml' );
     my $filter = '.foo';
-    my ( $output, $stderr ) = capture { yq->main( $filter, $file ) };
+    my ( $output, $stderr ) = capture { yq->main( $filter, "$file" ) };
     ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
     my @got = YAML::Load( $output );
     cmp_deeply \@got, [ 'bar' ];
 };
 
 subtest 'multiple documents print properly' => sub {
-    my $doc = <<ENDYML;
-foo: bar
-baz: buzz
-ENDYML
-    open my $stdin, '<', \$doc;
-    local *STDIN = $stdin;
+    local *STDIN = $SHARE_DIR->child( yaml => 'noseperator.yaml' )->openr;
     my $filter = '.foo, .baz';
     my ( $output, $stderr ) = capture { yq->main( $filter ) };
     ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
@@ -85,19 +63,7 @@ ENDYML
 };
 
 subtest 'finish() gets called' => sub {
-    my $docs = <<ENDYML;
----
-foo: 'bar'
-baz: 1
----
-foo: 'bar'
-baz: 2
----
-foo: 'baz'
-baz: 3
-ENDYML
-    open my $stdin, '<', \$docs;
-    local *STDIN = $stdin;
+    local *STDIN = $SHARE_DIR->child( yaml => 'group_by.yaml' )->openr;
     my $filter = 'group_by( .foo )';
     my ( $output, $stderr ) = capture { yq->main( $filter ) };
     ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";

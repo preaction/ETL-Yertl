@@ -2,20 +2,12 @@
 use ETL::Yertl 'Test';
 use Test::Lib;
 use ETL::Yertl::Format::csv;
+my $SHARE_DIR = path( __DIR__, '..', 'share' );
 
 my $CLASS = 'ETL::Yertl::Format::csv';
 
-my $EXPECT_TO = <<ENDJSON;
-bar,baz,foo
-2,3,one
-4,5,two
-ENDJSON
-
-my $EXPECT_TO_NOTRIM = <<ENDJSON;
-bar,baz,foo
-  2,  3,one
-  4,  5,two
-ENDJSON
+my $EXPECT_TO = $SHARE_DIR->child( csv => 'test.csv' )->slurp;
+my $EXPECT_TO_NOTRIM = $SHARE_DIR->child( csv => 'notrim.csv' )->slurp;
 
 my @EXPECT_FROM = (
     {
@@ -30,7 +22,7 @@ my @EXPECT_FROM = (
     },
 );
 
-my @EXPECT_NOTRIM = (
+my @EXPECT_FROM_NOTRIM = (
     {
         bar => '  2',
         baz => '  3',
@@ -83,7 +75,7 @@ subtest 'format options' => sub {
     subtest 'no trim' => sub {
         my $formatter = $CLASS->new( trim => 0 );
         my $got = [ $formatter->from( split /\n/, $EXPECT_TO_NOTRIM ) ];
-        cmp_deeply $got, \@EXPECT_NOTRIM or diag explain $got;
+        cmp_deeply $got, \@EXPECT_FROM_NOTRIM or diag explain $got;
     };
 
 };
