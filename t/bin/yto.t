@@ -49,21 +49,21 @@ subtest 'error checking' => sub {
 };
 
 subtest 'DOC -> JSON' => sub {
-    plan skip_all => 'No JSON module installed (' . ( join ", ", yto->format_modules( 'json' ) ) . ')'
-        unless yto->can_format( 'json' );
+    # JSON::PP is a test requirement
 
     subtest 'filename' => sub {
         my ( $stdout, $stderr, $exit ) = capture { yto->main( 'json', $doc_fn ) };
         is $exit, 0, 'exit 0';
-        ok !$stderr, 'nothing on stderr';
+        ok !$stderr, 'nothing on stderr' or diag $stderr;
         like $stdout, $json;
     };
+
     subtest 'stdin' => sub {
         local *STDIN = $doc_fh;
 
         my ( $stdout, $stderr, $exit ) = capture { yto->main( 'json' ) };
         is $exit, 0, 'exit 0';
-        ok !$stderr, 'nothing on stderr';
+        ok !$stderr, 'nothing on stderr' or diag $stderr;
         like $stdout, $json;
 
         seek $doc_fh, 0, 0;

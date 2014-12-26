@@ -5,8 +5,7 @@ package yto;
 use ETL::Yertl;
 use Pod::Usage::Return qw( pod2usage );
 use Getopt::Long qw( GetOptionsFromArray );
-use YAML;
-use Module::Runtime qw( use_module );
+use ETL::Yertl::Command::yto;
 
 $|++; # no buffering
 
@@ -23,97 +22,13 @@ sub main {
         return 0;
     }
 
-    my $format = shift @argv;
-    return pod2usage("ERROR: Must give a format") unless $format;
-    return pod2usage("ERROR: Unknown format '$format'")
-        unless $class->format_modules( $format );
-
-    push @argv, "-" unless @argv;
-    for $ARGV ( @argv ) {
-        # We're doing a similar behavior to <>, but manually for easier testing.
-        my $fh;
-        if ( $ARGV eq '-' ) {
-            # Use the existing STDIN so tests can fake it
-            $fh = \*STDIN;
-        }
-        else {
-            unless ( open $fh, '<', $ARGV ) {
-                warn "Could not open file '$ARGV' for reading: $!\n";
-                next;
-            }
-        }
-
-        my $buffer;
-        my $scope = {};
-        while ( my $line = <$fh> ) {
-            # --- is the start of a new document
-            if ( $buffer && $line =~ /^---/ ) {
-                # Flush the previous document
-                print $class->format( $format, YAML::Load( $buffer ) );
-                $buffer = '';
-            }
-            $buffer .= $line;
-        }
-        # Flush the buffer in the case of a single document with no ---
-        if ( $buffer =~ /\S/ ) {
-            #print STDERR "Buffer is: $buffer\n";
-            print $class->format( $format, YAML::Load( $buffer ) );
-        }
+    eval {
+        ETL::Yertl::Command::yto->main( @argv, \%opt );
+    };
+    if ( $@ ) {
+        return pod2usage( "ERROR: $@" );
     }
-
     return 0;
-}
-
-# Hash of "format" => Formatter sub we chose
-# This is after we choose a formatter module
-my %formatter = ();
-
-# Hash of "format" => [ MODULE... ]
-# The modules are in order we should try to load them, so put the better ones first
-my %FORMAT_MODULES = (
-    json => [qw( JSON::XS JSON::PP )],
-);
-
-# Hash of MODULE => formatter sub
-my %FORMAT_SUB = (
-    'JSON::XS' => sub {
-        state $json = JSON::XS->new->canonical->pretty->allow_nonref;
-        return join( "\n", map { $json->encode( $_ ) } @_ );
-    },
-    'JSON::PP' => sub {
-        state $json = JSON::PP->new->canonical->pretty->indent_length(3)->allow_nonref;
-        return join "\n", map { $json->encode( $_ ) } @_;
-    },
-);
-
-sub format_modules {
-    my ( $class, $format ) = @_;
-    return unless $FORMAT_MODULES{ $format };
-    return @{ $FORMAT_MODULES{ $format } };
-}
-
-sub can_format {
-    my ( $class, $format ) = @_;
-    my $f = $formatter{ $format };
-    if ( !$f ) {
-        my @modules = $class->format_modules( $format );
-        for my $module ( @modules ) {
-            if ( eval { use_module( $module ); 1 } ) {
-                $f = $formatter{ $format } = $FORMAT_SUB{ $module };
-                last;
-            }
-        }
-    }
-    return $f;
-}
-
-sub format {
-    my ( $class, $format, @docs ) = @_;
-    my $f = $class->can_format( $format )
-        or die "Could not load format module for '$format' (tried: "
-            . ( join ", ", $class->format_modules( $format ) )
-            . ")\n";
-    return $f->( @docs );
 }
 
 exit __PACKAGE__->main( @ARGV ) unless caller(0);
