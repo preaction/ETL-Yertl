@@ -57,6 +57,13 @@ subtest 'JSON::PP' => sub {
     cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
 };
 
+subtest 'default' => sub {
+    my $formatter = $CLASS->new;
+    eq_or_diff $formatter->to( @EXPECT_FROM ), $EXPECT_TO;
+    my $got = [ $formatter->from( $EXPECT_TO ) ];
+    cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
+};
+
 subtest 'no formatter available' => sub {
     local @ETL::Yertl::Format::json::FORMAT_MODULES = (
         'Not::JSON::Module' => 0,
