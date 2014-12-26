@@ -45,7 +45,8 @@ has format_module => (
     default => sub {
         for my $format_module ( pairs @FORMAT_MODULES ) {
             eval {
-                use_module( @$format_module );
+                # Prototypes on use_module() make @$format_module not work correctly
+                use_module( $format_module->[0], $format_module->[1] );
             };
             if ( !$@ ) {
                 return $format_module->[0];

@@ -54,6 +54,18 @@ for my $format_module ( qw( YAML::XS YAML::Syck YAML ) ) {
     };
 }
 
+subtest 'default' => sub {
+    my $formatter = $CLASS->new;
+    my $got_yaml = $formatter->to( @EXPECT_FROM );
+    my $format_module = $formatter->format_module;
+
+    no strict 'refs';
+    cmp_deeply [ "${format_module}::Load"->( $got_yaml ) ], \@EXPECT_FROM or diag $got_yaml;
+
+    my $got = [ $formatter->from( $EXPECT_TO ) ];
+    cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
+};
+
 subtest 'no formatter available' => sub {
     local @ETL::Yertl::Format::yaml::FORMAT_MODULES = (
         'Not::YAML::Module' => 0,
