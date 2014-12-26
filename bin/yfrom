@@ -5,9 +5,7 @@ package yfrom;
 use ETL::Yertl;
 use Pod::Usage::Return qw( pod2usage );
 use Getopt::Long qw( GetOptionsFromArray );
-use YAML;
-use Module::Runtime qw( use_module );
-use Text::Trim qw( ltrim );
+use ETL::Yertl::Command::yfrom;
 
 $|++; # no buffering
 
@@ -29,123 +27,13 @@ sub main {
     # hash
     $opt{trim} //= 1;
 
-    my $format = shift @argv;
-    return pod2usage("ERROR: Must give a format") unless $format;
-    return pod2usage("ERROR: Unknown format '$format'")
-        unless $class->format_modules( $format );
-
-    push @argv, "-" unless @argv;
-    for $ARGV ( @argv ) {
-        # We're doing a similar behavior to <>, but manually for easier testing.
-        my $fh;
-        if ( $ARGV eq '-' ) {
-            # Use the existing STDIN so tests can fake it
-            $fh = \*STDIN;
-        }
-        else {
-            unless ( open $fh, '<', $ARGV ) {
-                warn "Could not open file '$ARGV' for reading: $!\n";
-                next;
-            }
-        }
-
-        my $f = $class->can_format( $format, %opt )
-            or die "Could not load format module for '$format' (tried: "
-                . ( join ", ", $class->format_modules( $format ) )
-                . ")\n";
-
-        while ( my $line = <$fh> ) {
-            my @docs = $f->( $line );
-            print YAML::Dump( @docs ) if @docs;
-        }
+    eval {
+        ETL::Yertl::Command::yfrom->main( @argv, \%opt );
+    };
+    if ( $@ ) {
+        return pod2usage( "ERROR: $@" );
     }
-
     return 0;
-}
-
-my %formatter;
-
-# Hash of "format" => [ MODULE... ]
-# The modules are in order we should try to load them, so put the better ones first
-my %FORMAT_MODULES = (
-    json => [qw( JSON::XS JSON::PP )],
-    csv => [qw( Text::CSV_XS Text::CSV )],
-);
-
-# Hash of MODULE => formatter sub
-sub format_sub {
-    my ( $class, $module, %opt ) = @_;
-
-    # Do this to reset the state() variables every time
-    my %FORMAT_SUB = (
-        'JSON::XS' => sub {
-            state $json = JSON::XS->new->relaxed;
-            return $json->incr_parse( @_ );
-        },
-
-        'JSON::PP' => sub {
-            state $json = JSON::PP->new->relaxed;
-            return $json->incr_parse( @_ );
-        },
-
-        'Text::CSV_XS' => sub {
-            state $csv = Text::CSV_XS->new;
-            state @names;
-            if ( !@names ) {
-                $csv->parse( shift );
-                @names = $csv->fields;
-                return;
-            }
-            $csv->parse( shift );
-            my @values = $csv->fields;
-            my $doc = { map {; $names[ $_ ] => $values[ $_ ] } 0..$#values };
-            if ( $opt{trim} ) {
-                ltrim for values %$doc;
-            }
-            return $doc;
-        },
-
-        'Text::CSV' => sub {
-            state $csv = Text::CSV->new;
-            state @names;
-            if ( !@names ) {
-                $csv->parse( shift );
-                @names = $csv->fields;
-                return;
-            }
-            $csv->parse( shift );
-            my @values = $csv->fields;
-            my $doc = { map {; $names[ $_ ] => $values[ $_ ] } 0..$#values };
-            if ( $opt{trim} ) {
-                ltrim for values %$doc;
-            }
-            return $doc;
-        },
-
-    );
-
-    return $FORMAT_SUB{ $module };
-}
-
-sub format_modules {
-    my ( $class, $format ) = @_;
-    return unless $FORMAT_MODULES{ $format };
-    return @{ $FORMAT_MODULES{ $format } };
-}
-
-sub can_format {
-    my ( $class, $format, %opt ) = @_;
-    my $m = $formatter{ $format };
-    if ( !$m ) {
-        my @modules = $class->format_modules( $format );
-        for my $module ( @modules ) {
-            if ( eval { use_module( $module ); 1 } ) {
-                $m = $module;
-                last;
-            }
-        }
-    }
-    return $class->format_sub( $m, %opt );
 }
 
 exit __PACKAGE__->main( @ARGV ) unless caller(0);
