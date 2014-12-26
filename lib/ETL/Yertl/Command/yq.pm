@@ -103,6 +103,7 @@ __END__
 
     ### On a shell...
     $ yq [-v] <script> [<file>...]
+    $ yq [-h|--help|--version]
 
     ### In Perl...
     use ETL::Yertl;
@@ -113,5 +114,4 @@ __END__
 =head1 ARGUMENTS
 
 =head1 OPTIONS
-
 
