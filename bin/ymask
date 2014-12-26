@@ -5,8 +5,7 @@ package ymask;
 use ETL::Yertl;
 use Pod::Usage::Return qw( pod2usage );
 use Getopt::Long qw( GetOptionsFromArray );
-use YAML;
-use Data::Partial::Google;
+use ETL::Yertl::Command::ymask;
 
 $|++; # no buffering
 
@@ -23,44 +22,12 @@ sub main {
         return 0;
     }
 
-    my $mask = shift @argv;
-    return pod2usage("ERROR: Must give a mask") unless $mask;
-
-    my $filter = Data::Partial::Google->new( $mask );
-
-    push @argv, "-" unless @argv;
-    for $ARGV ( @argv ) {
-        # We're doing a similar behavior to <>, but manually for easier testing.
-        my $fh;
-        if ( $ARGV eq '-' ) {
-            # Use the existing STDIN so tests can fake it
-            $fh = \*STDIN;
-        }
-        else {
-            unless ( open $fh, '<', $ARGV ) {
-                warn "Could not open file '$ARGV' for reading: $!\n";
-                next;
-            }
-        }
-
-        my $buffer;
-        my $scope = {};
-        while ( my $line = <$fh> ) {
-            # --- is the start of a new document
-            if ( $buffer && $line =~ /^---/ ) {
-                # Flush the previous document
-                print YAML::Dump( $filter->mask( YAML::Load( $buffer ) ) );
-                $buffer = '';
-            }
-            $buffer .= $line;
-        }
-        # Flush the buffer in the case of a single document with no ---
-        if ( $buffer =~ /\S/ ) {
-            #print STDERR "Buffer is: $buffer\n";
-            print YAML::Dump( $filter->mask( YAML::Load( $buffer ) ) );
-        }
+    eval {
+        ETL::Yertl::Command::ymask->main( @argv, \%opt );
+    };
+    if ( $@ ) {
+        return pod2usage( "ERROR: $@" );
     }
-
     return 0;
 }
 
