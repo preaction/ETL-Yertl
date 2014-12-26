@@ -58,7 +58,8 @@ has format_module => (
     default => sub {
         for my $format_module ( pairs @FORMAT_MODULES ) {
             eval {
-                use_module( @$format_module );
+                # Prototypes on use_module() make @$format_module not work correctly
+                use_module( $format_module->[0], $format_module->[1] );
             };
             if ( !$@ ) {
                 return $format_module->[0];
@@ -72,106 +73,116 @@ has format_module => (
 );
 
 
-# Hash of MODULE => formatter sub
-my %FORMAT_SUB = (
+sub format_sub {
+    # Since we use state variables to keep the headers, we need to build new subs
+    # for every instance. This is not a good way to do this and we need to come
+    # up with another one (caching on the object perhaps?)
 
-    'Text::CSV_XS' => {
-        to => sub {
-            my $self = shift;
-            state $csv = Text::CSV_XS->new;
-            state @names;
-            my $str;
+    my ( $self ) = @_;
 
-            if ( !@names ) {
-                @names = sort keys %{ $_[0] };
-                $csv->combine( @names );
-                $str .= $csv->string . $/;
-            }
+    # Hash of MODULE => formatter sub
+    my %subs = (
 
-            for my $doc ( @_ ) {
-                $csv->combine( map { $doc->{ $_ } } @names );
-                $str .= $csv->string . $/;
-            }
+        'Text::CSV_XS' => {
+            to => sub {
+                my $self = shift;
+                state $csv = Text::CSV_XS->new;
+                state @names;
+                my $str;
 
-            return $str;
-        },
-
-        from => sub {
-            my $self = shift;
-            state $csv = Text::CSV_XS->new;
-            state @names;
-
-            if ( !@names ) {
-                $csv->parse( shift );
-                @names = $csv->fields;
-            }
-
-            my @docs;
-            for my $line ( @_ ) {
-                $csv->parse( $line );
-                my @values = $csv->fields;
-                my $doc = { map {; $names[ $_ ] => $values[ $_ ] } 0..$#values };
-
-                if ( $self->trim ) {
-                    ltrim for values %$doc;
+                if ( !@names ) {
+                    @names = sort keys %{ $_[0] };
+                    $csv->combine( @names );
+                    $str .= $csv->string . $/;
                 }
 
-                push @docs, $doc;
-            }
-
-            return @docs;
-        },
-    },
-
-    'Text::CSV' => {
-        to => sub {
-            my $self = shift;
-            state $csv = Text::CSV->new;
-            state @names;
-            my $str;
-
-            if ( !@names ) {
-                @names = sort keys %{ $_[0] };
-                $csv->combine( @names );
-                $str .= $csv->string . $/;
-            }
-
-            for my $doc ( @_ ) {
-                $csv->combine( map { $doc->{ $_ } } @names );
-                $str .= $csv->string . $/;
-            }
-
-            return $str;
-        },
-
-        from => sub {
-            my $self = shift;
-            state $csv = Text::CSV->new;
-            state @names;
-
-            if ( !@names ) {
-                $csv->parse( shift );
-                @names = $csv->fields;
-            }
-
-            my @docs;
-            for my $line ( @_ ) {
-                $csv->parse( $line );
-                my @values = $csv->fields;
-                my $doc = { map {; $names[ $_ ] => $values[ $_ ] } 0..$#values };
-
-                if ( $self->trim ) {
-                    ltrim for values %$doc;
+                for my $doc ( @_ ) {
+                    $csv->combine( map { $doc->{ $_ } } @names );
+                    $str .= $csv->string . $/;
                 }
 
-                push @docs, $doc;
-            }
+                return $str;
+            },
 
-            return @docs;
+            from => sub {
+                my $self = shift;
+                state $csv = Text::CSV_XS->new;
+                state @names;
+
+                if ( !@names ) {
+                    $csv->parse( shift );
+                    @names = $csv->fields;
+                }
+
+                my @docs;
+                for my $line ( @_ ) {
+                    $csv->parse( $line );
+                    my @values = $csv->fields;
+                    my $doc = { map {; $names[ $_ ] => $values[ $_ ] } 0..$#values };
+
+                    if ( $self->trim ) {
+                        ltrim for values %$doc;
+                    }
+
+                    push @docs, $doc;
+                }
+
+                return @docs;
+            },
         },
 
-    },
-);
+        'Text::CSV' => {
+            to => sub {
+                my $self = shift;
+                state $csv = Text::CSV->new;
+                state @names;
+                my $str;
+
+                if ( !@names ) {
+                    @names = sort keys %{ $_[0] };
+                    $csv->combine( @names );
+                    $str .= $csv->string . $/;
+                }
+
+                for my $doc ( @_ ) {
+                    $csv->combine( map { $doc->{ $_ } } @names );
+                    $str .= $csv->string . $/;
+                }
+
+                return $str;
+            },
+
+            from => sub {
+                my $self = shift;
+                state $csv = Text::CSV->new;
+                state @names;
+
+                if ( !@names ) {
+                    $csv->parse( shift );
+                    @names = $csv->fields;
+                }
+
+                my @docs;
+                for my $line ( @_ ) {
+                    $csv->parse( $line );
+                    my @values = $csv->fields;
+                    my $doc = { map {; $names[ $_ ] => $values[ $_ ] } 0..$#values };
+
+                    if ( $self->trim ) {
+                        ltrim for values %$doc;
+                    }
+
+                    push @docs, $doc;
+                }
+
+                return @docs;
+            },
+
+        },
+    );
+
+    return $subs{ $self->format_module };
+}
 
 =method to( DOCUMENTS )
 
@@ -181,7 +192,7 @@ Convert the given C<DOCUMENTS> to CSV. Returns a CSV string.
 
 sub to {
     my $self = shift;
-    return $FORMAT_SUB{ $self->format_module }{to}->( $self, @_ );
+    return $self->format_sub->{to}->( $self, @_ );
 }
 
 =method from( CSV )
@@ -192,6 +203,9 @@ Convert the given C<CSV> string into documents. Returns the list of values extra
 
 sub from {
     my $self = shift;
-    return $FORMAT_SUB{ $self->format_module }{from}->( $self, @_ );
+    return $self->format_sub->{from}->( $self, @_ );
 }
+
+1;
+__END__
 
