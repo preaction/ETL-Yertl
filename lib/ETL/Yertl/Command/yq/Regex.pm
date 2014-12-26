@@ -1,4 +1,4 @@
-package ETL::Yertl::Filter::Regex;
+package ETL::Yertl::Command::yq::Regex;
 # ABSTRACT: A regex-based parser for programs
 
 use ETL::Yertl;

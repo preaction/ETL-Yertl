@@ -4,7 +4,7 @@ use YAML qw( Dump Load );
 use Capture::Tiny qw( capture );
 use File::Spec;
 
-my $script = "$FindBin::Bin/../bin/yq";
+my $script = "$FindBin::Bin/../../bin/yq";
 require $script;
 $0 = $script; # So pod2usage finds the right file
 
@@ -62,7 +62,7 @@ ENDYML
 };
 
 subtest 'file in ARGV' => sub {
-    my $file = File::Spec->catfile( $Bin, 'share', 'foo.yml' );
+    my $file = File::Spec->catfile( $Bin, '..', 'share', 'foo.yml' );
     my $filter = '.foo';
     my ( $output, $stderr ) = capture { yq->main( $filter, $file ) };
     ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";

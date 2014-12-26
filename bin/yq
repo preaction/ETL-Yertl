@@ -98,7 +98,7 @@ sub diag {
     print STDERR "$text\n" if $VERBOSE >= $level;
 }
 
-$ENV{YQ_CLASS} ||= 'ETL::Yertl::Filter::Regex';
+$ENV{YQ_CLASS} ||= 'ETL::Yertl::Command::yq::Regex';
 use_module( $ENV{YQ_CLASS} );
 {
     no strict 'refs';

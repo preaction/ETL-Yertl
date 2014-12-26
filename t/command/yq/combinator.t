@@ -1,6 +1,6 @@
 
 use ETL::Yertl 'Test';
-my $script = "$FindBin::Bin/../bin/yq";
+my $script = "$FindBin::Bin/../../../bin/yq";
 require $script;
 
 subtest ', emits multiple results' => sub {

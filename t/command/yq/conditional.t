@@ -1,6 +1,6 @@
 
 use ETL::Yertl 'Test';
-my $script = "$FindBin::Bin/../bin/yq";
+my $script = "$FindBin::Bin/../../../bin/yq";
 require $script;
 
 subtest 'conditional match single hash key and return full document' => sub {

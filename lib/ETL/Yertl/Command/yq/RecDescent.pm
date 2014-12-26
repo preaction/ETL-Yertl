@@ -1,4 +1,4 @@
-package ETL::Yertl::Filter::RecDescent;
+package ETL::Yertl::Command::yq::RecDescent;
 # ABSTRACT: A Parse::RecDescent-based parser for programs
 
 use ETL::Yertl;
