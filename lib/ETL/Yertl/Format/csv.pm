@@ -4,21 +4,16 @@ package ETL::Yertl::Format::csv;
 use ETL::Yertl 'Class';
 use Module::Runtime qw( use_module );
 use List::Util qw( pairs pairkeys pairfirst );
-use Text::Trim qw( ltrim );
 
-=attr trim
+=attr input
 
-If true, trim off leading whitespace from the cells. Defaults to true.
-
-Some CSV documents are formatted to line up the commas for easy visual
-scanning. This removes that whitespace.
+The filehandle to read from for input.
 
 =cut
 
-has trim => (
+has input => (
     is => 'ro',
-    isa => Bool,
-    default => sub { 1 },
+    isa => FileHandle,
 );
 
 =attr format_module
@@ -72,138 +67,71 @@ has format_module => (
     },
 );
 
+has _field_names => (
+    is => 'rw',
+    isa => ArrayRef[Str],
+    default => sub { [] },
+);
 
-sub format_sub {
-    # Since we use state variables to keep the headers, we need to build new subs
-    # for every instance. This is not a good way to do this and we need to come
-    # up with another one (caching on the object perhaps?)
+has _csv => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+        my ( $self ) = @_;
+        $self->format_module->new({ binary => 1, eol => $\ });
+    },
+);
 
-    my ( $self ) = @_;
-
-    # Hash of MODULE => formatter sub
-    my %subs = (
-
-        'Text::CSV_XS' => {
-            to => sub {
-                my $self = shift;
-                state $csv = Text::CSV_XS->new;
-                state @names;
-                my $str;
-
-                if ( !@names ) {
-                    @names = sort keys %{ $_[0] };
-                    $csv->combine( @names );
-                    $str .= $csv->string . $/;
-                }
-
-                for my $doc ( @_ ) {
-                    $csv->combine( map { $doc->{ $_ } } @names );
-                    $str .= $csv->string . $/;
-                }
-
-                return $str;
-            },
-
-            from => sub {
-                my $self = shift;
-                state $csv = Text::CSV_XS->new;
-                state @names;
-
-                if ( !@names ) {
-                    $csv->parse( shift );
-                    @names = $csv->fields;
-                }
-
-                my @docs;
-                for my $line ( @_ ) {
-                    $csv->parse( $line );
-                    my @values = $csv->fields;
-                    my $doc = { map {; $names[ $_ ] => $values[ $_ ] } 0..$#values };
-
-                    if ( $self->trim ) {
-                        ltrim for values %$doc;
-                    }
-
-                    push @docs, $doc;
-                }
-
-                return @docs;
-            },
-        },
-
-        'Text::CSV' => {
-            to => sub {
-                my $self = shift;
-                state $csv = Text::CSV->new;
-                state @names;
-                my $str;
-
-                if ( !@names ) {
-                    @names = sort keys %{ $_[0] };
-                    $csv->combine( @names );
-                    $str .= $csv->string . $/;
-                }
-
-                for my $doc ( @_ ) {
-                    $csv->combine( map { $doc->{ $_ } } @names );
-                    $str .= $csv->string . $/;
-                }
-
-                return $str;
-            },
-
-            from => sub {
-                my $self = shift;
-                state $csv = Text::CSV->new;
-                state @names;
-
-                if ( !@names ) {
-                    $csv->parse( shift );
-                    @names = $csv->fields;
-                }
-
-                my @docs;
-                for my $line ( @_ ) {
-                    $csv->parse( $line );
-                    my @values = $csv->fields;
-                    my $doc = { map {; $names[ $_ ] => $values[ $_ ] } 0..$#values };
-
-                    if ( $self->trim ) {
-                        ltrim for values %$doc;
-                    }
-
-                    push @docs, $doc;
-                }
-
-                return @docs;
-            },
-
-        },
-    );
-
-    return $subs{ $self->format_module };
-}
-
-=method to( DOCUMENTS )
+=method write( DOCUMENTS )
 
 Convert the given C<DOCUMENTS> to CSV. Returns a CSV string.
 
 =cut
 
-sub to {
-    my $self = shift;
-    return $self->format_sub->{to}->( $self, @_ );
+sub write {
+    my ( $self, @docs ) = @_;
+    my $csv = $self->_csv;
+    my $str = '';
+    my @names = @{ $self->_field_names };
+
+    if ( !@names ) {
+        @names = sort keys %{ $docs[0] };
+        $csv->combine( @names );
+        $str .= $csv->string . $/;
+        $self->_field_names( \@names );
+    }
+
+    for my $doc ( @docs ) {
+        $csv->combine( map { $doc->{ $_ } } @names );
+        $str .= $csv->string . $/;
+    }
+
+    return $str;
 }
 
-=method from( CSV )
+=method read()
 
-Convert the given C<CSV> string into documents. Returns the list of values extracted.
+Read a CSV string from L<input> and return all the documents.
 
 =cut
 
-sub from {
-    my $self = shift;
-    return $self->format_sub->{from}->( $self, @_ );
+sub read {
+    my ( $self ) = @_;
+    my $fh = $self->input || die "No input filehandle";
+    my $csv = $self->_csv;
+    my @names = @{ $self->_field_names };
+
+    if ( !@names ) {
+        @names = @{ $csv->getline( $fh ) };
+        $self->_field_names( \@names );
+    }
+
+    my @docs;
+    while ( my $row = $csv->getline( $fh ) ) {
+        push @docs, { map {; $names[ $_ ] => $row->[ $_ ] } 0..$#{ $row } };
+    }
+
+    return @docs;
 }
 
 1;

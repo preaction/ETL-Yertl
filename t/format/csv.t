@@ -6,8 +6,7 @@ my $SHARE_DIR = path( __DIR__, '..', 'share' );
 
 my $CLASS = 'ETL::Yertl::Format::csv';
 
-my $EXPECT_TO = $SHARE_DIR->child( csv => 'test.csv' )->slurp;
-my $EXPECT_TO_NOTRIM = $SHARE_DIR->child( csv => 'notrim.csv' )->slurp;
+my $EXPECT_TO = $SHARE_DIR->child( csv => 'test.csv' );
 
 my @EXPECT_FROM = (
     {
@@ -22,19 +21,6 @@ my @EXPECT_FROM = (
     },
 );
 
-my @EXPECT_FROM_NOTRIM = (
-    {
-        bar => '  2',
-        baz => '  3',
-        foo => 'one',
-    },
-    {
-        bar => '  4',
-        baz => '  5',
-        foo => 'two',
-    },
-);
-
 subtest 'constructor' => sub {
     subtest 'invalid format module' => sub {
         throws_ok {
@@ -43,41 +29,51 @@ subtest 'constructor' => sub {
     };
 };
 
-subtest 'Text::CSV_XS' => sub {
-    my $formatter = $CLASS->new( format_module => 'Text::CSV_XS' );
-    eq_or_diff $formatter->to( @EXPECT_FROM ), $EXPECT_TO;
-    my $got = [ $formatter->from( split /\n/, $EXPECT_TO ) ];
-    cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
-};
-
-subtest 'Text::CSV' => sub {
-    my $formatter = $CLASS->new( format_module => 'Text::CSV' );
-    eq_or_diff $formatter->to( @EXPECT_FROM ), $EXPECT_TO;
-    my $got = [ $formatter->from( split /\n/, $EXPECT_TO ) ];
-    cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
-};
-
-subtest 'default' => sub {
-    my $formatter = $CLASS->new;
-    eq_or_diff $formatter->to( @EXPECT_FROM ), $EXPECT_TO;
-    my $got = [ $formatter->from( split /\n/, $EXPECT_TO ) ];
-    cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
-};
-
-subtest 'format options' => sub {
-
-    subtest 'trim (default)' => sub {
-        my $formatter = $CLASS->new;
-        my $got = [ $formatter->from( split /\n/, $EXPECT_TO_NOTRIM ) ];
+subtest 'default formatter' => sub {
+    subtest 'input' => sub {
+        my $formatter = $CLASS->new( input => $EXPECT_TO->openr );
+        my $got = [ $formatter->read ];
         cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
     };
 
-    subtest 'no trim' => sub {
-        my $formatter = $CLASS->new( trim => 0 );
-        my $got = [ $formatter->from( split /\n/, $EXPECT_TO_NOTRIM ) ];
-        cmp_deeply $got, \@EXPECT_FROM_NOTRIM or diag explain $got;
+    subtest 'output' => sub {
+        my $formatter = $CLASS->new;
+        eq_or_diff $formatter->write( @EXPECT_FROM ), $EXPECT_TO->slurp;
+    };
+};
+
+subtest 'formatter modules' => sub {
+    subtest 'Text::CSV_XS' => sub {
+        subtest 'input' => sub {
+            my $formatter = $CLASS->new(
+                input => $EXPECT_TO->openr,
+                format_module => 'Text::CSV_XS',
+            );
+            my $got = [ $formatter->read ];
+            cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
+        };
+
+        subtest 'output' => sub {
+            my $formatter = $CLASS->new( format_module => 'Text::CSV_XS' );
+            eq_or_diff $formatter->write( @EXPECT_FROM ), $EXPECT_TO->slurp;
+        };
     };
 
+    subtest 'Text::CSV' => sub {
+        subtest 'input' => sub {
+            my $formatter = $CLASS->new(
+                input => $EXPECT_TO->openr,
+                format_module => 'Text::CSV',
+            );
+            my $got = [ $formatter->read ];
+            cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
+        };
+
+        subtest 'output' => sub {
+            my $formatter = $CLASS->new( format_module => 'Text::CSV' );
+            eq_or_diff $formatter->write( @EXPECT_FROM ), $EXPECT_TO->slurp;
+        };
+    };
 };
 
 subtest 'no formatter available' => sub {
