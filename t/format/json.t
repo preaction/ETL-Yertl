@@ -7,7 +7,7 @@ my $SHARE_DIR = path( __DIR__, '..', 'share' );
 my $CLASS = 'ETL::Yertl::Format::json';
 
 # 3-space indents because JSON::XS provides no other option
-my $EXPECT_TO = $SHARE_DIR->child( json => 'test.json' )->slurp;
+my $EXPECT_TO = $SHARE_DIR->child( json => 'test.json' );
 
 my @EXPECT_FROM = (
     {
@@ -28,25 +28,53 @@ subtest 'constructor' => sub {
     };
 };
 
-subtest 'JSON::XS' => sub {
-    my $formatter = $CLASS->new( format_module => 'JSON::XS' );
-    eq_or_diff $formatter->to( @EXPECT_FROM ), $EXPECT_TO;
-    my $got = [ $formatter->from( $EXPECT_TO ) ];
-    cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
+subtest 'default formatter' => sub {
+    subtest 'input' => sub {
+        my $formatter = $CLASS->new(
+            input => $EXPECT_TO->openr,
+        );
+        my $got = [ $formatter->read ];
+        cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
+    };
+
+    subtest 'output' => sub {
+        my $formatter = $CLASS->new;
+        eq_or_diff $formatter->write( @EXPECT_FROM ), $EXPECT_TO->slurp;
+    };
 };
 
-subtest 'JSON::PP' => sub {
-    my $formatter = $CLASS->new( format_module => 'JSON::PP' );
-    eq_or_diff $formatter->to( @EXPECT_FROM ), $EXPECT_TO;
-    my $got = [ $formatter->from( $EXPECT_TO ) ];
-    cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
-};
+subtest 'formatter modules' => sub {
+    subtest 'JSON::XS' => sub {
+        subtest 'input' => sub {
+            my $formatter = $CLASS->new(
+                input => $EXPECT_TO->openr,
+                format_module => 'JSON::XS',
+            );
+            my $got = [ $formatter->read ];
+            cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
+        };
 
-subtest 'default' => sub {
-    my $formatter = $CLASS->new;
-    eq_or_diff $formatter->to( @EXPECT_FROM ), $EXPECT_TO;
-    my $got = [ $formatter->from( $EXPECT_TO ) ];
-    cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
+        subtest 'output' => sub {
+            my $formatter = $CLASS->new( format_module => 'JSON::XS' );
+            eq_or_diff $formatter->write( @EXPECT_FROM ), $EXPECT_TO->slurp;
+        };
+    };
+
+    subtest 'JSON::PP' => sub {
+        subtest 'input' => sub {
+            my $formatter = $CLASS->new(
+                input => $EXPECT_TO->openr,
+                format_module => 'JSON::PP',
+            );
+            my $got = [ $formatter->read ];
+            cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
+        };
+
+        subtest 'output' => sub {
+            my $formatter = $CLASS->new( format_module => 'JSON::PP' );
+            eq_or_diff $formatter->write( @EXPECT_FROM ), $EXPECT_TO->slurp;
+        };
+    };
 };
 
 subtest 'no formatter available' => sub {

@@ -5,6 +5,17 @@ use ETL::Yertl 'Class';
 use Module::Runtime qw( use_module );
 use List::Util qw( pairs pairkeys pairfirst );
 
+=attr input
+
+The filehandle to read from for input.
+
+=cut
+
+has input => (
+    is => 'ro',
+    isa => FileHandle,
+);
+
 =attr format_module
 
 The module being used for this format. Possible modules, in order of importance:
@@ -61,25 +72,25 @@ has format_module => (
 my %FORMAT_SUB = (
 
     'JSON::XS' => {
-        to => sub {
+        write => sub {
             my $self = shift;
             state $json = JSON::XS->new->canonical->pretty->allow_nonref;
             return join( "", map { $json->encode( $_ ) } @_ );
         },
-        from => sub {
+        read => sub {
             my $self = shift;
             state $json = JSON::XS->new->relaxed;
-            return $json->incr_parse( @_ );
+            return $json->incr_parse( do { local $/; readline $self->input } );
         },
     },
 
     'JSON::PP' => {
-        to => sub {
+        write => sub {
             my $self = shift;
             state $json = JSON::PP->new->canonical->pretty->indent_length(3)->allow_nonref;
             return join "", map { $json->encode( $_ ) } @_;
         },
-        from => sub {
+        read => sub {
             my $self = shift;
             state $json = JSON::PP->new->relaxed;
             require Storable;
@@ -87,12 +98,13 @@ my %FORMAT_SUB = (
 
             # Work around a bug in JSON::PP.
             # incr_parse() only returns the first item, see: https://github.com/makamaka/JSON-PP/pull/7
-            my @objs = $json->incr_parse( @_ );
+            my $text = do { local $/; readline $self->input };
+            my @objs = $json->incr_parse( $text );
             if ( scalar @objs == 1 ) {
-                my @more_objs = $json->incr_parse( @_ );
+                my @more_objs = $json->incr_parse( $text );
                 while ( Storable::freeze( $objs[0] ) ne Storable::freeze( $more_objs[0] ) ) {
                     push @objs, @more_objs;
-                    @more_objs = $json->incr_parse( @_ );
+                    @more_objs = $json->incr_parse( $text );
                     last if !@more_objs;
                 }
             }
@@ -103,26 +115,26 @@ my %FORMAT_SUB = (
 
 );
 
-=method to( DOCUMENTS )
+=method write( DOCUMENTS )
 
 Convert the given C<DOCUMENTS> to JSON. Returns a JSON string.
 
 =cut
 
-sub to {
+sub write {
     my $self = shift;
-    return $FORMAT_SUB{ $self->format_module }{to}->( $self, @_ );
+    return $FORMAT_SUB{ $self->format_module }{write}->( $self, @_ );
 }
 
-=method from( JSON )
+=method read()
 
-Convert the given C<JSON> string into documents. Returns the list of values extracted.
+Read a JSON string from L<input> and return all the documents
 
 =cut
 
-sub from {
+sub read {
     my $self = shift;
-    return $FORMAT_SUB{ $self->format_module }{from}->( $self, @_ );
+    return $FORMAT_SUB{ $self->format_module }{read}->( $self );
 }
 
 1;
