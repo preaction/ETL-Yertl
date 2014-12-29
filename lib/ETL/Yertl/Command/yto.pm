@@ -15,7 +15,11 @@ sub main {
     my ( $format, @files ) = @_;
 
     die "Must give a format\n" unless $format;
-    my $formatter_class = compose_module_name( 'ETL::Yertl::Format', $format );
+    my $formatter_class = eval { compose_module_name( 'ETL::Yertl::Format', $format ) };
+    if ( $@ ) {
+        die "Unknown format '$format'\n";
+    }
+
     eval {
         use_module( $formatter_class );
     };
@@ -26,7 +30,7 @@ sub main {
         die "Could not load format '$format': $@";
     }
 
-    my $formatter = $formatter_class->new( %opt );
+    my $out_fmt = $formatter_class->new( %opt );
 
     push @files, "-" unless @files;
     for my $file ( @files ) {
@@ -43,22 +47,8 @@ sub main {
             }
         }
 
-        my $buffer;
-        my $scope = {};
-        while ( my $line = <$fh> ) {
-            # --- is the start of a new document
-            if ( $buffer && $line =~ /^---/ ) {
-                # Flush the previous document
-                print $formatter->to( YAML::Load( $buffer ) );
-                $buffer = '';
-            }
-            $buffer .= $line;
-        }
-        # Flush the buffer in the case of a single document with no ---
-        if ( $buffer =~ /\S/ ) {
-            #print STDERR "Buffer is: $buffer\n";
-            print $formatter->to( YAML::Load( $buffer ) );
-        }
+        my $in_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
+        print $out_fmt->write( $in_fmt->read );
     }
 }
 
