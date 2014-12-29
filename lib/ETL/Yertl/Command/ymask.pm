@@ -1,7 +1,7 @@
 package ETL::Yertl::Command::ymask;
 
 use ETL::Yertl;
-use YAML;
+use ETL::Yertl::Format::yaml;
 use Data::Partial::Google;
 
 sub main {
@@ -17,6 +17,7 @@ sub main {
     die "Must give a mask\n" unless $mask;
 
     my $filter = Data::Partial::Google->new( $mask );
+    my $out_fmt = ETL::Yertl::Format::yaml->new;
 
     push @files, "-" unless @files;
     for my $file ( @files ) {
@@ -33,21 +34,9 @@ sub main {
             }
         }
 
-        my $buffer;
-        my $scope = {};
-        while ( my $line = <$fh> ) {
-            # --- is the start of a new document
-            if ( $buffer && $line =~ /^---/ ) {
-                # Flush the previous document
-                print YAML::Dump( $filter->mask( YAML::Load( $buffer ) ) );
-                $buffer = '';
-            }
-            $buffer .= $line;
-        }
-        # Flush the buffer in the case of a single document with no ---
-        if ( $buffer =~ /\S/ ) {
-            #print STDERR "Buffer is: $buffer\n";
-            print YAML::Dump( $filter->mask( YAML::Load( $buffer ) ) );
+        my $in_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
+        for my $doc ( $in_fmt->read ) {
+            print $out_fmt->write( $filter->mask( $doc ) );
         }
     }
 }

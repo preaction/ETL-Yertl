@@ -1,38 +1,18 @@
 
 use ETL::Yertl 'Test';
-use YAML qw( Dump Load );
 use Capture::Tiny qw( capture );
-use File::Spec;
-use File::Temp qw( tempfile );
+use ETL::Yertl::Format::yaml;
+my $SHARE_DIR = path( __DIR__, '..', 'share' );
 
 my $script = "$FindBin::Bin/../../bin/ymask";
 require $script;
 $0 = $script; # So pod2usage finds the right file
 
-my $text = <<ENDYML;
-foo: bar
-baz: buzz
----
-flip:
-  - flop: 1
-    blip: 2
-  - flop: 3
-    blip: 4
-ENDYML
-
-my @docs = Load( $text );
-my $expect = <<ENDYML;
----
-foo: bar
----
-flip:
-  - flop: 1
-  - flop: 3
-ENDYML
-
-my ( $doc_fh, $doc_fn ) = tempfile();
-print {$doc_fh} $text;
-seek $doc_fh, 0, 0;
+my $doc_fn = $SHARE_DIR->child(qw( command ymask in.yaml ));
+my @expect = (
+    { foo => 'bar' },
+    { flip => [ { flop => 1 }, { flop => 3 } ] },
+);
 
 subtest 'error checking' => sub {
     subtest 'no arguments' => sub {
@@ -45,21 +25,23 @@ subtest 'error checking' => sub {
 subtest 'input' => sub {
 
     subtest 'filename' => sub {
-        my ( $stdout, $stderr, $exit ) = capture { ymask->main( 'foo,flip/flop', $doc_fn ) };
+        my ( $stdout, $stderr, $exit ) = capture { ymask->main( 'foo,flip/flop', "$doc_fn" ) };
         is $exit, 0, 'exit 0';
         ok !$stderr, 'nothing on stderr';
-        eq_or_diff $stdout, $expect;
+        open my $fh, '<', \$stdout;
+        my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
+        cmp_deeply [ $yaml_fmt->read ], \@expect;
     };
 
     subtest 'stdin' => sub {
-        local *STDIN = $doc_fh;
+        local *STDIN = $doc_fn->openr;
 
         my ( $stdout, $stderr, $exit ) = capture { ymask->main( 'foo,flip/flop' ) };
         is $exit, 0, 'exit 0';
         ok !$stderr, 'nothing on stderr';
-        eq_or_diff $stdout, $expect;
-
-        seek $doc_fh, 0, 0;
+        open my $fh, '<', \$stdout;
+        my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
+        cmp_deeply [ $yaml_fmt->read ], \@expect;
     };
 };
 

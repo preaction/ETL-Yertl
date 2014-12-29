@@ -1,0 +1,8 @@
+foo: bar
+baz: buzz
+---
+flip:
+  - flop: 1
+    blip: 2
+  - flop: 3
+    blip: 4
