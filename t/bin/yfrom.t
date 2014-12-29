@@ -1,9 +1,8 @@
 
 use ETL::Yertl 'Test';
-use YAML qw( Dump Load );
 use Capture::Tiny qw( capture );
-use File::Spec;
-use File::Temp qw( tempfile );
+use ETL::Yertl::Format::yaml;
+my $SHARE_DIR = path( __DIR__, '..', 'share' );
 
 my $script = "$FindBin::Bin/../../bin/yfrom";
 require $script;
@@ -23,48 +22,30 @@ subtest 'error checking' => sub {
 };
 
 subtest 'JSON -> DOC' => sub {
-    my $text = <<ENDYML;
----
-baz: buzz
-foo: bar
----
-flip:
-  - flop
-  - blip
-ENDYML
-
-    my $json = <<'ENDJSON';
-{
-  "baz" : "buzz",
-  "foo" : "bar"
-}
-{
-  "flip" : [
-    "flop",
-    "blip"
-  ]
-}
-ENDJSON
-
-    my ( $json_fh, $json_fn ) = tempfile();
-    print {$json_fh} $json;
-    seek $json_fh, 0, 0;
+    my $json_fn = $SHARE_DIR->child( json => 'test.json' );
+    my @expect = (
+        { baz => 'buzz', foo => 'bar' },
+        { flip => [qw( flop blip )] },
+        [qw( foo bar baz )],
+    );
 
     subtest 'filename' => sub {
         my ( $stdout, $stderr, $exit ) = capture { yfrom->main( 'json', $json_fn ) };
         is $exit, 0, 'exit 0';
         ok !$stderr, 'nothing on stderr' or diag $stderr;
-        eq_or_diff $stdout, $text;
+        open my $fh, '<', \$stdout;
+        my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
+        cmp_deeply [ $yaml_fmt->read ], \@expect;
     };
-    subtest 'stdin' => sub {
-        local *STDIN = $json_fh;
 
+    subtest 'stdin' => sub {
+        local *STDIN = $json_fn->openr;
         my ( $stdout, $stderr, $exit ) = capture { yfrom->main( 'json' ) };
         is $exit, 0, 'exit 0';
         ok !$stderr, 'nothing on stderr' or diag $stderr;
-        eq_or_diff $stdout, $text;
-
-        seek $json_fh, 0, 0;
+        open my $fh, '<', \$stdout;
+        my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
+        cmp_deeply [ $yaml_fmt->read ], \@expect;
     };
 };
 

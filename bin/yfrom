@@ -15,17 +15,12 @@ sub main {
     GetOptionsFromArray( \@argv, \%opt,
         'help|h',
         'version',
-        'trim!',
     );
     return pod2usage(0) if $opt{help};
     if ( $opt{version} ) {
         print "yfrom version $yfrom::VERSION (Perl $^V)\n";
         return 0;
     }
-
-    # Have to set the default like this, because it doesn't seem to work in the %opt
-    # hash
-    $opt{trim} //= 1;
 
     eval {
         ETL::Yertl::Command::yfrom->main( @argv, \%opt );

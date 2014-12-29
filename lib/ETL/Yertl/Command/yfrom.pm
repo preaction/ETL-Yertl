@@ -1,7 +1,7 @@
 package ETL::Yertl::Command::yfrom;
 
 use ETL::Yertl;
-use YAML;
+use ETL::Yertl::Format::yaml;
 use Module::Runtime qw( use_module compose_module_name );
 
 sub main {
@@ -26,10 +26,10 @@ sub main {
         die "Could not load format '$format': $@";
     }
 
-    my $formatter = $formatter_class->new( %opt );
-
+    my $out_formatter = ETL::Yertl::Format::yaml->new;
     push @files, "-" unless @files;
     for my $file ( @files ) {
+
         # We're doing a similar behavior to <>, but manually for easier testing.
         my $fh;
         if ( $file eq '-' ) {
@@ -43,10 +43,9 @@ sub main {
             }
         }
 
-        while ( my $line = <$fh> ) {
-            my @docs = $formatter->from( $line );
-            print YAML::Dump( @docs ) if @docs;
-        }
+        my $in_formatter = $formatter_class->new( input => $fh, %opt );
+        my @docs = $in_formatter->read;
+        print $out_formatter->write( @docs );
     }
 }
 
