@@ -5,6 +5,17 @@ use ETL::Yertl 'Class';
 use Module::Runtime qw( use_module );
 use List::Util qw( pairs pairkeys pairfirst );
 
+=attr input
+
+The filehandle to read from for input.
+
+=cut
+
+has input => (
+    is => 'ro',
+    isa => FileHandle,
+);
+
 =attr format_module
 
 The module being used for this format. Possible modules, in order of importance:
@@ -64,65 +75,65 @@ has format_module => (
 my %FORMAT_SUB = (
 
     'YAML::XS' => {
-        to => sub {
+        write => sub {
             my $self = shift;
             return YAML::XS::Dump( @_ );
         },
 
-        from => sub {
+        read => sub {
             my $self = shift;
-            return YAML::XS::Load( @_ );
+            return YAML::XS::Load( do { local $/; readline $self->input } );
         },
 
     },
 
     'YAML::Syck' => {
-        to => sub {
+        write => sub {
             my $self = shift;
             return YAML::Syck::Dump( @_ );
         },
 
-        from => sub {
+        read => sub {
             my $self = shift;
-            return YAML::Syck::Load( @_ );
+            return YAML::Syck::Load( do { local $/; readline $self->input } );
         },
 
     },
 
     'YAML' => {
-        to => sub {
+        write => sub {
             my $self = shift;
             return YAML::Dump( @_ );
         },
 
-        from => sub {
+        read => sub {
             my $self = shift;
-            return YAML::Load( @_ );
+            return YAML::Load( do { local $/; readline $self->input } );
         },
 
     },
 );
 
-=method to( DOCUMENTS )
+=method write( DOCUMENTS )
 
 Convert the given C<DOCUMENTS> to YAML. Returns a YAML string.
 
 =cut
 
-sub to {
+sub write {
     my $self = shift;
-    return $FORMAT_SUB{ $self->format_module }{to}->( $self, @_ );
+    return $FORMAT_SUB{ $self->format_module }{write}->( $self, @_ );
 }
 
-=method from( YAML )
+=method read()
 
-Convert the given C<YAML> string into documents. Returns the list of values extracted.
+Read a YAML string from L<input> and return all the documents.
 
 =cut
 
-sub from {
+sub read {
     my $self = shift;
-    return $FORMAT_SUB{ $self->format_module }{from}->( $self, @_ );
+    return $FORMAT_SUB{ $self->format_module }{read}->( $self );
 }
 
 1;

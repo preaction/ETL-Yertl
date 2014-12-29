@@ -7,7 +7,7 @@ my $SHARE_DIR = path( __DIR__, '..', 'share' );
 
 my $CLASS = 'ETL::Yertl::Format::yaml';
 
-my $EXPECT_TO = $SHARE_DIR->child( yaml => 'test.yaml' )->slurp;
+my $EXPECT_TO = $SHARE_DIR->child( yaml => 'test.yaml' );
 
 my @EXPECT_FROM = (
     {
@@ -28,31 +28,43 @@ subtest 'constructor' => sub {
     };
 };
 
-for my $format_module ( qw( YAML::XS YAML::Syck YAML ) ) {
-    subtest $format_module => sub {
-        my $formatter = $CLASS->new( format_module => $format_module );
-        # Can't compare against strings because whitespace is both significant
-        # and differs between implementations
-        # And YAML::XS and YAML are _incompatible_. See: https://github.com/ingydotnet/yaml-libyaml-pm/issues/9
-        my $got_yaml = $formatter->to( @EXPECT_FROM );
-        no strict 'refs';
-        cmp_deeply [ "${format_module}::Load"->( $got_yaml ) ], \@EXPECT_FROM or diag $got_yaml;
-
-        my $got = [ $formatter->from( $EXPECT_TO ) ];
+subtest 'default formatter' => sub {
+    subtest 'input' => sub {
+        my $formatter = $CLASS->new( input => $EXPECT_TO->openr );
+        my $got = [ $formatter->read ];
         cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
     };
-}
 
-subtest 'default' => sub {
-    my $formatter = $CLASS->new;
-    my $got_yaml = $formatter->to( @EXPECT_FROM );
-    my $format_module = $formatter->format_module;
+    subtest 'output' => sub {
+        my $formatter = $CLASS->new;
+        my $got_yaml = $formatter->write( @EXPECT_FROM );
+        my $format_module = $formatter->format_module;
 
-    no strict 'refs';
-    cmp_deeply [ "${format_module}::Load"->( $got_yaml ) ], \@EXPECT_FROM or diag $got_yaml;
+        no strict 'refs';
+        cmp_deeply [ "${format_module}::Load"->( $got_yaml ) ], \@EXPECT_FROM or diag $got_yaml;
+    };
+};
 
-    my $got = [ $formatter->from( $EXPECT_TO ) ];
-    cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
+subtest 'formatter modules' => sub {
+    for my $format_module ( qw( YAML::XS YAML::Syck YAML ) ) {
+        subtest $format_module => sub {
+            subtest 'input' => sub {
+                my $formatter = $CLASS->new( input => $EXPECT_TO->openr );
+                my $got = [ $formatter->read ];
+                cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
+            };
+
+            subtest 'output' => sub {
+                my $formatter = $CLASS->new( format_module => $format_module );
+                # Can't compare against strings because whitespace is both significant
+                # and differs between implementations
+                # And YAML::XS and YAML are _incompatible_. See: https://github.com/ingydotnet/yaml-libyaml-pm/issues/9
+                my $got_yaml = $formatter->write( @EXPECT_FROM );
+                no strict 'refs';
+                cmp_deeply [ "${format_module}::Load"->( $got_yaml ) ], \@EXPECT_FROM or diag $got_yaml;
+            };
+        };
+    }
 };
 
 subtest 'no formatter available' => sub {
