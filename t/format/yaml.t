@@ -1,12 +1,18 @@
 
 use ETL::Yertl 'Test';
 use Test::Lib;
-use YAML;
 use ETL::Yertl::Format::yaml;
+use List::Util qw( pairkeys );
+
+my @FORMATTER_MODULES;
+BEGIN {
+    @FORMATTER_MODULES = grep { eval "use $_; 1" } pairkeys @ETL::Yertl::Format::yaml::FORMAT_MODULES;
+    plan skip_all => 'No formatter modules available (tried ' . join( ", ", @FORMATTER_MODULES ) . ')'
+        unless @FORMATTER_MODULES;
+}
+
 my $SHARE_DIR = path( __DIR__, '..', 'share' );
-
 my $CLASS = 'ETL::Yertl::Format::yaml';
-
 my $EXPECT_TO = $SHARE_DIR->child( yaml => 'test.yaml' );
 
 my @EXPECT_FROM = (
@@ -46,7 +52,7 @@ subtest 'default formatter' => sub {
 };
 
 subtest 'formatter modules' => sub {
-    for my $format_module ( qw( YAML::XS YAML::Syck YAML ) ) {
+    for my $format_module ( @FORMATTER_MODULES ) {
         subtest $format_module => sub {
             subtest 'input' => sub {
                 my $formatter = $CLASS->new( input => $EXPECT_TO->openr );

@@ -2,10 +2,17 @@
 use ETL::Yertl 'Test';
 use Test::Lib;
 use ETL::Yertl::Format::csv;
+use List::Util qw( pairkeys );
+
+my @FORMATTER_MODULES;
+BEGIN {
+    @FORMATTER_MODULES = grep { eval "use $_; 1" } pairkeys @ETL::Yertl::Format::csv::FORMAT_MODULES;
+    plan skip_all => 'No formatter modules available (tried ' . join( ", ", @FORMATTER_MODULES ) . ')'
+        unless @FORMATTER_MODULES;
+}
+
 my $SHARE_DIR = path( __DIR__, '..', 'share' );
-
 my $CLASS = 'ETL::Yertl::Format::csv';
-
 my $EXPECT_TO = $SHARE_DIR->child( csv => 'test.csv' );
 
 my @EXPECT_FROM = (
@@ -43,37 +50,23 @@ subtest 'default formatter' => sub {
 };
 
 subtest 'formatter modules' => sub {
-    subtest 'Text::CSV_XS' => sub {
-        subtest 'input' => sub {
-            my $formatter = $CLASS->new(
-                input => $EXPECT_TO->openr,
-                format_module => 'Text::CSV_XS',
-            );
-            my $got = [ $formatter->read ];
-            cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
-        };
+    for my $formatter_module ( @FORMATTER_MODULES ) {
+        subtest $formatter_module => sub {
+            subtest 'input' => sub {
+                my $formatter = $CLASS->new(
+                    input => $EXPECT_TO->openr,
+                    format_module => $formatter_module,
+                );
+                my $got = [ $formatter->read ];
+                cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
+            };
 
-        subtest 'output' => sub {
-            my $formatter = $CLASS->new( format_module => 'Text::CSV_XS' );
-            eq_or_diff $formatter->write( @EXPECT_FROM ), $EXPECT_TO->slurp;
+            subtest 'output' => sub {
+                my $formatter = $CLASS->new( format_module => $formatter_module );
+                eq_or_diff $formatter->write( @EXPECT_FROM ), $EXPECT_TO->slurp;
+            };
         };
-    };
-
-    subtest 'Text::CSV' => sub {
-        subtest 'input' => sub {
-            my $formatter = $CLASS->new(
-                input => $EXPECT_TO->openr,
-                format_module => 'Text::CSV',
-            );
-            my $got = [ $formatter->read ];
-            cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
-        };
-
-        subtest 'output' => sub {
-            my $formatter = $CLASS->new( format_module => 'Text::CSV' );
-            eq_or_diff $formatter->write( @EXPECT_FROM ), $EXPECT_TO->slurp;
-        };
-    };
+    }
 };
 
 subtest 'no formatter available' => sub {
