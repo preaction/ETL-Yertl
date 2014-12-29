@@ -1,6 +1,31 @@
 Changelog for ETL-Yertl
 
-0.015 2014-12-24T06:06:18
+0.015 2014-12-29T23:15:11
+ - only run format tests if we have a formatter
+ - use yaml formatter in ymask
+ - use yaml formatter in yto
+ - use yaml formatter in yfrom
+ - move YAML formatter to new stream-based API
+ - move JSON formatter to new stream-based API
+ - move CSV formatter to new stream-based API
+ - move test data into files
+ - move ymask to ETL::Yertl::Command::ymask
+ - move yfrom to ETL::Yertl::Command::yfrom
+ - move test for CSV trimming to format tests
+ - always document the -h, --help, and --version options
+ - move yto to ETL::Yertl::Command::yto
+ - require JSON::PP for testing
+ - fix default format module in yaml formatter
+ - fix default format module in csv format
+ - fix default format module in json formatter
+ - move yq into ETL::Yertl::Command::yq
+ - move yq support classes to ETL::Yertl::Command::yq
+ - add recommends for all supported formatter modules
+ - add yaml formatter class
+ - add csv format module
+ - add formatter object to format sub
+ - add json formatter class
+ - create new base/project-intro module
  - rename to ETL-Yertl
 
 0.014 2014-12-12T07:28:58

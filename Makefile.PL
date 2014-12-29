@@ -34,25 +34,33 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Getopt::Long" => "2.36",
     "Import::Base" => 0,
+    "List::Util" => "1.29",
     "Module::Runtime" => 0,
+    "Moo::Lax" => 0,
     "Parse::RecDescent" => 0,
+    "Path::Tiny" => 0,
     "Pod::Usage::Return" => 0,
     "Regexp::Common" => 0,
     "Text::Trim" => 0,
+    "Type::Tiny" => 0,
+    "Types::Standard" => 0,
     "YAML" => 0,
     "boolean" => 0
   },
   "TEST_REQUIRES" => {
     "Capture::Tiny" => 0,
+    "Dir::Self" => 0,
+    "JSON::PP" => 0,
     "Test::Compile" => 0,
     "Test::Deep" => 0,
     "Test::Differences" => 0,
     "Test::Exception" => 0,
+    "Test::Lib" => 0,
     "Test::More" => 0
   },
   "VERSION" => "0.015",
   "test" => {
-    "TESTS" => "t/*.t t/bin/*.t"
+    "TESTS" => "t/*.t t/bin/*.t t/command/yq/*.t t/format/*.t"
   }
 );
 
@@ -60,21 +68,29 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Capture::Tiny" => 0,
   "Data::Partial::Google" => 0,
+  "Dir::Self" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Getopt::Long" => "2.36",
   "Import::Base" => 0,
+  "JSON::PP" => 0,
+  "List::Util" => "1.29",
   "Module::Build" => "0.28",
   "Module::Runtime" => 0,
+  "Moo::Lax" => 0,
   "Parse::RecDescent" => 0,
+  "Path::Tiny" => 0,
   "Pod::Usage::Return" => 0,
   "Regexp::Common" => 0,
   "Test::Compile" => 0,
   "Test::Deep" => 0,
   "Test::Differences" => 0,
   "Test::Exception" => 0,
+  "Test::Lib" => 0,
   "Test::More" => 0,
   "Text::Trim" => 0,
+  "Type::Tiny" => 0,
+  "Types::Standard" => 0,
   "YAML" => 0,
   "boolean" => 0
 );

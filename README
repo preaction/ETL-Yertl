@@ -36,10 +36,17 @@ DESCRIPTION
     Distributing data through messaging APIs (ZeroMQ)
 
 SEE ALSO
+  Yertl Tools
     yfrom
     yto
     ymask
     yq
+
+  Other Tools
+    Here are some other tools that can be used with Yertl
+
+    jq  <http://stedolan.github.io/jq/> A filter for JSON documents. The
+        inspiration for yq.
 
 AUTHOR
     Doug Bell <preaction@cpan.org>

@@ -22,18 +22,30 @@ my %module_build_args = (
   "dist_version" => "0.015",
   "license" => "perl",
   "module_name" => "ETL::Yertl",
-  "recommends" => {},
+  "recommends" => {
+    "JSON::PP" => 0,
+    "JSON::XS" => 0,
+    "Text::CSV" => 0,
+    "Text::CSV_XS" => 0,
+    "YAML::Syck" => 0,
+    "YAML::XS" => 0
+  },
   "recursive_test_files" => 1,
   "requires" => {
     "Data::Partial::Google" => 0,
     "File::Spec" => 0,
     "Getopt::Long" => "2.36",
     "Import::Base" => 0,
+    "List::Util" => "1.29",
     "Module::Runtime" => 0,
+    "Moo::Lax" => 0,
     "Parse::RecDescent" => 0,
+    "Path::Tiny" => 0,
     "Pod::Usage::Return" => 0,
     "Regexp::Common" => 0,
     "Text::Trim" => 0,
+    "Type::Tiny" => 0,
+    "Types::Standard" => 0,
     "YAML" => 0,
     "boolean" => 0,
     "perl" => "5.010"
@@ -46,10 +58,13 @@ my %module_build_args = (
   ],
   "test_requires" => {
     "Capture::Tiny" => 0,
+    "Dir::Self" => 0,
+    "JSON::PP" => 0,
     "Test::Compile" => 0,
     "Test::Deep" => 0,
     "Test::Differences" => 0,
     "Test::Exception" => 0,
+    "Test::Lib" => 0,
     "Test::More" => 0
   }
 );
@@ -57,11 +72,14 @@ my %module_build_args = (
 
 my %fallback_build_requires = (
   "Capture::Tiny" => 0,
+  "Dir::Self" => 0,
+  "JSON::PP" => 0,
   "Module::Build" => "0.28",
   "Test::Compile" => 0,
   "Test::Deep" => 0,
   "Test::Differences" => 0,
   "Test::Exception" => 0,
+  "Test::Lib" => 0,
   "Test::More" => 0
 );
 

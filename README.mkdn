@@ -45,10 +45,21 @@ Yertl will have tools for:
 
 # SEE ALSO
 
+## Yertl Tools
+
 - [yfrom](https://metacpan.org/pod/yfrom)
 - [yto](https://metacpan.org/pod/yto)
 - [ymask](https://metacpan.org/pod/ymask)
 - [yq](https://metacpan.org/pod/yq)
+
+## Other Tools
+
+Here are some other tools that can be used with Yertl
+
+- jq
+
+    [http://stedolan.github.io/jq/](http://stedolan.github.io/jq/) A filter for JSON documents. The inspiration
+    for [yq](https://metacpan.org/pod/yq).
 
 # AUTHOR
 
