@@ -1,0 +1,79 @@
+#!/usr/bin/env perl
+package ysql;
+# ABSTRACT: Query SQL databases in a Yertl workflow
+
+use ETL::Yertl;
+use Pod::Usage::Return qw( pod2usage );
+use Getopt::Long qw( GetOptionsFromArray );
+use ETL::Yertl::Command::ysql;
+
+$|++; # no buffering
+
+sub main {
+    my ( $class, @argv ) = @_;
+    my %opt;
+    GetOptionsFromArray( \@argv, \%opt,
+        'help|h',
+        'version',
+        'dsn=s',
+    );
+    return pod2usage(0) if $opt{help};
+    if ( $opt{version} ) {
+        print "ysql version $ysql::VERSION (Perl $^V)\n";
+        return 0;
+    }
+
+    eval {
+        ETL::Yertl::Command::ysql->main( @argv, \%opt );
+    };
+    if ( $@ ) {
+        return pod2usage( "ERROR: $@" );
+    }
+    return 0;
+}
+
+exit __PACKAGE__->main( @ARGV ) unless caller(0);
+
+__END__
+
+=head1 SYNOPSIS
+
+    ysql query [--dsn <dsn>] <query>
+
+    ysql -h|--help|--version
+
+=head1 DESCRIPTION
+
+This program queries a SQL database and prints the result as YAML.
+
+=head1 ARGUMENTS
+
+=head2 query
+
+The SQL query to run against the database.
+
+=head1 OPTIONS
+
+=head2 dsn
+
+The L<DBI> Data Source Name. A string that DBI uses to connect to the database.
+
+Some examples:
+
+    # A SQLite database in "test.db"
+    dbi:SQLite:test.db
+
+    # A MySQL database named "example"
+    dbi:mysql:example
+
+    # A Postgres database named "foo"
+    dbi:Pg:foo
+
+=head2 -h | --help
+
+Show this help document.
+
+=head2 --version
+
+Print the current ysql and Perl versions.
+
