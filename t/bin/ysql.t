@@ -16,7 +16,7 @@ subtest 'error checking' => sub {
     };
 };
 
-subtest 'basic query' => sub {
+subtest 'query' => sub {
     my $tmp = tempfile;
     my $dbi = DBI->connect( 'dbi:SQLite:dbname=' . $tmp );
     $dbi->do( 'CREATE TABLE person ( id INT, name VARCHAR, email VARCHAR )' );
@@ -51,5 +51,33 @@ subtest 'basic query' => sub {
     };
 
 };
+
+subtest 'write' => sub {
+
+    subtest 'basic write' => sub {
+        my $tmp = tempfile;
+        my $dbi = DBI->connect( 'dbi:SQLite:dbname=' . $tmp );
+        $dbi->do( 'CREATE TABLE person ( id INT, name VARCHAR, email VARCHAR )' );
+        local *STDIN = $SHARE_DIR->child( 'command', 'ysql', 'write.yml' )->openr;
+
+        my ( $stdout, $stderr, $exit ) = capture {
+            ysql->main( '--dsn', 'dbi:SQLite:dbname=' . $tmp, 'write',
+                'INSERT INTO person (id, name, email) VALUES (:id, :name, :email)',
+            );
+        };
+        is $exit, 0;
+        ok !$stderr, 'nothing on stderr' or diag $stderr;
+        ok !$stdout, 'nothing on stdout' or diag $stdout;
+
+        cmp_deeply
+            $dbi->selectall_arrayref( 'SELECT id,name,email FROM person' ),
+            bag(
+                [ 1, 'Hazel Murphy', 'hank@example.com' ],
+                [ 2, 'Quentin Quinn', 'quinn@example.com' ],
+            );
+    };
+
+};
+
 
 done_testing;

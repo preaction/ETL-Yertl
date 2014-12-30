@@ -38,13 +38,38 @@ __END__
 
 =head1 SYNOPSIS
 
-    ysql query [--dsn <dsn>] <query>
+    ysql [--dsn <dsn>] query <query>
+    ysql [--dsn <dsn>] write <query>
 
     ysql -h|--help|--version
 
 =head1 DESCRIPTION
 
 This program queries a SQL database and prints the result as YAML.
+
+=head1 COMMANDS
+
+=head2 query <query>
+
+Run a query to read data from the database. C<query> is a SQL query, usually a C<SELECT>.
+
+=head2 write <query>
+
+Run a query to write data to the database. C<query> is a SQL query, usually an C<INSERT>.
+YAML documents are read from C<STDIN>.
+
+In order to map keys in the YAML document to fields in the SQL query, C<ysql> supports
+named placeholders, which begin with C<:>. For example:
+
+    # input.yml
+    ---
+    name: Stormy Waters
+    email: stormy@example.com
+    ---
+    name: Debbie Dupree
+    email: debbie@example.com
+
+    $ ysql write 'INSERT INTO person ( name, email ) VALUES ( :name, :email )' <input.yml
 
 =head1 ARGUMENTS
 
