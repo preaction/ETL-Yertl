@@ -38,8 +38,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    ysql [--dsn <dsn>] query <query>
-    ysql [--dsn <dsn>] write <query>
+    ysql query [<db_name> | --dsn <dsn>] <query>
+    ysql write [<db_name> | --dsn <dsn>] <query>
 
     # Add/edit database configuration
     ysql config <db_name> <dsn> [--user <user>] [--password <password>]
@@ -122,6 +122,10 @@ named placeholders, which begin with C<$.>. For example:
 
 =head1 ARGUMENTS
 
+=head2 db_name
+
+The saved database name to use. Add and edit databases using the L<config> command.
+
 =head2 query
 
 The SQL query to run against the database.
@@ -150,4 +154,3 @@ Show this help document.
 =head2 --version
 
 Print the current ysql and Perl versions.
-

@@ -4,6 +4,7 @@ use ETL::Yertl;
 use Getopt::Long qw( GetOptionsFromArray );
 use ETL::Yertl::Format::yaml;
 use DBI;
+use File::HomeDir;
 
 sub main {
     my $class = shift;
@@ -19,8 +20,10 @@ sub main {
     my $out_fmt = ETL::Yertl::Format::yaml->new;
 
     if ( $command eq 'query' ) {
+        my @dbi_args = $opt{dsn} ? ( $opt{dsn} ) : dbi_args( shift );
+        my $dbh = DBI->connect( @dbi_args );
+
         my $query = shift;
-        my $dbh = DBI->connect( $opt{dsn} );
         my $sth = $dbh->prepare( $query );
         $sth->execute;
 
@@ -31,12 +34,13 @@ sub main {
         return 0;
     }
     elsif ( $command eq 'write' ) {
-        my $query = shift;
+        my @dbi_args = $opt{dsn} ? ( $opt{dsn} ) : dbi_args( shift );
+        my $dbh = DBI->connect( @dbi_args );
 
+        my $query = shift;
         my @fields = $query =~ m/\$(\.[.\w]+)/g;
         $query =~ s/\$\.[\w.]+/?/g;
 
-        my $dbh = DBI->connect( $opt{dsn} );
         my $sth = $dbh->prepare( $query );
 
         my $in_fmt = ETL::Yertl::Format::yaml->new( input => \*STDIN );
@@ -48,7 +52,6 @@ sub main {
         my ( $db_key, @args ) = @_;
 
         # Get the existing config first
-        require File::HomeDir;
         my $conf_file = path( File::HomeDir->my_home, '.yertl', 'ysql.yml' );
         my $config = {};
         if ( $conf_file->exists ) {
@@ -117,6 +120,29 @@ sub select_doc {
         $doc = $doc->{ $part };
     }
     return $doc;
+}
+
+sub dbi_args {
+    my ( $db_name ) = @_;
+    my $conf_file = path( File::HomeDir->my_home, '.yertl', 'ysql.yml' );
+    if ( $conf_file->exists ) {
+        my $yaml = ETL::Yertl::Format::yaml->new( input => $conf_file->openr );
+        my ( $config ) = $yaml->read;
+        my $db_config = $config->{ $db_name };
+
+        my $driver_dsn =
+            join ";",
+            map { join "=", $_, $db_config->{ $_ } }
+            grep { $db_config->{ $_ } }
+            qw( database host port )
+            ;
+
+        return (
+            sprintf( 'dbi:%s:%s', $db_config->{driver}, $driver_dsn ),
+            $db_config->{user},
+            $db_config->{password},
+        );
+    }
 }
 
 1;
