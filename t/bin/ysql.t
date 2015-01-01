@@ -62,7 +62,7 @@ subtest 'write' => sub {
 
         my ( $stdout, $stderr, $exit ) = capture {
             ysql->main( '--dsn', 'dbi:SQLite:dbname=' . $tmp, 'write',
-                'INSERT INTO person (id, name, email) VALUES (:id, :name, :email)',
+                'INSERT INTO person (id, name, email) VALUES ($.id, $.name, $.email)',
             );
         };
         is $exit, 0;

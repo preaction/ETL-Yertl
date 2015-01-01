@@ -32,8 +32,8 @@ sub main {
     elsif ( $command eq 'write' ) {
         my $query = shift;
 
-        my @fields = $query =~ m/:(\w+)/g;
-        $query =~ s/:\w+/?/g;
+        my @fields = $query =~ m/\$\.(\w+)/g;
+        $query =~ s/\$\.\w+/?/g;
 
         my $dbh = DBI->connect( $opt{dsn} );
         my $sth = $dbh->prepare( $query );

@@ -59,7 +59,7 @@ Run a query to write data to the database. C<query> is a SQL query, usually an C
 YAML documents are read from C<STDIN>.
 
 In order to map keys in the YAML document to fields in the SQL query, C<ysql> supports
-named placeholders, which begin with C<:>. For example:
+named placeholders, which begin with C<$.>. For example:
 
     # input.yml
     ---
@@ -69,7 +69,7 @@ named placeholders, which begin with C<:>. For example:
     name: Debbie Dupree
     email: debbie@example.com
 
-    $ ysql write 'INSERT INTO person ( name, email ) VALUES ( :name, :email )' <input.yml
+    $ ysql write 'INSERT INTO person ( name, email ) VALUES ( $.name, $.email )' <input.yml
 
 =head1 ARGUMENTS
 
