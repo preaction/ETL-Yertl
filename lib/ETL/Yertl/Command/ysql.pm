@@ -32,17 +32,27 @@ sub main {
     elsif ( $command eq 'write' ) {
         my $query = shift;
 
-        my @fields = $query =~ m/\$\.(\w+)/g;
-        $query =~ s/\$\.\w+/?/g;
+        my @fields = $query =~ m/\$(\.[.\w]+)/g;
+        $query =~ s/\$\.[\w.]+/?/g;
 
         my $dbh = DBI->connect( $opt{dsn} );
         my $sth = $dbh->prepare( $query );
 
         my $in_fmt = ETL::Yertl::Format::yaml->new( input => \*STDIN );
         for my $doc ( $in_fmt->read ) {
-            $sth->execute( map { $doc->{ $_ } } @fields );
+            $sth->execute( map { select_doc( $_, $doc ) } @fields );
         }
     }
+}
+
+sub select_doc {
+    my ( $select, $doc ) = @_;
+    $select =~ s/^[.]//; # select must start with .
+    my @parts = split /[.]/, $select;
+    for my $part ( @parts ) {
+        $doc = $doc->{ $part };
+    }
+    return $doc;
 }
 
 1;

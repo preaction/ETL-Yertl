@@ -65,11 +65,17 @@ named placeholders, which begin with C<$.>. For example:
     ---
     name: Stormy Waters
     email: stormy@example.com
+    profile:
+        dept: Pilot
     ---
     name: Debbie Dupree
     email: debbie@example.com
+    profile:
+        dept: Wildlife
 
-    $ ysql write 'INSERT INTO person ( name, email ) VALUES ( $.name, $.email )' <input.yml
+    $ ysql write 'INSERT INTO person ( name, email, dept ) \
+                  VALUES ( $.name, $.email, $.profile.dept )' \
+                  < input.yml
 
 =head1 ARGUMENTS
 
