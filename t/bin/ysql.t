@@ -105,5 +105,158 @@ subtest 'write' => sub {
 
 };
 
+subtest 'config' => sub {
+
+    my $conf_test = sub {
+        my ( $home, $args, $expect ) = @_;
+        my ( $stdout, $stderr, $exit ) = capture {
+            ysql->main( 'config', 'test', @$args );
+        };
+        ok !$stdout, 'nothing on stdout' or diag $stdout;
+        ok !$stderr, 'nothing on stderr' or diag $stderr;
+        is $exit, 0, 'success exit status';
+
+        my $yaml_config = ETL::Yertl::Format::yaml->new(
+            input => $home->child( '.yertl', 'ysql.yml' )->openr,
+        );
+        my ( $config ) = $yaml_config->read;
+        cmp_deeply $config, { test => $expect }, 'config is correct'
+            or diag explain $config;
+    };
+
+    subtest 'add/edit' => sub {
+
+        subtest 'SQLite' => sub {
+
+            subtest 'by DSN' => sub {
+                my $home = tempdir;
+                local $ENV{HOME} = "$home";
+
+                subtest 'add' => $conf_test,
+                    $home,
+                    [ 'dbi:SQLite:test.db' ],
+                    {
+                        driver => 'SQLite',
+                        database => 'test.db',
+                    };
+
+                subtest 'edit' => $conf_test,
+                    $home,
+                    [ 'dbi:SQLite:test2.db' ],
+                    {
+                        driver => 'SQLite',
+                        database => 'test2.db',
+                    };
+            };
+
+            subtest 'by options' => sub {
+                my $home = tempdir;
+                local $ENV{HOME} = "$home";
+
+                subtest 'add' => $conf_test,
+                    $home,
+                    [
+                        '--driver', 'SQLite',
+                        '--db', 'test.db',
+                    ],
+                    {
+                        driver => 'SQLite',
+                        database => 'test.db',
+                    };
+
+                subtest 'edit' => $conf_test,
+                    $home,
+                    [
+                        '--db', 'test2.db',
+                    ],
+                    {
+                        driver => 'SQLite',
+                        database => 'test2.db',
+                    };
+
+            };
+        };
+
+        subtest 'mysql' => sub {
+
+            subtest 'by DSN' => sub {
+                my $home = tempdir;
+                local $ENV{HOME} = "$home";
+
+                subtest 'add' => $conf_test,
+                    $home,
+                    [
+                        'dbi:mysql:database=foo;host=localhost;port=4650',
+                        '--user' => 'preaction',
+                        '--password' => 'example',
+                    ],
+                    {
+                        driver => 'mysql',
+                        database => 'foo',
+                        host => 'localhost',
+                        port => 4650,
+                        user => 'preaction',
+                        password => 'example',
+                    };
+
+                subtest 'edit' => $conf_test,
+                    $home,
+                    [
+                        'dbi:mysql:database=foo;host=example.com',
+                        '--user' => 'postaction',
+                    ],
+                    {
+                        driver => 'mysql',
+                        database => 'foo',
+                        host => 'example.com',
+                        user => 'postaction',
+                        password => 'example',
+                    };
+
+            };
+
+            subtest 'by options' => sub {
+                my $home = tempdir;
+                local $ENV{HOME} = "$home";
+
+                subtest 'add' => $conf_test,
+                    $home,
+                    [
+                        '--driver', 'mysql',
+                        '--db', 'foo',
+                        '--host', 'localhost',
+                        '--port', '4650',
+                        '--user' => 'preaction',
+                        '--password' => 'example',
+                    ],
+                    {
+                        driver => 'mysql',
+                        database => 'foo',
+                        host => 'localhost',
+                        port => 4650,
+                        user => 'preaction',
+                        password => 'example',
+                    };
+
+                subtest 'edit' => $conf_test,
+                    $home,
+                    [
+                        '--db', 'test',
+                        '--host', 'example.com',
+                        '--password' => 'newpassword',
+                    ],
+                    {
+                        driver => 'mysql',
+                        database => 'test',
+                        host => 'example.com',
+                        port => 4650,
+                        user => 'preaction',
+                        password => 'newpassword',
+                    };
+
+            };
+        };
+    };
+};
 
 done_testing;

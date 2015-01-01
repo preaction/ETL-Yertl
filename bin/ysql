@@ -4,7 +4,7 @@ package ysql;
 
 use ETL::Yertl;
 use Pod::Usage::Return qw( pod2usage );
-use Getopt::Long qw( GetOptionsFromArray );
+use Getopt::Long qw( GetOptionsFromArray :config pass_through );
 use ETL::Yertl::Command::ysql;
 
 $|++; # no buffering
@@ -41,6 +41,11 @@ __END__
     ysql [--dsn <dsn>] query <query>
     ysql [--dsn <dsn>] write <query>
 
+    # Add/edit database configuration
+    ysql config <db_name> <dsn> [--user <user>] [--password <password>]
+    ysql config <db_name> [--driver <driver>] [--database <database] [--host <host>]
+        [--port <port>] [--user <user>] [--password <password>]
+
     ysql -h|--help|--version
 
 =head1 DESCRIPTION
@@ -48,6 +53,44 @@ __END__
 This program queries a SQL database and prints the result as YAML.
 
 =head1 COMMANDS
+
+=head2 config <db_name> <options>
+
+Configure the given C<db_name> with the given options. Available options are:
+
+=over 4
+
+=item --driver <driver>
+
+The database driver to use, corresponding to a DBD::* module. Some examples: C<SQLite>,
+C<mysql>, C<Pg>.
+
+=item --database <database>
+
+The name of the database. For SQLite, the name of the database file.
+
+=item --host <host>
+
+The hostname to connect to. Optional.
+
+=item --port <port>
+
+The port to connect to. Optional.
+
+=item --user <user>
+
+The user to connect as. Optional.
+
+=item --password <password>
+
+The password to connect with. Optional. This is stored in plain text, so beware.
+
+=back
+
+=head2 config <db_name> <dsn>
+
+Configure the given C<db_name> with the given C<dsn>. The C<user> and C<password>
+options can also be used.
 
 =head2 query <query>
 

@@ -9,6 +9,7 @@ our @IMPORT_MODULES = (
     strict => [],
     warnings => [],
     feature => [qw( :5.10 )],
+    'Path::Tiny' => [qw( path )],
 );
 
 my @class_modules = (
@@ -20,7 +21,7 @@ our %IMPORT_BUNDLES = (
         qw( Test::More Test::Deep Test::Exception Test::Differences ),
         FindBin => [ '$Bin' ],
         boolean => [':all'],
-        'Path::Tiny' => [qw( path cwd tempfile )],
+        'Path::Tiny' => [qw( cwd tempfile tempdir )],
         'Dir::Self' => [qw( __DIR__ )],
     ],
 
