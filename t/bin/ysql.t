@@ -4,6 +4,13 @@ use Capture::Tiny qw( capture );
 use ETL::Yertl::Format::yaml;
 my $SHARE_DIR = path( __DIR__, '..', 'share' );
 
+BEGIN {
+    eval { use DBI; use DBD::SQLite; };
+    if ( $@ ) {
+        plan skip_all => 'missing DBI and/or DBD::SQLite';
+    }
+};
+
 my $script = "$FindBin::Bin/../../bin/ysql";
 require $script;
 $0 = $script; # So pod2usage finds the right file
