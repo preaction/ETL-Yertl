@@ -26,12 +26,34 @@ sub main {
     my $out_fmt = ETL::Yertl::Format::yaml->new;
 
     if ( $command eq 'query' ) {
-        my @dbi_args = $opt{dsn} ? ( $opt{dsn} ) : dbi_args( shift );
+        my @args = @_;
+        my %query_opt;
+        GetOptionsFromArray( \@args, \%query_opt,
+            'save=s',
+        );
+
+        if ( $query_opt{ save } ) {
+            my $db_key = shift @args;
+            my $db_conf = db_config( $db_key );
+            $db_conf->{query}{ $query_opt{save} } = shift @args;
+            db_config( $db_key => $db_conf );
+            return 0;
+        }
+
+        my $db_key = !$opt{dsn} ? shift @args : undef;
+        my @dbi_args = $opt{dsn} ? ( $opt{dsn} ) : dbi_args( $db_key );
         my $dbh = DBI->connect( @dbi_args );
 
-        my $query = shift;
+        my $query = shift @args;
+        if ( $db_key ) {
+            my $db_conf = db_config( $db_key );
+            if ( $db_conf->{query}{ $query } ) {
+                $query = $db_conf->{query}{ $query };
+            }
+        }
+
         my $sth = $dbh->prepare( $query );
-        $sth->execute;
+        $sth->execute( @args );
 
         while ( my $doc = $sth->fetchrow_hashref ) {
             print $out_fmt->write( $doc );
@@ -58,17 +80,7 @@ sub main {
         my ( $db_key, @args ) = @_;
 
         # Get the existing config first
-        my $conf_file = path( File::HomeDir->my_home, '.yertl', 'ysql.yml' );
-        my $config = {};
-        if ( $conf_file->exists ) {
-            my $yaml = ETL::Yertl::Format::yaml->new( input => $conf_file->openr );
-            ( $config ) = $yaml->read;
-        }
-        else {
-            $conf_file->touchpath;
-        }
-
-        my $db_conf = $config->{ $db_key } ||= {};
+        my $db_conf = db_config( $db_key );
 
         # Set via options
         GetOptionsFromArray( \@args, $db_conf,
@@ -113,9 +125,34 @@ sub main {
         }
 
         # Write back the config
-        my $yaml = ETL::Yertl::Format::yaml->new;
-        $conf_file->spew( $yaml->write( $config ) );
+        db_config( $db_key => $db_conf );
     }
+}
+
+sub config {
+    my $conf_file = path( File::HomeDir->my_home, '.yertl', 'ysql.yml' );
+    my $config = {};
+    if ( $conf_file->exists ) {
+        my $yaml = ETL::Yertl::Format::yaml->new( input => $conf_file->openr );
+        ( $config ) = $yaml->read;
+    }
+    return $config;
+}
+
+sub db_config {
+    my ( $db_key, $config ) = @_;
+    if ( $config ) {
+        my $conf_file = path( File::HomeDir->my_home, '.yertl', 'ysql.yml' );
+        if ( !$conf_file->exists ) {
+            $conf_file->touchpath;
+        }
+        my $all_config = config();
+        $all_config->{ $db_key } = $config;
+        my $yaml = ETL::Yertl::Format::yaml->new;
+        $conf_file->spew( $yaml->write( $all_config ) );
+        return;
+    }
+    return config()->{ $db_key } || {};
 }
 
 sub select_doc {

@@ -38,10 +38,16 @@ __END__
 
 =head1 SYNOPSIS
 
-    ysql query [<db_name> | --dsn <dsn>] <query>
+    ysql query [<db_name> | --dsn <dsn>] <query> [<value>...]
     ysql write [<db_name> | --dsn <dsn>] <query>
 
-    # Add/edit database configuration
+    ### Saved queries
+    # Save
+    ysql query <db_name> --save <query_name> <query>
+    # Execute
+    ysql query <db_name> <query_name> [<value>...]
+
+    ### Add/edit database configuration
     ysql config <db_name> <dsn> [--user <user>] [--password <password>]
     ysql config <db_name> [--driver <driver>] [--database <database] [--host <host>]
         [--port <port>] [--user <user>] [--password <password>]
@@ -92,9 +98,14 @@ The password to connect with. Optional. This is stored in plain text, so beware.
 Configure the given C<db_name> with the given C<dsn>. The C<user> and C<password>
 options can also be used.
 
-=head2 query <query>
+=head2 query <query> [<value>...]
 
-Run a query to read data from the database. C<query> is a SQL query, usually a C<SELECT>.
+Run a query to read data from the database. C<query> is either the name of a saved
+query, or SQL (usually a C<SELECT>). C<value> is used to fill in C<?> placeholders.
+
+=head2 query --save <query_name> <query>
+
+Save a query to run later.
 
 =head2 write <query>
 

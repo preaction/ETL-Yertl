@@ -178,29 +178,36 @@ subtest 'config' => sub {
 };
 
 subtest 'query' => sub {
-    my $home = tempdir;
-    local $ENV{HOME} = "$home";
 
-    my $conf = {
-        testdb => {
-            driver => 'SQLite',
-            database => $home->child( 'test.db' )->stringify,
-        },
+    my $setup = sub {
+        my $home = tempdir;
+
+        my $conf = {
+            testdb => {
+                driver => 'SQLite',
+                database => $home->child( 'test.db' )->stringify,
+            },
+        };
+        my $conf_file = $home->child( '.yertl', 'ysql.yml' );
+        my $yaml = ETL::Yertl::Format::yaml->new;
+        $conf_file->touchpath->spew( $yaml->write( $conf ) );
+
+        my $dbi = DBI->connect( 'dbi:SQLite:dbname=' . $home->child( 'test.db' ) );
+        $dbi->do( 'CREATE TABLE person ( id INT, name VARCHAR, email VARCHAR )' );
+        my @people = (
+            [ 1, 'Hazel Murphy', 'hank@example.com' ],
+            [ 2, 'Quentin Quinn', 'quinn@example.com' ],
+        );
+        my $sql_people = join ", ", map { sprintf '( %d, "%s", "%s" )', @$_ } @people;
+        $dbi->do( 'INSERT INTO person ( id, name, email ) VALUES ' . $sql_people );
+
+        return ( $home );
     };
-    my $conf_file = $home->child( '.yertl', 'ysql.yml' );
-    my $yaml = ETL::Yertl::Format::yaml->new;
-    $conf_file->touchpath->spew( $yaml->write( $conf ) );
-
-    my $dbi = DBI->connect( 'dbi:SQLite:dbname=' . $home->child( 'test.db' ) );
-    $dbi->do( 'CREATE TABLE person ( id INT, name VARCHAR, email VARCHAR )' );
-    my @people = (
-        [ 1, 'Hazel Murphy', 'hank@example.com' ],
-        [ 2, 'Quentin Quinn', 'quinn@example.com' ],
-    );
-    my $sql_people = join ", ", map { sprintf '( %d, "%s", "%s" )', @$_ } @people;
-    $dbi->do( 'INSERT INTO person ( id, name, email ) VALUES ' . $sql_people );
 
     subtest 'basic query' => sub {
+        my ( $home ) = $setup->();
+        local $ENV{HOME} = "$home";
+
         my ( $stdout, $stderr, $exit ) = capture {
             ysql->main( 'query', 'testdb', 'SELECT * FROM person' );
         };
@@ -222,6 +229,109 @@ subtest 'query' => sub {
             },
         );
 
+    };
+
+    subtest 'saved queries' => sub {
+        subtest 'without placeholders' => sub {
+            my ( $home ) = $setup->();
+            local $ENV{HOME} = "$home";
+
+            subtest 'save the query' => sub {
+                my ( $stdout, $stderr, $exit ) = capture {
+                    ysql->main( 'query', 'testdb', '--save', 'testquery',
+                        'SELECT * FROM person',
+                    );
+                };
+                is $exit, 0;
+                ok !$stderr, 'nothing on stderr' or diag $stderr;
+                ok !$stdout, 'nothing on stdout, query is not run' or diag $stdout;
+
+                my $conf_file = $home->child( '.yertl', 'ysql.yml' );
+                my $yaml = ETL::Yertl::Format::yaml->new( input => $conf_file->openr );
+                my ( $config ) = $yaml->read;
+                cmp_deeply $config, {
+                    testdb => {
+                        driver => 'SQLite',
+                        database => $home->child( 'test.db' )->stringify,
+                        query => {
+                            testquery => 'SELECT * FROM person',
+                        },
+                    },
+                }, 'config is in the db' or diag explain $config;
+            };
+
+            subtest 'run the saved query' => sub {
+                my ( $stdout, $stderr, $exit ) = capture {
+                    ysql->main( 'query', 'testdb', 'testquery' );
+                };
+                is $exit, 0;
+                ok !$stderr, 'nothing on stderr' or diag $stderr;
+
+                open my $fh, '<', \$stdout;
+                my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
+                cmp_deeply [ $yaml_fmt->read ], bag(
+                    {
+                        id => 1,
+                        name => 'Hazel Murphy',
+                        email => 'hank@example.com',
+                    },
+                    {
+                        id => 2,
+                        name => 'Quentin Quinn',
+                        email => 'quinn@example.com',
+                    },
+                );
+
+            };
+        };
+
+        subtest 'with placeholders' => sub {
+            my ( $home ) = $setup->();
+            local $ENV{HOME} = "$home";
+
+            subtest 'save the query' => sub {
+                my ( $stdout, $stderr, $exit ) = capture {
+                    ysql->main( 'query', 'testdb', '--save', 'testquery',
+                        'SELECT * FROM person WHERE email=?',
+                    );
+                };
+                is $exit, 0;
+                ok !$stderr, 'nothing on stderr' or diag $stderr;
+                ok !$stdout, 'nothing on stdout, query is not run' or diag $stdout;
+
+                my $conf_file = $home->child( '.yertl', 'ysql.yml' );
+                my $yaml = ETL::Yertl::Format::yaml->new( input => $conf_file->openr );
+                my ( $config ) = $yaml->read;
+                cmp_deeply $config, {
+                    testdb => {
+                        driver => 'SQLite',
+                        database => $home->child( 'test.db' )->stringify,
+                        query => {
+                            testquery => 'SELECT * FROM person WHERE email=?',
+                        },
+                    },
+                }, 'config is in the db' or diag explain $config;
+            };
+
+            subtest 'run the saved query' => sub {
+                my ( $stdout, $stderr, $exit ) = capture {
+                    ysql->main( 'query', 'testdb', 'testquery', 'hank@example.com' );
+                };
+                is $exit, 0;
+                ok !$stderr, 'nothing on stderr' or diag $stderr;
+
+                open my $fh, '<', \$stdout;
+                my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
+                cmp_deeply [ $yaml_fmt->read ], bag(
+                    {
+                        id => 1,
+                        name => 'Hazel Murphy',
+                        email => 'hank@example.com',
+                    },
+                );
+
+            };
+        };
     };
 };
 
