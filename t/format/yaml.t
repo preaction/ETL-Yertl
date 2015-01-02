@@ -69,6 +69,15 @@ subtest 'formatter modules' => sub {
                 no strict 'refs';
                 cmp_deeply [ "${format_module}::Load"->( $got_yaml ) ], \@EXPECT_FROM or diag $got_yaml;
             };
+
+            subtest 'empty file' => sub {
+                my $tmp = tempfile;
+                my $formatter = $CLASS->new( input => $tmp->openr );
+                my $got;
+                lives_ok { $got = [ $formatter->read ] };
+                cmp_deeply $got, [], 'file is empty';
+            };
+
         };
     }
 };

@@ -82,7 +82,8 @@ my %FORMAT_SUB = (
 
         read => sub {
             my $self = shift;
-            return YAML::XS::Load( do { local $/; readline $self->input } );
+            my $yaml = do { local $/; readline $self->input };
+            return $yaml ? YAML::XS::Load( $yaml ) : ();
         },
 
     },
@@ -95,7 +96,8 @@ my %FORMAT_SUB = (
 
         read => sub {
             my $self = shift;
-            return YAML::Syck::Load( do { local $/; readline $self->input } );
+            my $yaml = do { local $/; readline $self->input };
+            return $yaml ? YAML::Syck::Load( $yaml ) : ();
         },
 
     },
@@ -108,7 +110,8 @@ my %FORMAT_SUB = (
 
         read => sub {
             my $self = shift;
-            return YAML::Load( do { local $/; readline $self->input } );
+            my $yaml = do { local $/; readline $self->input };
+            return $yaml ? YAML::Load( $yaml ) : ();
         },
 
     },
