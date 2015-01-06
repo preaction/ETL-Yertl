@@ -2,7 +2,7 @@ NAME
     ETL::Yertl - ETL with a Shell
 
 VERSION
-    version 0.015
+    version 0.016
 
 SYNOPSIS
         ### On a shell...
@@ -51,8 +51,11 @@ SEE ALSO
 AUTHOR
     Doug Bell <preaction@cpan.org>
 
+CONTRIBUTOR
+    Doug Bell <doug.bell@baml.com>
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2014 by Doug Bell.
+    This software is copyright (c) 2015 by Doug Bell.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

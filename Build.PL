@@ -19,10 +19,12 @@ my %module_build_args = (
     "Doug Bell <preaction\@cpan.org>"
   ],
   "dist_name" => "ETL-Yertl",
-  "dist_version" => "0.015",
+  "dist_version" => "0.016",
   "license" => "perl",
   "module_name" => "ETL::Yertl",
   "recommends" => {
+    "DBD::SQLite" => 0,
+    "DBI" => 0,
     "JSON::PP" => 0,
     "JSON::XS" => 0,
     "Text::CSV" => 0,
@@ -33,14 +35,15 @@ my %module_build_args = (
   "recursive_test_files" => 1,
   "requires" => {
     "Data::Partial::Google" => 0,
+    "File::HomeDir" => 0,
     "File::Spec" => 0,
     "Getopt::Long" => "2.36",
-    "Import::Base" => 0,
+    "Import::Base" => "0.010",
     "List::Util" => "1.29",
     "Module::Runtime" => 0,
     "Moo::Lax" => 0,
     "Parse::RecDescent" => 0,
-    "Path::Tiny" => 0,
+    "Path::Tiny" => "0.055",
     "Pod::Usage::Return" => 0,
     "Regexp::Common" => 0,
     "Text::Trim" => 0,
@@ -54,6 +57,7 @@ my %module_build_args = (
     "bin/yfrom",
     "bin/ymask",
     "bin/yq",
+    "bin/ysql",
     "bin/yto"
   ],
   "test_requires" => {
@@ -65,7 +69,7 @@ my %module_build_args = (
     "Test::Differences" => 0,
     "Test::Exception" => 0,
     "Test::Lib" => 0,
-    "Test::More" => 0
+    "Test::More" => "1.001005"
   }
 );
 
@@ -80,7 +84,7 @@ my %fallback_build_requires = (
   "Test::Differences" => 0,
   "Test::Exception" => 0,
   "Test::Lib" => 0,
-  "Test::More" => 0
+  "Test::More" => "1.001005"
 );
 
 

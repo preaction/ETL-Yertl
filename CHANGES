@@ -1,6 +1,25 @@
 Changelog for ETL-Yertl
 
-0.015 2014-12-29T23:15:11
+0.016 2015-01-06T02:36:59
+ - update Import::Base prereq
+ - fix contributors dependency
+ - update copyright year
+ - add contributors dzil plugin for proper attribution
+ - add saved queries with placeholders to ysql
+ - fix empty yaml file throws exception
+ - check for DBI and DBD::SQLite before loading ysql
+ - update Test::More to allow args to subtest refs
+ - add prereq on File::HomeDir
+ - use db config to query and write to saved dbs
+ - add ysql config command to add databases
+ - allow deep data structure interpolation in ysql
+ - change interpolation sigil to '$.'
+ - update Path::Tiny to 0.055
+ - add basic write command to ysql
+ - add ysql command with basic query support
+
+0.015 2014-12-29T23:15:29
+ - release v0.015
  - only run format tests if we have a formatter
  - use yaml formatter in ymask
  - use yaml formatter in yto
