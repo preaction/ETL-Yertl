@@ -42,6 +42,172 @@ subtest 'config' => sub {
             or diag explain $config;
     };
 
+    subtest 'read config' => sub {
+
+        subtest 'by key' => sub {
+            local $ENV{HOME} = $SHARE_DIR->child( 'command', 'ysql' )->stringify;
+
+            subtest 'sqlite' => sub {
+                my ( $stdout, $stderr, $exit ) = capture {
+                    ysql->main( 'config', 'test' );
+                };
+                ok !$stderr, 'nothing on stderr' or diag $stderr;
+                is $exit, 0, 'success exit status';
+
+                open my $fh, '<', \$stdout;
+                my $yaml_config = ETL::Yertl::Format::yaml->new( input => $fh );
+                my ( $config ) = $yaml_config->read;
+                cmp_deeply
+                    $config,
+                    {
+                        driver => 'SQLite',
+                        database => 'test.db',
+                    },
+                    'reading config is correct'
+                    or diag explain $config;
+            };
+
+            subtest 'mysql' => sub {
+                my ( $stdout, $stderr, $exit ) = capture {
+                    ysql->main( 'config', 'dev' );
+                };
+                ok !$stderr, 'nothing on stderr' or diag $stderr;
+                is $exit, 0, 'success exit status';
+
+                open my $fh, '<', \$stdout;
+                my $yaml_config = ETL::Yertl::Format::yaml->new( input => $fh );
+                my ( $config ) = $yaml_config->read;
+                cmp_deeply
+                    $config,
+                    {
+                        driver => 'mysql',
+                        database => 'foo',
+                        host => 'dev.example.com',
+                        port => 4650,
+                        user => 'preaction',
+                        password => 'example',
+                    },
+                    'reading config is correct'
+                    or diag explain $config;
+            };
+
+            subtest 'config was not altered' => sub {
+                my $yaml_config = ETL::Yertl::Format::yaml->new(
+                    input => $SHARE_DIR->child( 'command', 'ysql', '.yertl', 'ysql.yml' )->openr,
+                );
+                my ( $config ) = $yaml_config->read;
+                cmp_deeply
+                    $config,
+                    {
+                        test => {
+                            driver => 'SQLite',
+                            database => 'test.db',
+                        },
+
+                        dev => {
+                            driver => 'mysql',
+                            database => 'foo',
+                            host => 'dev.example.com',
+                            port => 4650,
+                            user => 'preaction',
+                            password => 'example',
+                        },
+
+                        prod => {
+                            driver => 'mysql',
+                            database => 'foo',
+                            host => 'example.com',
+                            port => 4650,
+                            user => 'produser',
+                            password => 'production',
+                        },
+
+                    },
+                    'config is correct'
+                    or diag explain $config;
+            };
+        };
+
+        subtest 'all keys' => sub {
+            local $ENV{HOME} = $SHARE_DIR->child( 'command', 'ysql' )->stringify;
+
+            my ( $stdout, $stderr, $exit ) = capture {
+                ysql->main( 'config' );
+            };
+            ok !$stderr, 'nothing on stderr' or diag $stderr;
+            is $exit, 0, 'success exit status';
+
+            open my $fh, '<', \$stdout;
+            my $yaml_config = ETL::Yertl::Format::yaml->new( input => $fh );
+            my ( $config ) = $yaml_config->read;
+            cmp_deeply
+                $config,
+                {
+                    test => {
+                        driver => 'SQLite',
+                        database => 'test.db',
+                    },
+
+                    dev => {
+                        driver => 'mysql',
+                        database => 'foo',
+                        host => 'dev.example.com',
+                        port => 4650,
+                        user => 'preaction',
+                        password => 'example',
+                    },
+
+                    prod => {
+                        driver => 'mysql',
+                        database => 'foo',
+                        host => 'example.com',
+                        port => 4650,
+                        user => 'produser',
+                        password => 'production',
+                    },
+
+                },
+                'config is correct'
+                or diag explain $config;
+
+            subtest 'config was not altered' => sub {
+                my $yaml_config = ETL::Yertl::Format::yaml->new(
+                    input => $SHARE_DIR->child( 'command', 'ysql', '.yertl', 'ysql.yml' )->openr,
+                );
+                my ( $config ) = $yaml_config->read;
+                cmp_deeply
+                    $config,
+                    {
+                        test => {
+                            driver => 'SQLite',
+                            database => 'test.db',
+                        },
+
+                        dev => {
+                            driver => 'mysql',
+                            database => 'foo',
+                            host => 'dev.example.com',
+                            port => 4650,
+                            user => 'preaction',
+                            password => 'example',
+                        },
+
+                        prod => {
+                            driver => 'mysql',
+                            database => 'foo',
+                            host => 'example.com',
+                            port => 4650,
+                            user => 'produser',
+                            password => 'production',
+                        },
+
+                    },
+                    'config is correct'
+                    or diag explain $config;
+            };
+        };
+    };
+
     subtest 'add/edit' => sub {
 
         subtest 'SQLite' => sub {

@@ -77,8 +77,20 @@ sub main {
     elsif ( $command eq 'config' ) {
         my ( $db_key, @args ) = @_;
 
+        if ( !$db_key ) {
+            my $out_fmt = ETL::Yertl::Format::yaml->new;
+            print $out_fmt->write( config() );
+            return 0;
+        }
+
         # Get the existing config first
         my $db_conf = db_config( $db_key );
+
+        if ( !@args ) {
+            my $out_fmt = ETL::Yertl::Format::yaml->new;
+            print $out_fmt->write( $db_conf );
+            return 0;
+        }
 
         # Set via options
         GetOptionsFromArray( \@args, $db_conf,

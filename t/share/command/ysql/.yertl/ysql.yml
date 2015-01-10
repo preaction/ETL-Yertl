@@ -1,0 +1,21 @@
+---
+test:
+    driver: SQLite
+    database: test.db
+
+dev:
+    driver: mysql
+    database: foo
+    host: dev.example.com
+    port: 4650
+    user: preaction
+    password: example
+
+prod:
+    driver: mysql
+    database: foo
+    host: example.com
+    port: 4650
+    user: produser
+    password: production
+
