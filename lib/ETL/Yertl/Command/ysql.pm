@@ -5,15 +5,13 @@ use Getopt::Long qw( GetOptionsFromArray );
 use ETL::Yertl::Format::yaml;
 use File::HomeDir;
 
-BEGIN {
-    eval { use DBI; };
+sub main {
+    my $class = shift;
+
+    eval { require DBI; };
     if ( $@ ) {
         die "Can't load ysql: Can't load DBI. Make sure the DBI module is installed.\n";
     }
-}
-
-sub main {
-    my $class = shift;
 
     my %opt;
     if ( ref $_[-1] eq 'HASH' ) {

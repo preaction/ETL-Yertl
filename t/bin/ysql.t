@@ -5,7 +5,7 @@ use ETL::Yertl::Format::yaml;
 my $SHARE_DIR = path( __DIR__, '..', 'share' );
 
 BEGIN {
-    eval { use DBI; use DBD::SQLite; };
+    eval { require DBI; require DBD::SQLite; };
     if ( $@ ) {
         plan skip_all => 'missing DBI and/or DBD::SQLite';
     }
