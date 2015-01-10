@@ -50,7 +50,7 @@ and prints only the fields specified by the C<mask>.
 
 =head2 mask
 
-See L<Data::Partial::Google/Rules> for more information
+See L<MASK SYNTAX|/MASK SYNTAX> for more information
 
 =head2 <file>
 
@@ -66,4 +66,110 @@ Show this help document.
 =head2 --version
 
 Print the current ymask and Perl versions.
+
+=head1 MASK SYNTAX
+
+=head2 PROPERTIES
+
+    $ ymask 'name,rank,serial'
+
+Select multiple properties in a document using C<,>. If a property does not exist,
+nothing will be added (and no error or warning will be output).
+
+=head2 DESCENDANTS
+
+    $ ymask 'squad/name'
+
+Select an inner document's properties using C</>. Arrays are automatically looped over.
+
+=head2 SUB-SELECTION
+
+    $ ymask 'squad(name,location)'
+
+Select multiple parts of an inner document by using parentheses.
+
+=head2 WILDCARDS
+
+    $ ymask 'squad/*/city'
+
+Select every property in a document, which is useful for picking parts out of
+every inner document.
+
+=head1 EXAMPLES
+
+All these examples use the following documents:
+
+    ---
+    name: Hazel Murphy
+    role: Captain
+    nickname: Hank
+    history:
+        - location: Sealab
+          from: 2014-01-01
+        - location: USS Hunley
+          from: 2012-06-01
+          to: 2013-11-28
+    ---
+    name: Quinn Quinlan
+    role: Science Officer
+    nickname: Doctor
+    history:
+        - location: Sealab
+          from: 2014-04-01
+        - location: MIT
+          from: 2008-08-01
+          to: 2012-06-05
+    ---
+    name: Debbie Dupree
+    role: Oceanographer
+    history:
+        - location: Sealab
+          from: 2014-02-10
+        - location: Sea Parks
+          from: 2004-09-01
+          to: 2014-01-20
+
+=head2 SELECT MULTIPLE PROPERTIES
+
+    $ ymask 'name,role,nickname'
+    ---
+    name: Hazel Murphy
+    nickname: Hank
+    role: Captain
+    ---
+    name: Quinn Quinlan
+    nickname: Doctor
+    role: Science Officer
+    ---
+    name: Debbie Dupree
+    role: Oceanographer
+
+=head2 SELECT PROPERTIES IN ARRAYS
+
+    $ ymask 'name,history/location'
+    ---
+    history:
+      - location: Sealab
+      - location: USS Hunley
+    name: Hazel Murphy
+    ---
+    history:
+      - location: Sealab
+      - location: MIT
+    name: Quinn Quinlan
+    ---
+    history:
+      - location: Sealab
+      - location: Sea Parks
+    name: Debbie Dupree
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Data::Partial::Google> - The implementation of this command
+
+=back
 
