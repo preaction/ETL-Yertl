@@ -1,0 +1,16 @@
+# PODNAME: ETL::Yertl::Help::Cookbook
+# ABSTRACT: Some recipies for common ETL tasks
+
+=head1 DESCRIPTION
+
+This document describes how to do some common ETL tasks
+
+=head1 EMBEDDED DOCUMENTS
+
+When you've got serialized JSON in a database field, you can use C<jq> to deserialize
+it:
+
+    ysql query TESTDB 'SELECT json_field FROM table'        # Query the database
+        | yto json                                          # Convert to JSON for jq
+        | js '.json_field | fromjson'                       # Inflate the JSON
+        | yfrom json                                        # Convert back to Yertl
