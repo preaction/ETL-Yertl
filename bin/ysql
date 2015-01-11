@@ -47,10 +47,18 @@ __END__
     # Execute
     ysql query <db_name> <query_name> [<value>...]
 
-    ### Add/edit database configuration
+    ### Database configuration
+
+    # Add/Edit
     ysql config <db_name> <dsn> [--user <user>] [--password <password>]
     ysql config <db_name> [--driver <driver>] [--database <database] [--host <host>]
         [--port <port>] [--user <user>] [--password <password>]
+
+    # Show database configuration
+    ysql config <db_name>
+
+    # Show all configuration
+    ysql config
 
     ysql -h|--help|--version
 
@@ -97,6 +105,14 @@ The password to connect with. Optional. This is stored in plain text, so beware.
 
 Configure the given C<db_name> with the given C<dsn>. The C<user> and C<password>
 options can also be used.
+
+=head2 config <db_name>
+
+Show the configuration for the given C<db_name>.
+
+=head2 config
+
+Show the configuration for all databases.
 
 =head2 query <query> [<value>...]
 
