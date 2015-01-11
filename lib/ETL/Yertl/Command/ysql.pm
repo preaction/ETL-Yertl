@@ -87,6 +87,7 @@ sub main {
         my $db_conf = db_config( $db_key );
 
         if ( !@args ) {
+            die "Database key '$db_key' does not exist" unless keys %$db_conf;
             my $out_fmt = ETL::Yertl::Format::yaml->new;
             print $out_fmt->write( $db_conf );
             return 0;

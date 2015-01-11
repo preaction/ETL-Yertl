@@ -91,6 +91,15 @@ subtest 'config' => sub {
                     or diag explain $config;
             };
 
+            subtest 'does not exist' => sub {
+                my ( $stdout, $stderr, $exit ) = capture {
+                    ysql->main( 'config', 'DOES_NOT_EXIST' );
+                };
+                ok !$stdout, 'nothing on stdout' or diag $stdout;
+                like $stderr, qr{ERROR: Database key 'DOES_NOT_EXIST' does not exist};
+                isnt $exit, 0, 'error exit status';
+            };
+
             subtest 'config was not altered' => sub {
                 my $yaml_config = ETL::Yertl::Format::yaml->new(
                     input => $SHARE_DIR->child( 'command', 'ysql', '.yertl', 'ysql.yml' )->openr,
