@@ -25,23 +25,6 @@ subtest 'error checking' => sub {
 
 subtest 'config' => sub {
 
-    my $conf_test = sub {
-        my ( $home, $args, $expect ) = @_;
-        my ( $stdout, $stderr, $exit ) = capture {
-            ysql->main( 'config', 'test', @$args );
-        };
-        ok !$stdout, 'nothing on stdout' or diag $stdout;
-        ok !$stderr, 'nothing on stderr' or diag $stderr;
-        is $exit, 0, 'success exit status';
-
-        my $yaml_config = ETL::Yertl::Format::yaml->new(
-            input => $home->child( '.yertl', 'ysql.yml' )->openr,
-        );
-        my ( $config ) = $yaml_config->read;
-        cmp_deeply $config, { test => $expect }, 'config is correct'
-            or diag explain $config;
-    };
-
     subtest 'read config' => sub {
 
         subtest 'by key' => sub {
@@ -219,6 +202,29 @@ subtest 'config' => sub {
 
     subtest 'add/edit' => sub {
 
+        my $conf_test = sub {
+            my ( $home, $args, $expect, $opt ) = @_;
+            my ( $stdout, $stderr, $exit ) = capture {
+                ysql->main( 'config', 'test', @$args );
+            };
+            ok !$stdout, 'nothing on stdout' or diag $stdout;
+
+            if ( $opt->{stderr} ) {
+                like $stderr, qr{$opt->{stderr}}, 'stderr matches';
+            }
+            else {
+                ok !$stderr, 'nothing on stderr' or diag $stderr;
+            }
+            is $exit, 0, 'success exit status';
+
+            my $yaml_config = ETL::Yertl::Format::yaml->new(
+                input => $home->child( '.yertl', 'ysql.yml' )->openr,
+            );
+            my ( $config ) = $yaml_config->read;
+            cmp_deeply $config, { test => $expect }, 'config is correct'
+                or diag explain $config;
+        };
+
         subtest 'SQLite' => sub {
 
             subtest 'by DSN' => sub {
@@ -240,6 +246,7 @@ subtest 'config' => sub {
                         driver => 'SQLite',
                         database => 'test2.db',
                     };
+
             };
 
             subtest 'by options' => sub {
@@ -268,9 +275,41 @@ subtest 'config' => sub {
                     };
 
             };
+
+            subtest 'warn on capitalization' => sub {
+                my $home = tempdir;
+                local $ENV{HOME} = "$home";
+
+                subtest 'add' => $conf_test,
+                    $home,
+                    [ 'dbi:sqlite:test.db' ],
+                    {
+                        driver => 'sqlite',
+                        database => 'test.db',
+                    },
+                    {
+                        stderr => "Driver 'sqlite' does not exist. Did you mean: SQLite",
+                    };
+
+                subtest 'edit' => $conf_test,
+                    $home,
+                    [
+                        '--driver', 'sqlite',
+                        '--db', 'test2.db',
+                    ],
+                    {
+                        driver => 'sqlite',
+                        database => 'test2.db',
+                    },
+                    {
+                        stderr => "Driver 'sqlite' does not exist. Did you mean: SQLite",
+                    };
+
+            };
         };
 
         subtest 'mysql' => sub {
+            my $has_mysql = grep { /^mysql$/ } DBI->available_drivers;
 
             subtest 'by DSN' => sub {
                 my $home = tempdir;
@@ -290,6 +329,9 @@ subtest 'config' => sub {
                         port => 4650,
                         user => 'preaction',
                         password => 'example',
+                    },
+                    {
+                        stderr => $has_mysql ? '' : "Driver 'mysql' does not exist.",
                     };
 
                 subtest 'edit' => $conf_test,
@@ -304,6 +346,9 @@ subtest 'config' => sub {
                         host => 'example.com',
                         user => 'postaction',
                         password => 'example',
+                    },
+                    {
+                        stderr => $has_mysql ? '' : "Driver 'mysql' does not exist.",
                     };
 
             };
@@ -329,6 +374,9 @@ subtest 'config' => sub {
                         port => 4650,
                         user => 'preaction',
                         password => 'example',
+                    },
+                    {
+                        stderr => $has_mysql ? '' : "Driver 'mysql' does not exist.",
                     };
 
                 subtest 'edit' => $conf_test,
@@ -345,6 +393,9 @@ subtest 'config' => sub {
                         port => 4650,
                         user => 'preaction',
                         password => 'newpassword',
+                    },
+                    {
+                        stderr => $has_mysql ? '' : "Driver 'mysql' does not exist.",
                     };
 
             };

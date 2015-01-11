@@ -135,6 +135,14 @@ sub main {
             }
         }
 
+        # Check if the driver is installed
+        my $driver = $db_conf->{driver};
+        if ( !grep { /^$driver$/ } DBI->available_drivers ) {
+            my @possible = grep { /^$driver$/i } DBI->available_drivers;
+            my $suggest = @possible ? " Did you mean: $possible[0]" : '';
+            warn "Driver '$driver' does not exist." . $suggest . "\n";
+        }
+
         # Write back the config
         db_config( $db_key => $db_conf );
     }
