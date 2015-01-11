@@ -138,6 +138,10 @@ sub main {
         # Write back the config
         db_config( $db_key => $db_conf );
     }
+    elsif ( $command eq 'drivers' ) {
+        my $ignore = join "|", qw( ExampleP Sponge File );
+        say join "\n", grep { !/^(?:$ignore)$/ } DBI->available_drivers;
+    }
 }
 
 sub config {

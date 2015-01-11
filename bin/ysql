@@ -147,6 +147,11 @@ named placeholders, which begin with C<$.>. For example:
                   VALUES ( $.name, $.email, $.profile.dept )' \
                   < input.yml
 
+=head2 drivers
+
+List the drivers available. Helpful for remembering the proper spelling for the
+driver you want to use.
+
 =head1 ARGUMENTS
 
 =head2 db_name

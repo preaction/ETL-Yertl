@@ -352,6 +352,18 @@ subtest 'config' => sub {
     };
 };
 
+subtest 'drivers' => sub {
+    my ( $stdout, $stderr, $exit ) = capture {
+        ysql->main( 'drivers' );
+    };
+    is $exit, 0;
+    ok !$stderr, 'nothing on stderr' or diag $stderr;
+    my $ignore = join "|", qw( ExampleP Sponge File );
+    for my $driver ( grep { !/^(?:$ignore)$/ } DBI->available_drivers ) {
+        like $stdout, qr{$driver}, 'output contains driver: ' . $driver;
+    }
+};
+
 subtest 'query' => sub {
 
     my $setup = sub {
