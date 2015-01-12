@@ -1,0 +1,5 @@
+.build
+*.swp
+*.tar.gz
+/ETL-Yertl-*
+site/_build
