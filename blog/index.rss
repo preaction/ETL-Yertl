@@ -7,6 +7,25 @@
         <description>Blog feed of Yertl</description>
         <generator>Statocles 0.033</generator>
         <item>
+            <title>Release v0.017</title>
+            <link>http://preaction.github.io/ETL-Yertl/blog/2015/01/11/release-v0.017.html</link>
+            <guid>http://preaction.github.io/ETL-Yertl/blog/2015/01/11/release-v0.017.html</guid>
+            <description><![CDATA[
+                <p>This release fixes a bunch of issues with <code>ysql</code>, and allows displaying of database
+configuration.</p>
+
+<p>Full changelog below:</p>
+
+                    <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/01/11/release-v0.017.html#section-2">Continue reading...</a></p>
+                <p>Tags:
+                    <a href="/blog/tag/release/index.html">release</a>
+                </p>
+            ]]></description>
+            <pubDate>
+                Sun, 11 Jan 2015 00:00:00 -0600
+            </pubDate>
+        </item>
+        <item>
             <title>Initial Release</title>
             <link>http://preaction.github.io/ETL-Yertl/blog/2015/01/11/initial-release.html</link>
             <guid>http://preaction.github.io/ETL-Yertl/blog/2015/01/11/initial-release.html</guid>

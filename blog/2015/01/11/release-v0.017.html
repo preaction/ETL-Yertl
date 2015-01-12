@@ -53,8 +53,6 @@
             }
 
         </style>
-            <link href="/ETL-Yertl/blog/index.atom" rel="alternate" type="application/atom+xml">
-            <link href="/ETL-Yertl/blog/index.rss" rel="alternate" type="application/rss+xml">
         
     </head>
     <body>
@@ -87,102 +85,54 @@
             
         </header>
         <div class="main container">
-            
-<div class="row">
+            <div class="row">
 
     <div class="col-md-9">
         <main>
-            <article>
-                <header>
-                    <h1><a href="/ETL-Yertl/blog/2015/01/11/release-v0.017.html">Release v0.017</a></h1>
-                    <p class="tags">Tags:
-                        <a href="/ETL-Yertl/blog/tag/release/index.html" rel="tag">release</a>
-                    </p>
-                    <aside>
-                        <p><time datetime="2015-01-11">
-                            Posted on 2015-01-11
-                        </time>
-                        by preaction</p>
-                    </aside>
-                </header>
+            <header>
+                <h1>Release v0.017</h1>
+                <p class="tags">Tags:
+                    <a href="/ETL-Yertl/blog/tag/release/index.html" rel="tag">release</a>
+                </p>
+                <aside>
+                    <p><time datetime="2015-01-11">
+                        Posted on 2015-01-11
+                    </time>
+                    by preaction</p>
+                </aside>
+            </header>
+            <section id="section-1">
                 <p>This release fixes a bunch of issues with <code>ysql</code>, and allows displaying of database
 configuration.</p>
 
 <p>Full changelog below:</p>
 
-                    <p><a href="/ETL-Yertl/blog/2015/01/11/release-v0.017.html#section-2">Continue reading Release v0.017...</a></p>
-            </article>
-            <article>
-                <header>
-                    <h1><a href="/ETL-Yertl/blog/2015/01/11/initial-release.html">Initial Release</a></h1>
-                    <p class="tags">Tags:
-                        <a href="/ETL-Yertl/blog/tag/release/index.html" rel="tag">release</a>
-                    </p>
-                    <aside>
-                        <p><time datetime="2015-01-11">
-                            Posted on 2015-01-11
-                        </time>
-                        by preaction</p>
-                    </aside>
-                </header>
-                <p>This is the first release with Yertl&#39;s new website! Yertl is an ETL (Extract,
-Transform, Load) for the shell, with tools designed to be quickly assembled
-together into useful ETL processes.</p>
-
-<p>This release includes:</p>
-
-<ul>
-<li>Convert to and from YAML, JSON, and CSV (yto and yfrom)</li>
-<li>Read/write to/from SQL databases (ysql)</li>
-<li>Simple mask-style filtering (ymask)</li>
-<li>The beginning of a rich transform language (yq)</li>
+            </section>
+            <section id="section-2">
+                <ul>
+<li><a href="https://github.com/preaction/Statocles/commit/bec7ae0df7a91d8c8b285e26209692aa5212fa9d">remove docs about trim option</a></li>
+<li><a href="https://github.com/preaction/Statocles/commit/2cac631f018e2ba12efeeb712f24d7ec017753d8">add validation for database driver</a> (<a href="https://github.com/preaction/Statocles/issues/76">#76</a>)</li>
+<li><a href="https://github.com/preaction/Statocles/commit/62a9176890b641d26ec843bb157304e7b2476bf5">add drivers ysql command to list database drivers</a> (<a href="https://github.com/preaction/Statocles/issues/75">#75</a>)</li>
+<li><a href="https://github.com/preaction/Statocles/commit/2b801e0238f510df3c4849f47620cf9d8d9ee571">document new ysql config read commands</a></li>
+<li><a href="https://github.com/preaction/Statocles/commit/b0552cc674de31341dfe0d2da9643d4bfce6a689">show error if a database key does not exist</a> (<a href="https://github.com/preaction/Statocles/issues/74">#74</a>)</li>
+<li><a href="https://github.com/preaction/Statocles/commit/90850e278ff311233a7ade276b7b60b2c2381767">add read config commands to ysql</a> (<a href="https://github.com/preaction/Statocles/issues/73">#73</a>)</li>
+<li><a href="https://github.com/preaction/Statocles/commit/0b9a46c2d14cc0fc7fa5c9fb5affb93bf859cf64">add documentation for ymask</a> (<a href="https://github.com/preaction/Statocles/issues/53">#53</a>)</li>
+<li><a href="https://github.com/preaction/Statocles/commit/cb42b499ef1755eb8798a37c7d757c24e1f8c53b">make DBI completely optional</a> (<a href="https://github.com/preaction/Statocles/issues/77">#77</a>)</li>
+<li><a href="https://github.com/preaction/Statocles/commit/aff2829abd5c7d6c328fc8c737a7164b0735c5c1">add cookbook with embedded json recipe</a> (<a href="https://github.com/preaction/Statocles/issues/82">#82</a>)</li>
 </ul>
 
-<p>Future plans include:</p>
-
-<ul>
-<li>Job distribution using ZeroMQ send/receive</li>
-<li>Perl API for adding Yertl workflows to larger Perl scripts</li>
-<li>API for ORMs (DBIx::Class)</li>
-<li>API for document and key/value stores (MongoDB, Redis, Memcached)</li>
-<li>API for downloading and scraping data from websites (curl, Web::Query, Mojo::DOM)</li>
-<li>More options for filtering and transforming data (LINQ, XPath)</li>
-</ul>
-
-<p>See <a href="https://github.com/preaction/ETL-Yertl/labels/feature">the Github feature tickets</a>
-for more future plans.</p>
-
-            </article>
+            </section>
         </main>
-        <ul class="pager">
-            <li class="previous disabled">
-                <span>← Older</span>
-            </li>
-            <li class="next disabled">
-                <span>Newer →</span>
-            </li>
-        </ul>
     </div>
 
-    <div class="sidebar col-md-3">
+    <div class="col-md-3">
         
-        <h1>Tags</h1>
-        <ul class="list-inline">
-            <li><a href="/ETL-Yertl/blog/tag/release/index.html">release</a></li>
-        </ul>
-        <h1>Feeds</h1>
-        <ul class="list-inline">
-            <li>
-                <a href="/ETL-Yertl/blog/index.atom" rel="alternate" type="application/atom+xml">
-                    Atom
-                </a>
-            </li>
-            <li>
-                <a href="/ETL-Yertl/blog/index.rss" rel="alternate" type="application/rss+xml">
-                    RSS
-                </a>
-            </li>
-        </ul>
+        <nav id="tags">
+            <h1>Tags</h1>
+            <ul class="list-inline">
+                <li><a href="/ETL-Yertl/blog/tag/release/index.html">release</a></li>
+            </ul>
+        </nav>
     </div>
 
 </div>

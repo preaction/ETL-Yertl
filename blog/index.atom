@@ -2,10 +2,29 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>http://preaction.github.io/ETL-Yertl/blog/index.html</id>
     <title>Yertl</title>
-    <updated>2015-01-11T22:15:39Z</updated>
+    <updated>2015-01-11T23:37:30Z</updated>
     <link href="http://preaction.github.io/ETL-Yertl/blog/index.atom" rel="self" />
     <link href="http://preaction.github.io/ETL-Yertl/blog/index.html" rel="alternate" />
     <generator version="0.033">Statocles</generator>
+    <entry>
+        <id>http://preaction.github.io/ETL-Yertl/blog/2015/01/11/release-v0.017.html</id>
+        <title>Release v0.017</title>
+        <author><name>preaction</name></author>
+        <link href="http://preaction.github.io/ETL-Yertl/blog/2015/01/11/release-v0.017.html" rel="alternate" />
+        <content type="html"><![CDATA[
+            <p>This release fixes a bunch of issues with <code>ysql</code>, and allows displaying of database
+configuration.</p>
+
+<p>Full changelog below:</p>
+
+                <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/01/11/release-v0.017.html#section-2">Continue reading...</a></p>
+            <p>Tags:
+                <a href="/blog/tag/release/index.html">release</a>
+            </p>
+        ]]></content>
+        <updated>2015-01-11T00:00:00Z</updated>
+        <category term="ARRAY(0x7fe2ca44ef80)" />
+    </entry>
     <entry>
         <id>http://preaction.github.io/ETL-Yertl/blog/2015/01/11/initial-release.html</id>
         <title>Initial Release</title>
@@ -45,7 +64,7 @@ for more future plans.</p>
             </p>
         ]]></content>
         <updated>2015-01-11T00:00:00Z</updated>
-        <category term="ARRAY(0x7fc46b5cb3e0)" />
+        <category term="ARRAY(0x7fe2c9aa2e08)" />
     </entry>
 </feed>
 
