@@ -66,10 +66,3 @@ Show this help document.
 =head2 --version
 
 Print the current yfrom and Perl versions.
-
-=head2 --no-trim
-
-For CSV documents, trim any leading whitespace from each cell. Some CSV documents are
-formatted to line up the commas for easy visual scanning. By default, yfrom will remove
-leading whitespace in a cell. Setting C<--no-trim> will disable trimming.
-
