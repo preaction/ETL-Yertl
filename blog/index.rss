@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Yertl</title>
+        <link>http://preaction.github.io/ETL-Yertl/blog/index.html</link>
+        <atom:link href="http://preaction.github.io/ETL-Yertl/blog/index.rss" rel="self" type="application/rss+xml" />
+        <description>Blog feed of Yertl</description>
+        <generator>Statocles 0.033</generator>
+        <item>
+            <title>Initial Release</title>
+            <link>http://preaction.github.io/ETL-Yertl/blog/2015/01/11/initial-release.html</link>
+            <guid>http://preaction.github.io/ETL-Yertl/blog/2015/01/11/initial-release.html</guid>
+            <description><![CDATA[
+                <p>This is the first release with Yertl's new website! Yertl is an ETL (Extract,
+Transform, Load) for the shell, with tools designed to be quickly assembled
+together into useful ETL processes.</p>
+
+<p>This release includes:</p>
+
+<ul>
+<li>Convert to and from YAML, JSON, and CSV (yto and yfrom)</li>
+<li>Read/write to/from SQL databases (ysql)</li>
+<li>Simple mask-style filtering (ymask)</li>
+<li>The beginning of a rich transform language (yq)</li>
+</ul>
+
+<p>Future plans include:</p>
+
+<ul>
+<li>Job distribution using ZeroMQ send/receive</li>
+<li>Perl API for adding Yertl workflows to larger Perl scripts</li>
+<li>API for ORMs (DBIx::Class)</li>
+<li>API for document and key/value stores (MongoDB, Redis, Memcached)</li>
+<li>API for downloading and scraping data from websites (curl, Web::Query, Mojo::DOM)</li>
+<li>More options for filtering and transforming data (LINQ, XPath)</li>
+</ul>
+
+<p>See <a href="https://github.com/preaction/ETL-Yertl/labels/feature">the Github feature tickets</a>
+for more future plans.</p>
+
+                    <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/01/11/initial-release.html#section-2">Continue reading...</a></p>
+                <p>Tags:
+                    <a href="/blog/tag/release/index.html">release</a>
+                </p>
+            ]]></description>
+            <pubDate>
+                Sun, 11 Jan 2015 00:00:00 -0600
+            </pubDate>
+        </item>
+    </channel>
+</rss>
+
