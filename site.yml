@@ -1,0 +1,67 @@
+theme:
+    class: Statocles::Theme
+    args:
+        store: site/theme
+
+site:
+    class: Statocles::Site::Git
+    args:
+        title: Yertl
+        base_url: http://preaction.github.io/ETL-Yertl/
+        nav:
+            main:
+                - title: Blog
+                  href: /blog
+                - title: Docs
+                  href: /pod
+                - title: Code
+                  href: 'http://github.com/preaction/ETL-Yertl'
+                - title: Bugs
+                  href: 'http://github.com/preaction/ETL-Yertl/issues'
+                - title: CPAN
+                  href: 'http://metacpan.org/pod/ETL-Yertl'
+                - title: IRC
+                  href: 'https://chat.mibbit.com/?channel=%23yertl&server=irc.perl.org'
+        build_store: 'site/_build'
+        deploy_store: '.'
+        deploy_branch: gh-pages
+        index: page
+        theme:
+            $ref: theme
+        apps:
+
+            page:
+                $class: Statocles::App::Plain
+                $args:
+                    url_root: /
+                    store: site/
+
+            static:
+                $class: Statocles::App::Static
+                $args:
+                    url_root: /
+                    store: site/
+
+            pod:
+                $class: Statocles::App::Perldoc
+                $args:
+                    url_root: /pod
+                    inc:
+                        - lib/
+                        - bin/
+                    modules:
+                        - 'ETL::Yertl'
+                        - 'ETL::Yertl::'
+                        - 'yfrom'
+                        - 'yto'
+                        - 'ysql'
+                        - 'yq'
+                        - 'ymask'
+                    index_module: 'ETL::Yertl'
+                    weave: 1
+
+            blog:
+                $class: Statocles::App::Blog
+                $args:
+                    store: site/blog
+                    url_root: /blog
