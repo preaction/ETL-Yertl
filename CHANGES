@@ -1,6 +1,20 @@
 Changelog for ETL-Yertl
 
-0.016 2015-01-06T02:36:59
+0.017 2015-01-12T05:31:46
+ - add website using Statocles
+ - remove docs about trim option
+ - add validation for database driver
+ - add drivers ysql command to list database drivers
+ - remove root dotfiles and root ini files from dist
+ - document new ysql config read commands
+ - show error if a database key does not exist
+ - switch to dzil Git::GatherDir
+ - add read config commands to ysql
+ - add documentation for ymask
+ - make DBI completely optional
+ - add cookbook with embedded json recipe
+
+0.016 2015-01-06T02:36:59Z
  - update Import::Base prereq
  - fix contributors dependency
  - update copyright year
@@ -18,7 +32,7 @@ Changelog for ETL-Yertl
  - add basic write command to ysql
  - add ysql command with basic query support
 
-0.015 2014-12-29T23:15:29
+0.015 2014-12-29T23:15:29Z
  - release v0.015
  - only run format tests if we have a formatter
  - use yaml formatter in ymask
@@ -47,12 +61,12 @@ Changelog for ETL-Yertl
  - create new base/project-intro module
  - rename to ETL-Yertl
 
-0.014 2014-12-12T07:28:58
+0.014 2014-12-12T07:28:58Z
  - release v0.014
  - trim leading whitespace from CSV cells by default
  - rename ypick back to ymask
 
-0.013 2014-12-10T08:05:32
+0.013 2014-12-10T08:05:32Z
  - release v0.013
  - remove the Marpa version for now
  - fix test failures due to whitespace differences
@@ -69,7 +83,7 @@ Changelog for ETL-Yertl
  - update generated READMEs for status badges
  - update dist.ini for new best practices
 
-0.012 2014-10-19T22:25:41
+0.012 2014-10-19T22:25:41Z
  - release v0.012
  - add yfrom script to output YAML from JSON or CSV
  - remove references to Test::Most
@@ -102,7 +116,7 @@ Changelog for ETL-Yertl
  - add keys(EXPR) function
  - clarify and add some comments during the parsing
 
-0.011 2014-05-17T06:42:15
+0.011 2014-05-17T06:42:15Z
  - release v0.011
  - prevent undefined warnings
  - add missing options to SYNOPSIS
@@ -113,30 +127,30 @@ Changelog for ETL-Yertl
  - add pipe to use output from EXPR as input to next
  - break tests out into individual categories
 
-0.010 2014-05-16T15:30:07
+0.010 2014-05-16T15:30:07Z
  - add quoted strings using Text::Balanced
 
-0.009 2014-05-16T06:22:49
+0.009 2014-05-16T06:22:49Z
  - release 0.009
  - add hash and array constructors
  - add group_by( EXPR ) function
 
-0.008 2014-05-14T05:05:14
+0.008 2014-05-14T05:05:14Z
  - release v0.008
  - turn off STDOUT buffering
  - add note to grep() instead of using `if/else empty`
  - implement grep(EXPR)
  - allow `if .foo then .bar` for truthiness checking
 
-0.007 2014-05-09T04:27:11
+0.007 2014-05-09T04:27:11Z
  - update build artifacts for v0.007
  - test that -h and error messages are correct
 
-0.006 2014-05-09T02:41:31
+0.006 2014-05-09T02:41:31Z
  - update build artifacts
  - fix -h and --help option
 
-0.005 2014-05-07T03:45:17
+0.005 2014-05-07T03:45:17Z
  - update build artifacts
  - add .[] to flatten an array
  - add , operator to join multiple filters
@@ -146,19 +160,19 @@ Changelog for ETL-Yertl
  - filter documents that have no document separator
  - prepare for using STDERR as an error channel
 
-0.004 2014-05-03T03:30:31
+0.004 2014-05-03T03:30:31Z
  - increase required Getopt::Long version
 
-0.003 2014-05-01T05:54:23
+0.003 2014-05-01T05:54:23Z
  - update build artifacts
  - document the help option
  - fix POD errors
 
-0.002 2014-05-01T05:34:09
+0.002 2014-05-01T05:34:09Z
  - update build artifacts
  - add array filters and allow combining filters
 
-0.001 2014-04-30T05:55:50
+0.001 2014-04-30T05:55:50Z
  - fix gitignore for the app rename
  - update build artifacts
  - migrate to Import::Base
