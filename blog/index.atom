@@ -2,10 +2,34 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>http://preaction.github.io/ETL-Yertl/blog/index.html</id>
     <title>Yertl</title>
-    <updated>2015-01-11T23:37:30Z</updated>
+    <updated>2015-01-21T22:09:37Z</updated>
     <link href="http://preaction.github.io/ETL-Yertl/blog/index.atom" rel="self" />
     <link href="http://preaction.github.io/ETL-Yertl/blog/index.html" rel="alternate" />
-    <generator version="0.033">Statocles</generator>
+    <generator version="0.034">Statocles</generator>
+    <entry>
+        <id>http://preaction.github.io/ETL-Yertl/blog/2015/01/21/release-v0.019.html</id>
+        <title>Release v0.019</title>
+        <author><name /></author>
+        <link href="http://preaction.github.io/ETL-Yertl/blog/2015/01/21/release-v0.019.html" rel="alternate" />
+        <content type="html"><![CDATA[
+            <p>This release fixes a few bugs and inconsistencies in the <code>ysql</code> command, in
+anticipation of a blog post explaining how it works.</p>
+
+<p>We removed the "write" command in favor of making the "query" command accept
+input on <code>STDIN</code> and handle placeholders. So now you can run "SELECT" queries
+for each document as it comes in, perhaps to look up users as something
+else write's YAML with their ID in it.</p>
+
+<p>Full changelog below:</p>
+
+                <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/01/21/release-v0.019.html#section-2">Continue reading...</a></p>
+            <p>Tags:
+                <a href="/blog/tag/release/index.html">release</a>
+            </p>
+        ]]></content>
+        <updated>2015-01-21T00:00:00Z</updated>
+        <category term="ARRAY(0x7ffe9522f7c0)" />
+    </entry>
     <entry>
         <id>http://preaction.github.io/ETL-Yertl/blog/2015/01/11/release-v0.017.html</id>
         <title>Release v0.017</title>
@@ -23,7 +47,7 @@ configuration.</p>
             </p>
         ]]></content>
         <updated>2015-01-11T00:00:00Z</updated>
-        <category term="ARRAY(0x7fe2ca44ef80)" />
+        <category term="ARRAY(0x7ffe93e675a8)" />
     </entry>
     <entry>
         <id>http://preaction.github.io/ETL-Yertl/blog/2015/01/11/initial-release.html</id>
@@ -64,7 +88,7 @@ for more future plans.</p>
             </p>
         ]]></content>
         <updated>2015-01-11T00:00:00Z</updated>
-        <category term="ARRAY(0x7fe2c9aa2e08)" />
+        <category term="ARRAY(0x7ffe978f3390)" />
     </entry>
 </feed>
 

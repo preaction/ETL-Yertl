@@ -5,7 +5,31 @@
         <link>http://preaction.github.io/ETL-Yertl/blog/tag/release/index.html</link>
         <atom:link href="http://preaction.github.io/ETL-Yertl/blog/tag/release.rss" rel="self" type="application/rss+xml" />
         <description>Blog feed of Yertl</description>
-        <generator>Statocles 0.033</generator>
+        <generator>Statocles 0.034</generator>
+        <item>
+            <title>Release v0.019</title>
+            <link>http://preaction.github.io/ETL-Yertl/blog/2015/01/21/release-v0.019.html</link>
+            <guid>http://preaction.github.io/ETL-Yertl/blog/2015/01/21/release-v0.019.html</guid>
+            <description><![CDATA[
+                <p>This release fixes a few bugs and inconsistencies in the <code>ysql</code> command, in
+anticipation of a blog post explaining how it works.</p>
+
+<p>We removed the "write" command in favor of making the "query" command accept
+input on <code>STDIN</code> and handle placeholders. So now you can run "SELECT" queries
+for each document as it comes in, perhaps to look up users as something
+else write's YAML with their ID in it.</p>
+
+<p>Full changelog below:</p>
+
+                    <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/01/21/release-v0.019.html#section-2">Continue reading...</a></p>
+                <p>Tags:
+                    <a href="/blog/tag/release/index.html">release</a>
+                </p>
+            ]]></description>
+            <pubDate>
+                Wed, 21 Jan 2015 00:00:00 -0600
+            </pubDate>
+        </item>
         <item>
             <title>Release v0.017</title>
             <link>http://preaction.github.io/ETL-Yertl/blog/2015/01/11/release-v0.017.html</link>

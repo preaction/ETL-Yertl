@@ -4,13 +4,13 @@
         <loc>http://preaction.github.io/ETL-Yertl/blog/index.html</loc>
         <changefreq>daily</changefreq>
         <priority>0.3</priority>
-        <lastmod>2015-01-11</lastmod>
+        <lastmod>2015-01-21</lastmod>
     </url>
     <url>
         <loc>http://preaction.github.io/ETL-Yertl/blog/tag/release/index.html</loc>
         <changefreq>daily</changefreq>
         <priority>0.3</priority>
-        <lastmod>2015-01-11</lastmod>
+        <lastmod>2015-01-21</lastmod>
     </url>
     <url>
         <loc>http://preaction.github.io/ETL-Yertl/blog/2015/01/11/initial-release.html</loc>
@@ -25,51 +25,57 @@
         <lastmod>2015-01-11</lastmod>
     </url>
     <url>
+        <loc>http://preaction.github.io/ETL-Yertl/blog/2015/01/21/release-v0.019.html</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+        <lastmod>2015-01-21</lastmod>
+    </url>
+    <url>
         <loc>http://preaction.github.io/ETL-Yertl/pod/index.html</loc>
         <changefreq>weekly</changefreq>
         <priority>0.5</priority>
-        <lastmod>2015-01-11</lastmod>
-    </url>
-    <url>
-        <loc>http://preaction.github.io/ETL-Yertl/pod/ETL/Yertl/Format/json.html</loc>
-        <changefreq>weekly</changefreq>
-        <priority>0.5</priority>
-        <lastmod>2015-01-11</lastmod>
-    </url>
-    <url>
-        <loc>http://preaction.github.io/ETL-Yertl/pod/ETL/Yertl/Command/yto.html</loc>
-        <changefreq>weekly</changefreq>
-        <priority>0.5</priority>
-        <lastmod>2015-01-11</lastmod>
+        <lastmod>2015-01-21</lastmod>
     </url>
     <url>
         <loc>http://preaction.github.io/ETL-Yertl/pod/ETL/Yertl/Command/yq.html</loc>
         <changefreq>weekly</changefreq>
         <priority>0.5</priority>
-        <lastmod>2015-01-11</lastmod>
-    </url>
-    <url>
-        <loc>http://preaction.github.io/ETL-Yertl/pod/ETL/Yertl/Format/yaml.html</loc>
-        <changefreq>weekly</changefreq>
-        <priority>0.5</priority>
-        <lastmod>2015-01-11</lastmod>
+        <lastmod>2015-01-21</lastmod>
     </url>
     <url>
         <loc>http://preaction.github.io/ETL-Yertl/pod/ETL/Yertl/Format/csv.html</loc>
         <changefreq>weekly</changefreq>
         <priority>0.5</priority>
-        <lastmod>2015-01-11</lastmod>
+        <lastmod>2015-01-21</lastmod>
+    </url>
+    <url>
+        <loc>http://preaction.github.io/ETL-Yertl/pod/ETL/Yertl/Command/yto.html</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+        <lastmod>2015-01-21</lastmod>
+    </url>
+    <url>
+        <loc>http://preaction.github.io/ETL-Yertl/pod/ETL/Yertl/Format/yaml.html</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+        <lastmod>2015-01-21</lastmod>
+    </url>
+    <url>
+        <loc>http://preaction.github.io/ETL-Yertl/pod/ETL/Yertl/Format/json.html</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+        <lastmod>2015-01-21</lastmod>
     </url>
     <url>
         <loc>http://preaction.github.io/ETL-Yertl/pod/ETL/Yertl/Help/Cookbook.html</loc>
         <changefreq>weekly</changefreq>
         <priority>0.5</priority>
-        <lastmod>2015-01-11</lastmod>
+        <lastmod>2015-01-21</lastmod>
     </url>
     <url>
         <loc>http://preaction.github.io/ETL-Yertl/index.html</loc>
         <changefreq>weekly</changefreq>
         <priority>0.5</priority>
-        <lastmod>2015-01-11</lastmod>
+        <lastmod>2015-01-21</lastmod>
     </url>
 </urlset>
