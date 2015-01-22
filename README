@@ -2,7 +2,7 @@ NAME
     ETL::Yertl - ETL with a Shell
 
 VERSION
-    version 0.017
+    version 0.018
 
 SYNOPSIS
         ### On a shell...
@@ -52,7 +52,7 @@ AUTHOR
     Doug Bell <preaction@cpan.org>
 
 CONTRIBUTOR
-    Doug Bell <doug.bell@baml.com>
+    Doug Bell <preaction@users.noreply.github.com>
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2015 by Doug Bell.

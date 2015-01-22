@@ -1,6 +1,14 @@
 Changelog for ETL-Yertl
 
-0.017 2015-01-12T05:31:46
+0.018 2015-01-22T03:57:02
+ - add missing ABSTRACTs to Command modules
+ - add error checking when preparing or executing SQL
+ - allow using "--dsn" to edit config
+ - combine write and query in ysql
+ - Fix mailmap for my work e-mail
+ - add release 0.017 announcement
+
+0.017 2015-01-12T05:31:46Z
  - add website using Statocles
  - remove docs about trim option
  - add validation for database driver

@@ -4,7 +4,7 @@ ETL::Yertl - ETL with a Shell
 
 # VERSION
 
-version 0.017
+version 0.018
 
 # STATUS
 
@@ -67,7 +67,7 @@ Doug Bell <preaction@cpan.org>
 
 # CONTRIBUTOR
 
-Doug Bell <doug.bell@baml.com>
+Doug Bell <preaction@users.noreply.github.com>
 
 # COPYRIGHT AND LICENSE
 
