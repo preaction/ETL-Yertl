@@ -78,6 +78,8 @@ sub main {
     }
     elsif ( $command eq 'config' ) {
         my ( $db_key, @args ) = @_;
+        # Allow writing "--dsn" before the DSN
+        unshift @args, $opt{dsn} if $opt{dsn};
 
         if ( !$db_key ) {
             my $out_fmt = ETL::Yertl::Format::yaml->new;

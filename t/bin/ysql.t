@@ -249,6 +249,28 @@ subtest 'config' => sub {
 
             };
 
+            subtest 'by DSN (with --dsn option)' => sub {
+                my $home = tempdir;
+                local $ENV{HOME} = "$home";
+
+                subtest 'add' => $conf_test,
+                    $home,
+                    [ '--dsn', 'dbi:SQLite:test.db' ],
+                    {
+                        driver => 'SQLite',
+                        database => 'test.db',
+                    };
+
+                subtest 'edit' => $conf_test,
+                    $home,
+                    [ '--dsn', 'dbi:SQLite:test2.db' ],
+                    {
+                        driver => 'SQLite',
+                        database => 'test2.db',
+                    };
+
+            };
+
             subtest 'by options' => sub {
                 my $home = tempdir;
                 local $ENV{HOME} = "$home";
