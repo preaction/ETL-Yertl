@@ -458,8 +458,9 @@ subtest 'query' => sub {
             [ 1, 'Hazel Murphy', 'hank@example.com' ],
             [ 2, 'Quentin Quinn', 'quinn@example.com' ],
         );
-        my $sql_people = join ", ", map { sprintf '( %d, "%s", "%s" )', @$_ } @people;
-        $dbi->do( 'INSERT INTO person ( id, name, email ) VALUES ' . $sql_people );
+        for my $person ( @people ) {
+            $dbi->do( 'INSERT INTO person ( id, name, email ) VALUES ( ?, ?, ? )', {}, @$person );
+        }
 
         return ( $home );
     };
