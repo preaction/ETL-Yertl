@@ -2,7 +2,7 @@ NAME
     ETL::Yertl - ETL with a Shell
 
 VERSION
-    version 0.018
+    version 0.019
 
 SYNOPSIS
         ### On a shell...

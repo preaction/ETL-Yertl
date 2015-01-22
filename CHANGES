@@ -1,6 +1,9 @@
 Changelog for ETL-Yertl
 
-0.018 2015-01-22T03:57:02
+0.019 2015-01-22T04:04:01
+ - fix test failure on DBD::SQLite 1.33
+
+0.018 2015-01-22T03:57:02Z
  - add missing ABSTRACTs to Command modules
  - add error checking when preparing or executing SQL
  - allow using "--dsn" to edit config
