@@ -50,29 +50,31 @@ sub main {
             }
         }
 
-        my $sth = $dbh->prepare( $query );
-        $sth->execute( @args );
-
-        while ( my $doc = $sth->fetchrow_hashref ) {
-            print $out_fmt->write( $doc );
-        }
-
-        return 0;
-    }
-    elsif ( $command eq 'write' ) {
-        my @dbi_args = $opt{dsn} ? ( $opt{dsn} ) : dbi_args( shift );
-        my $dbh = DBI->connect( @dbi_args );
-
-        my $query = shift;
+        # Resolve interpolations with placeholders
         my @fields = $query =~ m/\$(\.[.\w]+)/g;
         $query =~ s/\$\.[\w.]+/?/g;
 
         my $sth = $dbh->prepare( $query );
 
-        my $in_fmt = ETL::Yertl::Format::yaml->new( input => \*STDIN );
-        for my $doc ( $in_fmt->read ) {
-            $sth->execute( map { select_doc( $_, $doc ) } @fields );
+        if ( !-t *STDIN ) {
+            my $in_fmt = ETL::Yertl::Format::yaml->new( input => \*STDIN );
+
+            for my $doc ( $in_fmt->read ) {
+                $sth->execute( map { select_doc( $_, $doc ) } @fields );
+                while ( my $doc = $sth->fetchrow_hashref ) {
+                    print $out_fmt->write( $doc );
+                }
+            }
+
         }
+        else {
+            $sth->execute( @args );
+            while ( my $doc = $sth->fetchrow_hashref ) {
+                print $out_fmt->write( $doc );
+            }
+        }
+
+        return 0;
     }
     elsif ( $command eq 'config' ) {
         my ( $db_key, @args ) = @_;

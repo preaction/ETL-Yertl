@@ -571,9 +571,6 @@ subtest 'query' => sub {
             };
         };
     };
-};
-
-subtest 'write' => sub {
 
     subtest 'basic write' => sub {
         my $home = tempdir;
@@ -594,7 +591,7 @@ subtest 'write' => sub {
         local *STDIN = $SHARE_DIR->child( 'command', 'ysql', 'write.yml' )->openr;
 
         my ( $stdout, $stderr, $exit ) = capture {
-            ysql->main( 'write', 'testdb',
+            ysql->main( 'query', 'testdb',
                 'INSERT INTO person (id, name, email) VALUES ($.id, $.name, $.email)',
             );
         };
@@ -631,7 +628,7 @@ subtest 'write' => sub {
             local *STDIN = $SHARE_DIR->child( 'command', 'ysql', 'deep.yml' )->openr;
 
             my ( $stdout, $stderr, $exit ) = capture {
-                ysql->main( 'write', 'testdb',
+                ysql->main( 'query', 'testdb',
                     'INSERT INTO person (id, name, email) VALUES ($.id, $.profile.name, $.email)',
                 );
             };

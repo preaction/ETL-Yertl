@@ -39,7 +39,6 @@ __END__
 =head1 SYNOPSIS
 
     ysql query [<db_name> | --dsn <dsn>] <query> [<value>...]
-    ysql write [<db_name> | --dsn <dsn>] <query>
 
     ### Saved queries
     # Save
@@ -119,17 +118,10 @@ Show the configuration for all databases.
 Run a query to read data from the database. C<query> is either the name of a saved
 query, or SQL (usually a C<SELECT>). C<value> is used to fill in C<?> placeholders.
 
-=head2 query --save <query_name> <query>
-
-Save a query to run later.
-
-=head2 write <query>
-
-Run a query to write data to the database. C<query> is a SQL query, usually an C<INSERT>.
-YAML documents are read from C<STDIN>.
-
-In order to map keys in the YAML document to fields in the SQL query, C<ysql> supports
-named placeholders, which begin with C<$.>. For example:
+If there are documents to read on STDIN, the C<query> will be executed once for
+each document read. In order to map keys in the YAML document to fields in the
+SQL query, C<ysql> supports named placeholders, which begin with C<$.>. For
+example:
 
     # input.yml
     ---
@@ -143,9 +135,13 @@ named placeholders, which begin with C<$.>. For example:
     profile:
         dept: Wildlife
 
-    $ ysql write 'INSERT INTO person ( name, email, dept ) \
+    $ ysql query 'INSERT INTO person ( name, email, dept ) \
                   VALUES ( $.name, $.email, $.profile.dept )' \
                   < input.yml
+
+=head2 query --save <query_name> <query>
+
+Save a query to run later.
 
 =head2 drivers
 
