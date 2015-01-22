@@ -27,6 +27,11 @@ sub main {
         ETL::Yertl::Command::ysql->main( @argv, \%opt );
     };
     if ( $@ ) {
+        # SQL errors do not need usage information
+        if ( $@ =~ /^SQL error/ ) {
+            print STDERR "ERROR: $@";
+            return 1;
+        }
         return pod2usage( "ERROR: $@" );
     }
     return 0;

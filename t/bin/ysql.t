@@ -667,6 +667,32 @@ subtest 'query' => sub {
 
         };
     };
+
+    subtest 'error handling' => sub {
+        my ( $home ) = $setup->();
+        local $ENV{HOME} = "$home";
+
+        subtest 'SQL error in prepare' => sub {
+            my ( $stdout, $stderr, $exit ) = capture {
+                ysql->main( 'query', 'testdb', 'SELECT FROM person' );
+            };
+            isnt $exit, 0, 'error happened';
+            ok !$stdout, 'nothing on stdout' or diag $stdout;
+            like $stderr, qr{ERROR: SQL error in prepare: near "FROM": syntax error};
+            unlike $stderr, qr{Usage:}, "we don't need usage info";
+        };
+
+        subtest 'SQL error in execute' => sub {
+            my ( $stdout, $stderr, $exit ) = capture {
+                ysql->main( 'query', 'testdb', 'SELECT * FROM person WHERE id=?', 1, 2 );
+            };
+            isnt $exit, 0, 'error happened';
+            ok !$stdout, 'nothing on stdout' or diag $stdout;
+            like $stderr, qr{ERROR: SQL error in execute: called with 2 bind variables when 1 are needed};
+            unlike $stderr, qr{Usage:}, "we don't need usage info";
+        };
+
+    };
 };
 
 done_testing;

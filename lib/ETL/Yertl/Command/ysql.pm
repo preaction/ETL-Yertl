@@ -40,7 +40,7 @@ sub main {
 
         my $db_key = !$opt{dsn} ? shift @args : undef;
         my @dbi_args = $opt{dsn} ? ( $opt{dsn} ) : dbi_args( $db_key );
-        my $dbh = DBI->connect( @dbi_args );
+        my $dbh = DBI->connect( @dbi_args, { PrintError => 0 } );
 
         my $query = shift @args;
         if ( $db_key ) {
@@ -54,13 +54,15 @@ sub main {
         my @fields = $query =~ m/\$(\.[.\w]+)/g;
         $query =~ s/\$\.[\w.]+/?/g;
 
-        my $sth = $dbh->prepare( $query );
+        my $sth = $dbh->prepare( $query )
+            or die "SQL error in prepare: " . $dbh->errstr . "\n";
 
         if ( !-t *STDIN ) {
             my $in_fmt = ETL::Yertl::Format::yaml->new( input => \*STDIN );
 
             for my $doc ( $in_fmt->read ) {
-                $sth->execute( map { select_doc( $_, $doc ) } @fields );
+                $sth->execute( map { select_doc( $_, $doc ) } @fields )
+                    or die "SQL error in execute: " . $dbh->errstr . "\n";
                 while ( my $doc = $sth->fetchrow_hashref ) {
                     print $out_fmt->write( $doc );
                 }
@@ -68,7 +70,8 @@ sub main {
 
         }
         else {
-            $sth->execute( @args );
+            $sth->execute( @args )
+                or die "SQL error in execute: " . $dbh->errstr . "\n";
             while ( my $doc = $sth->fetchrow_hashref ) {
                 print $out_fmt->write( $doc );
             }
