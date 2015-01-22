@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>http://preaction.github.io/ETL-Yertl/blog/tag/release/index.html</id>
     <title>Yertl</title>
-    <updated>2015-01-21T22:09:37Z</updated>
+    <updated>2015-01-21T22:20:44Z</updated>
     <link href="http://preaction.github.io/ETL-Yertl/blog/tag/release.atom" rel="self" />
     <link href="http://preaction.github.io/ETL-Yertl/blog/tag/release/index.html" rel="alternate" />
     <generator version="0.034">Statocles</generator>
@@ -28,7 +28,7 @@ else write's YAML with their ID in it.</p>
             </p>
         ]]></content>
         <updated>2015-01-21T00:00:00Z</updated>
-        <category term="ARRAY(0x7ffe9522f7c0)" />
+        <category term="ARRAY(0x7fb730b64538)" />
     </entry>
     <entry>
         <id>http://preaction.github.io/ETL-Yertl/blog/2015/01/11/release-v0.017.html</id>
@@ -47,7 +47,7 @@ configuration.</p>
             </p>
         ]]></content>
         <updated>2015-01-11T00:00:00Z</updated>
-        <category term="ARRAY(0x7ffe93e675a8)" />
+        <category term="ARRAY(0x7fb730b64e20)" />
     </entry>
     <entry>
         <id>http://preaction.github.io/ETL-Yertl/blog/2015/01/11/initial-release.html</id>
@@ -88,7 +88,7 @@ for more future plans.</p>
             </p>
         ]]></content>
         <updated>2015-01-11T00:00:00Z</updated>
-        <category term="ARRAY(0x7ffe978f3390)" />
+        <category term="ARRAY(0x7fb730b62cc0)" />
     </entry>
 </feed>
 
