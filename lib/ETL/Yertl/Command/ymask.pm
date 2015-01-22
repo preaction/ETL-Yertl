@@ -1,4 +1,5 @@
 package ETL::Yertl::Command::ymask;
+# ABSTRACT: Filter documents through applying a mask
 
 use ETL::Yertl;
 use ETL::Yertl::Format::yaml;

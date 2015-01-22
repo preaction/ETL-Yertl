@@ -1,4 +1,5 @@
 package ETL::Yertl::Command::ysql;
+# ABSTRACT: Read and write documents with a SQL database
 
 use ETL::Yertl;
 use Getopt::Long qw( GetOptionsFromArray );

@@ -1,4 +1,5 @@
 package ETL::Yertl::Command::yq;
+# ABSTRACT: Filter and construct documents using a mini-language
 
 use ETL::Yertl;
 use YAML;

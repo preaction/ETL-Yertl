@@ -1,4 +1,5 @@
 package ETL::Yertl::Command::yfrom;
+# ABSTRACT: Read documents from a format like JSON or CSV
 
 use ETL::Yertl;
 use ETL::Yertl::Format::yaml;

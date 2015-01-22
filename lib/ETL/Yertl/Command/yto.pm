@@ -1,4 +1,5 @@
 package ETL::Yertl::Command::yto;
+# ABSTRACT: Write documents to a format like JSON or CSV
 
 use ETL::Yertl;
 use Module::Runtime qw( use_module compose_module_name is_module_spec );
