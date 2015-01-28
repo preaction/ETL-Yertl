@@ -1,0 +1,124 @@
+#!/usr/bin/env perl
+package ygrok;
+# ABSTRACT: Build YAML by parsing lines of plain text
+
+use ETL::Yertl;
+use Pod::Usage::Return qw( pod2usage );
+use Getopt::Long qw( GetOptionsFromArray );
+use ETL::Yertl::Command::ygrok;
+
+$|++; # no buffering
+
+sub main {
+    my ( $class, @argv ) = @_;
+    my %opt;
+    GetOptionsFromArray( \@argv, \%opt,
+        'help|h',
+        'version',
+    );
+    return pod2usage(0) if $opt{help};
+    if ( $opt{version} ) {
+        print "ygrok version $ygrok::VERSION (Perl $^V)\n";
+        return 0;
+    }
+
+    eval {
+        ETL::Yertl::Command::ygrok->main( @argv, \%opt );
+    };
+    if ( $@ ) {
+        return pod2usage( "ERROR: $@" );
+    }
+    return 0;
+}
+
+exit __PACKAGE__->main( @ARGV ) unless caller(0);
+
+__END__
+
+=head1 SYNOPSIS
+
+    ygrok <pattern> [<file>...]
+
+    yfrom -h|--help|--version
+
+=head1 DESCRIPTION
+
+This program takes lines of plain text and converts them into documents.
+
+=head1 ARGUMENTS
+
+=head2 pattern
+
+The pattern to match with. Any line that does not match the pattern will be ignored.
+
+See the full documentation for pattern syntax.
+
+=head2 <file>
+
+A file to read. The special file "-" refers to STDIN. If no files are
+specified, read STDIN.
+
+=head1 OPTIONS
+
+=head2 -h | --help
+
+Show this help document.
+
+=head2 --version
+
+Print the current ygrok and Perl versions.
+
+=head1 PATTERNS
+
+A pattern is a match for the entire line, splitting the line into fields.
+
+A named ygrok match has the format: C<%{PATTERN_NAME:field_name}>. The
+C<PATTERN_NAME> is one of the available patterns, listed below. The
+C<field_name> is the field to put the matched data.
+
+Additionally, the pattern is a Perl regular expression, so any regular
+expression syntax will work. Any named captures
+(C<(?E<lt>field_nameE<gt>PATTERN)>) will be part of the document.
+
+=head2 BUILT-IN PATTERNS
+
+The built-in patterns are common patterns that are always available.
+
+=over 4
+
+=item Simple Patterns
+
+=over 4
+
+=item WORD
+
+A single word, C<\b\w+\b>.
+
+=item DATA
+
+A non-slurpy section of data, C<.*?>.
+
+=back
+
+=item Date/Time Patterns
+
+=over 4
+
+=item DATETIME
+
+An ISO8601 date/time
+
+=back
+
+=item Networking Patterns
+
+=over 4
+
+=item IPV4
+
+An IPV4 address.
+
+=back
+
+=back
+
