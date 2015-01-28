@@ -109,7 +109,11 @@ The Yertl home page.
 
 =item L<yfrom>
 
+Convert incoming data (CSV, JSON) to Yertl documents.
+
 =item L<yto>
+
+Convert Yertl documents into another format (CSV, JSON).
 
 =item L<ysql>
 
@@ -117,7 +121,11 @@ Read/write documents from SQL databases.
 
 =item L<ymask>
 
+Filter documents with a mask, letting only matching fields through.
+
 =item L<yq>
+
+A powerful mini-language for munging and filtering.
 
 =back
 
