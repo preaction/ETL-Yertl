@@ -19,7 +19,7 @@ my %module_build_args = (
     "Doug Bell <preaction\@cpan.org>"
   ],
   "dist_name" => "ETL-Yertl",
-  "dist_version" => "0.019",
+  "dist_version" => "0.020",
   "license" => "perl",
   "module_name" => "ETL::Yertl",
   "recommends" => {
@@ -55,6 +55,7 @@ my %module_build_args = (
   },
   "script_files" => [
     "bin/yfrom",
+    "bin/ygrok",
     "bin/ymask",
     "bin/yq",
     "bin/ysql",
@@ -63,8 +64,10 @@ my %module_build_args = (
   "test_requires" => {
     "Capture::Tiny" => 0,
     "Dir::Self" => 0,
+    "File::Spec" => 0,
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
     "JSON::PP" => 0,
-    "Test::Compile" => 0,
     "Test::Deep" => 0,
     "Test::Differences" => 0,
     "Test::Exception" => 0,
@@ -77,9 +80,11 @@ my %module_build_args = (
 my %fallback_build_requires = (
   "Capture::Tiny" => 0,
   "Dir::Self" => 0,
+  "File::Spec" => 0,
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
   "JSON::PP" => 0,
   "Module::Build" => "0.28",
-  "Test::Compile" => 0,
   "Test::Deep" => 0,
   "Test::Differences" => 0,
   "Test::Exception" => 0,

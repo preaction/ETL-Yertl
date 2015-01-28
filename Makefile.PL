@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "ETL-Yertl",
   "EXE_FILES" => [
     "bin/yfrom",
+    "bin/ygrok",
     "bin/ymask",
     "bin/yq",
     "bin/ysql",
@@ -52,15 +53,17 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Capture::Tiny" => 0,
     "Dir::Self" => 0,
+    "File::Spec" => 0,
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
     "JSON::PP" => 0,
-    "Test::Compile" => 0,
     "Test::Deep" => 0,
     "Test::Differences" => 0,
     "Test::Exception" => 0,
     "Test::Lib" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "0.019",
+  "VERSION" => "0.020",
   "test" => {
     "TESTS" => "t/*.t t/bin/*.t t/command/yq/*.t t/format/*.t"
   }
@@ -75,6 +78,8 @@ my %FallbackPrereqs = (
   "File::HomeDir" => 0,
   "File::Spec" => 0,
   "Getopt::Long" => "2.36",
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
   "Import::Base" => "0.010",
   "JSON::PP" => 0,
   "List::Util" => "1.29",
@@ -85,7 +90,6 @@ my %FallbackPrereqs = (
   "Path::Tiny" => "0.055",
   "Pod::Usage::Return" => 0,
   "Regexp::Common" => 0,
-  "Test::Compile" => 0,
   "Test::Deep" => 0,
   "Test::Differences" => 0,
   "Test::Exception" => 0,

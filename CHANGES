@@ -1,6 +1,16 @@
 Changelog for ETL-Yertl
 
-0.019 2015-01-22T04:04:01
+0.020 2015-01-28T04:42:06
+ - add short descriptions of all the Yertl tools
+ - add ysql to main page synopsis
+ - add links to yertl homepage
+ - exclude the website from the cpan dist
+ - fix "prototype mismatch" from Parse::RecDescent
+ - add initial ygrok script
+ - add dzil plugin for prereqs and compile tests
+ - add release v0.019 announcement
+
+0.019 2015-01-22T04:04:01Z
  - fix test failure on DBD::SQLite 1.33
 
 0.018 2015-01-22T03:57:02Z

@@ -2,7 +2,7 @@ NAME
     ETL::Yertl - ETL with a Shell
 
 VERSION
-    version 0.019
+    version 0.020
 
 SYNOPSIS
         ### On a shell...
@@ -16,6 +16,12 @@ SYNOPSIS
         # Convert file to output format
         $ yto csv work.yml
         $ yto json work.yml
+
+        # Read data from a database
+        $ ysql query devdb 'SELECT * FROM employee'
+
+        # Write data to a database
+        $ ysql query devdb 'INSERT INTO employee ( id, name ) VALUES ( $.id, $.name )'
 
         ### In Perl...
         use ETL::Yertl;
@@ -36,11 +42,22 @@ DESCRIPTION
     Distributing data through messaging APIs (ZeroMQ)
 
 SEE ALSO
+    <http://preaction.github.io/ETL-Yertl>
+        The Yertl home page.
+
   Yertl Tools
     yfrom
-    yto
+        Convert incoming data (CSV, JSON) to Yertl documents.
+
+    yto Convert Yertl documents into another format (CSV, JSON).
+
+    ysql
+        Read/write documents from SQL databases.
+
     ymask
-    yq
+        Filter documents with a mask, letting only matching fields through.
+
+    yq  A powerful mini-language for munging and filtering.
 
   Other Tools
     Here are some other tools that can be used with Yertl
