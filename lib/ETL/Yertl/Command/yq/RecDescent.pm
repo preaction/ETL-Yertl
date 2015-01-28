@@ -13,7 +13,7 @@ $::RD_HINT = 1;
 my $grammar = q{
     {
         use Data::Dumper;
-        use boolean qw( true false );
+        use boolean ();
         sub one { return is_list( $_[0] ) ? $_[0]->[0] : $_[0] }
         sub is_list { return ref $_[0] eq 'list' }
         sub flatten { map { is_list( $_ ) ? @$_ : $_ } @_ }
@@ -87,33 +87,33 @@ my $grammar = q{
             # another value. Undef will never be treated as '' or 0 here.
             if ( $cond eq 'eq' ) {
                 $return = defined $lhs_value == defined $rhs_value
-                    && $lhs_value eq $rhs_value ? true : false;
+                    && $lhs_value eq $rhs_value ? boolean::true : boolean::false;
             }
             elsif ( $cond eq 'ne' ) {
                 $return = defined $lhs_value != defined $rhs_value
-                    || $lhs_value ne $rhs_value ? true : false;
+                    || $lhs_value ne $rhs_value ? boolean::true : boolean::false;
             }
             elsif ( $cond eq '==' ) {
                 $return = defined $lhs_value == defined $rhs_value
-                    && $lhs_value == $rhs_value ? true : false;
+                    && $lhs_value == $rhs_value ? boolean::true : boolean::false;
             }
             elsif ( $cond eq '!=' ) {
                 $return = defined $lhs_value != defined $rhs_value
-                    || $lhs_value != $rhs_value ? true : false;
+                    || $lhs_value != $rhs_value ? boolean::true : boolean::false;
             }
             # These operators allow undef warnings, since equating undef to 0 or ''
             # can be a cause of problems.
             elsif ( $cond eq '>' ) {
-                $return = $lhs_value > $rhs_value ? true : false;
+                $return = $lhs_value > $rhs_value ? boolean::true : boolean::false;
             }
             elsif ( $cond eq '>=' ) {
-                $return = $lhs_value >= $rhs_value ? true : false;
+                $return = $lhs_value >= $rhs_value ? boolean::true : boolean::false;
             }
             elsif ( $cond eq '<' ) {
-                $return = $lhs_value < $rhs_value ? true : false;
+                $return = $lhs_value < $rhs_value ? boolean::true : boolean::false;
             }
             elsif ( $cond eq '<=' ) {
-                $return = $lhs_value <= $rhs_value ? true : false;
+                $return = $lhs_value <= $rhs_value ? boolean::true : boolean::false;
             }
             $return = list( $return );
         }
