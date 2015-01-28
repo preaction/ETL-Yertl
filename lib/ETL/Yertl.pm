@@ -60,6 +60,12 @@ __END__
     $ yto csv work.yml
     $ yto json work.yml
 
+    # Read data from a database
+    $ ysql query devdb 'SELECT * FROM employee'
+
+    # Write data to a database
+    $ ysql query devdb 'INSERT INTO employee ( id, name ) VALUES ( $.id, $.name )'
+
     ### In Perl...
     use ETL::Yertl;
 
@@ -104,6 +110,10 @@ The Yertl home page.
 =item L<yfrom>
 
 =item L<yto>
+
+=item L<ysql>
+
+Read/write documents from SQL databases.
 
 =item L<ymask>
 
