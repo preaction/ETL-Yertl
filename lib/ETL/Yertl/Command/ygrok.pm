@@ -3,6 +3,7 @@ package ETL::Yertl::Command::ygrok;
 
 use ETL::Yertl;
 use ETL::Yertl::Format::yaml;
+use Regexp::Common;
 
 sub main {
     my $class = shift;
@@ -46,8 +47,16 @@ sub main {
 our %PATTERNS = (
     DATETIME => '\d{4}-?\d{2}-?\d{2}[T ]\d{2}:?\d{2}:?\d{2}(?:Z|[+-]\d{4})',
     WORD => '\b\w+\b',
+    USER => '[a-zA-Z0-9._-]+',
     IPV4 => '\d{1,3}[.]\d{1,3}[.]\d{1,3}[.]\d{1,3}',
     DATA => '.*?',
+    NUM => $RE{num}{real},
+    INT => $RE{num}{int},
+    DATETIME_HTTP => '\d{2}/\w{3}/\d{4}:\d{2}:\d{2}:\d{2} [+-]\d{4}',
+    HOSTNAME => join( "|", $RE{net}{IPv4}, $RE{net}{IPv6}, $RE{net}{domain}{-rfc1101} ),
+    URL_PATH => '[^?#]*(?:\?[^#]*)?',
+    # URL regex from URI.pm
+    # (?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?
 );
 
 sub _get_pattern {
