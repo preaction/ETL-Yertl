@@ -37,7 +37,7 @@ sub main {
 
         while ( my $line = <$fh> ) {
             #; say STDERR "$line =~ $re";
-            if ( $line =~ $re ) {
+            if ( $line =~ /^$re$/ ) {
                 print $out_formatter->write( { %+ } );
             }
         }
@@ -57,21 +57,35 @@ our %PATTERNS = (
     URL_PATH => '[^?#]*(?:\?[^#]*)?',
     # URL regex from URI.pm
     # (?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?
+    COMMONLOG => join( " ", '%{HOSTNAME:remote_addr}', '%{USER:ident}', '%{USER:user}',
+                            '\[%{DATETIME_HTTP:timestamp}]',
+                            '"%{WORD:method} %{URL_PATH:path} HTTP/%{NUM:http_version}"',
+                            '%{INT:status}', '%{INT:content_length}',
+                        ),
 );
 
 sub _get_pattern {
-    my ( $pattern_name, $field_name ) = @_;
+    my ( $class, $pattern_name, $field_name ) = @_;
     if ( my $pattern = $PATTERNS{$pattern_name} ) {
-        return "(?<$field_name>$pattern)";
+        if ( $field_name ) {
+            return "(?<$field_name>" . $class->parse_pattern( $pattern ) . ")";
+        }
+        else {
+            return "(?:" . $class->parse_pattern( $pattern ) . ")";
+        }
     }
+
     # warn "Could not find pattern $pattern_name for field $field_name\n";
-    return "%{$pattern_name:$field_name}";
+    if ( $field_name ) {
+        return "%{$pattern_name:$field_name}";
+    }
+    return "%{$pattern_name}";
 }
 
 sub parse_pattern {
     my ( $class, $pattern ) = @_;
-    $pattern =~ s/\%\{([^:]+):([^:]+)\}/_get_pattern( $1, $2 )/ge;
-    return qr{^$pattern$};
+    $pattern =~ s/\%\{([^:]+)(?::([^:]+))?\}/$class->_get_pattern( $1, $2 )/ge;
+    return qr{$pattern};
 }
 
 1;

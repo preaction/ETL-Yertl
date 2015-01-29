@@ -37,7 +37,7 @@ sub test_ygrok {
         open my $fh, '<', \$stdout;
         my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
         my @docs = $yaml_fmt->read;
-        cmp_deeply \@docs, $expect or diag explain \@docs;;
+        cmp_deeply \@docs, $expect or diag explain \@docs;
     };
 }
 
@@ -127,6 +127,7 @@ subtest 'http logs' => sub {
     );
 
     test_ygrok( $file, $pattern, \@expect );
+    test_ygrok( $file, "%{COMMONLOG}", \@expect )
 };
 
 done_testing;
