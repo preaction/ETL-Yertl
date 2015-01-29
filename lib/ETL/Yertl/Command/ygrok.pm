@@ -50,9 +50,18 @@ our %PATTERNS = (
     DATA => '.*?',
 );
 
+sub _get_pattern {
+    my ( $pattern_name, $field_name ) = @_;
+    if ( my $pattern = $PATTERNS{$pattern_name} ) {
+        return "(?<$field_name>$pattern)";
+    }
+    # warn "Could not find pattern $pattern_name for field $field_name\n";
+    return "%{$pattern_name:$field_name}";
+}
+
 sub parse_pattern {
     my ( $class, $pattern ) = @_;
-    $pattern =~ s/\%\{([^:]+):([^:]+)\}/(?<$2>$PATTERNS{$1})/g;
+    $pattern =~ s/\%\{([^:]+):([^:]+)\}/_get_pattern( $1, $2 )/ge;
     return qr{^$pattern$};
 }
 
