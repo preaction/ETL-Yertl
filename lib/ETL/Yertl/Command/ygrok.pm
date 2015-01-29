@@ -56,11 +56,17 @@ our %PATTERNS = (
     HOSTNAME => join( "|", $RE{net}{IPv4}, $RE{net}{IPv6}, $RE{net}{domain}{-rfc1101} ),
     URL_PATH => '[^?#]*(?:\?[^#]*)?',
     # URL regex from URI.pm
-    # (?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?
+    URL => '(?:[^:/?#]+:)?(?://[^/?#]*)?[^?#]*(?:\?[^#]*)?(?:#.*)?',
     COMMONLOG => join( " ", '%{HOSTNAME:remote_addr}', '%{USER:ident}', '%{USER:user}',
                             '\[%{DATETIME_HTTP:timestamp}]',
                             '"%{WORD:method} %{URL_PATH:path} HTTP/%{NUM:http_version}"',
                             '%{INT:status}', '%{INT:content_length}',
+                        ),
+    COMBINEDLOG => join( " ", '%{HOSTNAME:remote_addr}', '%{USER:ident}', '%{USER:user}',
+                            '\[%{DATETIME_HTTP:timestamp}]',
+                            '"%{WORD:method} %{URL_PATH:path} HTTP/%{NUM:http_version}"',
+                            '%{INT:status}', '%{INT:content_length}',
+                            '"%{URL:referer}"', '"%{DATA:user_agent}"',
                         ),
 );
 
