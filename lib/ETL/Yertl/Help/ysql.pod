@@ -1,0 +1,116 @@
+# PODNAME: ETL::Yertl::Help::ysql
+# ABSTRACT: A guide to using ysql to work with SQL databases
+
+=head1 Configure Databases
+
+To use ysql, first we have to configure a database. This saves us from having
+to type the full DBI data source name (C<dbi:mysql:host=dev;database=mydb>) every
+time. Instead, we can refer to our database by a nice name, like "dev", or
+"prod".
+
+    $ ysql --config dev dbi:SQLite:database.db
+
+Later, we can update our configuration if we need to:
+
+    $ ysql --config dev --database=dev.db
+
+We can examine our configuration as a YAML document:
+
+    $ ysql --config dev
+    ---
+    database: dev.db
+    driver: SQLite
+
+Let's add a production database as well:
+
+    $ ysql --config prod --driver=SQLite --database=prod.db
+
+And now we can check both of our configs:
+
+    $ ysql --config
+    ---
+    dev:
+      database: dev.db
+      driver: SQLite
+    prod:
+      database: prod.db
+      driver: SQLite
+
+=head1 Working with Data
+
+Now that we've configured some databases, let's insert some data. First we need
+to make some tables:
+
+    $ ysql prod 'CREATE TABLE users ( id INTEGER PRIMARY KEY \
+        AUTOINCREMENT, name VARCHAR, email VARCHAR )'
+    $ ysql dev 'CREATE TABLE users ( id INTEGER PRIMARY KEY \
+        AUTOINCREMENT, name VARCHAR, email VARCHAR )'
+
+Next let's insert some data:
+
+    $ ysql prod 'INSERT INTO users ( name, email ) \
+        VALUES ( "preaction", "preaction@example.com" )'
+    $ ysql prod 'INSERT INTO users ( name, email ) \
+        VALUES ( "postaction", "postaction@example.com" )'
+
+Now, let's query for our data:
+
+    $ ysql prod 'SELECT * FROM users'
+    ---
+    email: preaction@example.com
+    id: 1
+    name: preaction
+    ---
+    email: postaction.example.com
+    id: 2
+    name: postaction
+
+=head1 Converting Formats
+
+Yertl uses YAML as its default output, but we can easily convert to JSON or CSV
+using the L<yto utility|yto>.
+
+    $ ysql prod 'SELECT * FROM users' | yto csv
+    email,id,name
+    preaction@example.com,1,preaction
+    postaction@example.com,2,postaction
+
+    $ ysql prod 'SELECT * FROM users' | yto json
+    {
+       "email" : "preaction@example.com",
+       "id" : "1",
+       "name" : "preaction"
+    }
+    {
+       "email" : "postaction@example.com",
+       "id" : "2",
+       "name" : "postaction"
+    }
+
+=head1 Writing Data
+
+Now, lets say we want to copy our production database to dev for testing. To do
+that, Yertl allows us to read YAML from C<STDIN> and execute a query for each YAML
+document. Yertl uses a special interpolation syntax (starting with a C<$>) to
+pick parts of the document to fill in the query:
+
+    $ ysql prod 'SELECT * FROM users' |
+        ysql dev 'INSERT INTO users ( id, name, email ) \
+            VALUES ( $.id, $.name, $.email )'
+
+So this will take our users table from prod and write it to dev. C<$.id> picks
+the "id" field, C<$.name> the "name" field, etc...
+
+=head1 Saved Queries
+
+But all this would be a bear to type over and over again (imagine if we had a
+bunch of joins to do). So, ysql allows you to save queries for later use using
+the C<--save E<lt>nameE<gt>> option:
+
+    $ ysql prod --save users 'SELECT * FROM users'
+    $ ysql dev --save update_users 'UPDATE users SET \
+        name=$.name, email=$.email WHERE id=$.id'
+
+Then we can recall our query by the name we gave to the C<--save> option:
+
+    $ ysql prod users | ysql dev update_users

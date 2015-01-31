@@ -171,3 +171,12 @@ Show this help document.
 =head2 --version
 
 Print the current ysql and Perl versions.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<ETL::Yertl::Help::ysql> - Using ysql to work with SQL databases
+
+=back
+
