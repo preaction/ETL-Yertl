@@ -43,26 +43,14 @@ __END__
 
 =head1 SYNOPSIS
 
-    ysql query [<db_name> | --dsn <dsn>] <query> [<value>...]
+    ysql [<db_name> | --dsn <dsn>] [<query> | <query_name>] [<value>...]
 
-    ### Saved queries
-    # Save
-    ysql query <db_name> --save <query_name> <query>
-    # Execute
-    ysql query <db_name> <query_name> [<value>...]
+    ysql <db_name> --save <query_name> <query>
 
-    ### Database configuration
-
-    # Add/Edit
-    ysql config <db_name> [--dsn] <dsn> [--user <user>] [--password <password>]
     ysql config <db_name> [--driver <driver>] [--database <database] [--host <host>]
         [--port <port>] [--user <user>] [--password <password>]
-
-    # Show database configuration
-    ysql config <db_name>
-
-    # Show all configuration
-    ysql config
+    ysql config <db_name> [--dsn] <dsn> [--user <user>] [--password <password>]
+    ysql config [<db_name>]
 
     ysql -h|--help|--version
 
@@ -70,58 +58,22 @@ __END__
 
 This program queries a SQL database and prints the result as YAML.
 
-=head1 COMMANDS
-
-=head2 config <db_name> <options>
-
-Configure the given C<db_name> with the given options. Available options are:
-
-=over 4
-
-=item --driver <driver>
-
-The database driver to use, corresponding to a DBD::* module. Some examples: C<SQLite>,
-C<mysql>, C<Pg>.
-
-=item --database <database>
-
-The name of the database. For SQLite, the name of the database file.
-
-=item --host <host>
-
-The hostname to connect to. Optional.
-
-=item --port <port>
-
-The port to connect to. Optional.
-
-=item --user <user>
-
-The user to connect as. Optional.
-
-=item --password <password>
-
-The password to connect with. Optional. This is stored in plain text, so beware.
-
-=back
-
-=head2 config <db_name> [--dsn] <dsn>
-
-Configure the given C<db_name> with the given C<dsn>. The C<user> and C<password>
-options can also be used.
-
-=head2 config <db_name>
-
-Show the configuration for the given C<db_name>.
-
-=head2 config
-
-Show the configuration for all databases.
-
-=head2 query <query> [<value>...]
+=head2 Reading
 
 Run a query to read data from the database. C<query> is either the name of a saved
 query, or SQL (usually a C<SELECT>). C<value> is used to fill in C<?> placeholders.
+
+    $ ysql db_name 'SELECT * FROM person'
+    ---
+    name: Hazel "Hank" Murphy
+    email: captain@example.com
+    dept: Captain
+    ---
+    name: Quinn Quinlan
+    email: dr.quinn@example.com
+    dept: Science
+
+=head2 Writing
 
 If there are documents to read on STDIN, the C<query> will be executed once for
 each document read. In order to map keys in the YAML document to fields in the
@@ -140,32 +92,60 @@ example:
     profile:
         dept: Wildlife
 
-    $ ysql query 'INSERT INTO person ( name, email, dept ) \
-                  VALUES ( $.name, $.email, $.profile.dept )' \
-                  < input.yml
-
-=head2 query --save <query_name> <query>
-
-Save a query to run later.
-
-=head2 drivers
-
-List the drivers available. Helpful for remembering the proper spelling for the
-driver you want to use.
+    $ ysql db_name 'INSERT INTO person ( name, email, dept ) \
+                    VALUES ( $.name, $.email, $.profile.dept )' \
+                    < input.yml
 
 =head1 ARGUMENTS
 
 =head2 db_name
 
-The saved database name to use. Add and edit databases using the L<config> command.
+The saved database name to use. Add and edit databases using the C<--config> option.
 
 =head2 query
 
 The SQL query to run against the database.
 
+=head2 query_name
+
+The name of a saved query. Add and edit saved queries using the C<--save> option.
+
 =head1 OPTIONS
 
-=head2 dsn
+=head2 --config
+
+View, add, and edit database configuration.
+
+=head2 --save <query_name>
+
+Save a query to run later.
+
+=head2 --driver <driver>
+
+The database driver to use, corresponding to a DBD::* module. Some examples: C<SQLite>,
+C<mysql>, C<Pg>.
+
+=head2 --database <database>
+
+The name of the database. For SQLite, the name of the database file.
+
+=head2 --host <host>
+
+The hostname to connect to. Optional.
+
+=head2 --port <port>
+
+The port to connect to. Optional.
+
+=head2 --user <user>
+
+The user to connect as. Optional.
+
+=head2 --password <password>
+
+The password to connect with. Optional. This is stored in plain text, so beware.
+
+=head2 --dsn <dsn>
 
 The L<DBI> Data Source Name. A string that DBI uses to connect to the database.
 
@@ -179,6 +159,10 @@ Some examples:
 
     # A Postgres database named "foo"
     dbi:Pg:foo
+
+=head2 --drivers
+
+List the available drivers
 
 =head2 -h | --help
 

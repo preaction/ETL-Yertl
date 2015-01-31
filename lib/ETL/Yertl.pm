@@ -61,10 +61,10 @@ __END__
     $ yto json work.yml
 
     # Read data from a database
-    $ ysql query devdb 'SELECT * FROM employee'
+    $ ysql db_name 'SELECT * FROM employee'
 
     # Write data to a database
-    $ ysql query devdb 'INSERT INTO employee ( id, name ) VALUES ( $.id, $.name )'
+    $ ysql db_name 'INSERT INTO employee ( id, name ) VALUES ( $.id, $.name )'
 
     ### In Perl...
     use ETL::Yertl;

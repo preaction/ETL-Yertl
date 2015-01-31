@@ -2,7 +2,7 @@ package ETL::Yertl::Command::ysql;
 # ABSTRACT: Read and write documents with a SQL database
 
 use ETL::Yertl;
-use Getopt::Long qw( GetOptionsFromArray );
+use Getopt::Long qw( GetOptionsFromArray :config pass_through );
 use ETL::Yertl::Format::yaml;
 use File::HomeDir;
 
@@ -19,28 +19,117 @@ sub main {
         %opt = %{ pop @_ };
     }
 
-    my $command = shift;
-    die "Must give a command\n" unless $command;
+    my @args = @_;
+    GetOptionsFromArray( \@args, \%opt,
+        'config',
+        'drivers',
+        'driver|t=s',
+        'database|db=s',
+        'host|h=s',
+        'port|p=s',
+        'user|u=s',
+        'password|pass=s',
+        'save=s',
+    );
+    #; use Data::Dumper;
+    #; say Dumper \@args;
+    #; say Dumper \%opt;
 
     my $out_fmt = ETL::Yertl::Format::yaml->new;
 
-    if ( $command eq 'query' ) {
-        my @args = @_;
-        my %query_opt;
-        GetOptionsFromArray( \@args, \%query_opt,
-            'save=s',
-        );
+    if ( $opt{config} ) {
+        my $db_key = shift @args;
 
-        if ( $query_opt{ save } ) {
+        if ( !$db_key ) {
+            my $out_fmt = ETL::Yertl::Format::yaml->new;
+            print $out_fmt->write( config() );
+            return 0;
+        }
+
+        # Get the existing config first
+        my $db_conf = db_config( $db_key );
+
+        if ( !@args && !grep { defined } @opt{qw( dsn driver database host port user password )} ) {
+            die "Database key '$db_key' does not exist" unless keys %$db_conf;
+            my $out_fmt = ETL::Yertl::Format::yaml->new;
+            print $out_fmt->write( $db_conf );
+            return 0;
+        }
+
+        #; use Data::Dumper;
+        #; say "Got from options: " . Dumper $db_conf;
+        #; say "Left in \@args: " . Dumper \@args;
+
+        for my $key ( qw{ driver database host port user password } ) {
+            next if !$opt{ $key };
+            $db_conf->{ $key } = $opt{ $key };
+        }
+
+        # Set via DSN
+        if ( my $dsn = $opt{dsn} || shift( @args ) ) {
+            delete $db_conf->{ $_ } for qw( driver database host port );
+            my ( undef, $driver, undef, undef, $driver_dsn ) = DBI->parse_dsn( $dsn );
+            $db_conf->{ driver } = $driver;
+
+            # The driver_dsn part is up to the driver, but we can make some guesses
+            if ( $driver_dsn !~ /[=:;@]/ ) {
+                $db_conf->{ database } = $driver_dsn;
+            }
+            elsif ( $driver_dsn =~ /^(\w+)\@([\w.]+)(?:\:(\d+))?$/ ) {
+                $db_conf->{ database } = $1;
+                $db_conf->{ host } = $2;
+                $db_conf->{ port } = $3;
+            }
+            elsif ( my @parts = split /\;/, $driver_dsn ) {
+                for my $part ( @parts ) {
+                    my ( $part_key, $part_value ) = split /=/, $part;
+                    if ( $part_key eq 'dbname' ) {
+                        $part_key = 'database';
+                    }
+                    $db_conf->{ $part_key } = $part_value;
+                }
+            }
+            else {
+                die "Unknown driver DSN: $driver_dsn";
+            }
+        }
+
+        # Check if the driver is installed
+        my $driver = $db_conf->{driver};
+        if ( !grep { /^$driver$/ } DBI->available_drivers ) {
+            my @possible = grep { /^$driver$/i } DBI->available_drivers;
+            my $suggest = @possible ? " Did you mean: $possible[0]" : '';
+            warn "Driver '$driver' does not exist." . $suggest . "\n";
+        }
+
+        # Write back the config
+        db_config( $db_key => $db_conf );
+
+    }
+    elsif ( $opt{drivers} ) {
+        my $ignore = join "|", qw( ExampleP Sponge File );
+        say join "\n", grep { !/^(?:$ignore)$/ } DBI->available_drivers;
+
+    }
+    else {
+        if ( $opt{ save } ) {
             my $db_key = shift @args;
             my $db_conf = db_config( $db_key );
-            $db_conf->{query}{ $query_opt{save} } = shift @args;
+            $db_conf->{query}{ $opt{save} } = shift @args;
             db_config( $db_key => $db_conf );
             return 0;
         }
 
         my $db_key = !$opt{dsn} ? shift @args : undef;
+        if ( !$db_key && !$opt{dsn} ) {
+            die "Must specify a database!\n";
+        }
+
         my @dbi_args = $opt{dsn} ? ( $opt{dsn} ) : dbi_args( $db_key );
+        if ( !@dbi_args ) {
+            die "Unknown database '$db_key'\n";
+        }
+
         my $dbh = DBI->connect( @dbi_args, { PrintError => 0 } );
 
         my $query = shift @args;
@@ -79,84 +168,6 @@ sub main {
         }
 
         return 0;
-    }
-    elsif ( $command eq 'config' ) {
-        my ( $db_key, @args ) = @_;
-        # Allow writing "--dsn" before the DSN
-        unshift @args, $opt{dsn} if $opt{dsn};
-
-        if ( !$db_key ) {
-            my $out_fmt = ETL::Yertl::Format::yaml->new;
-            print $out_fmt->write( config() );
-            return 0;
-        }
-
-        # Get the existing config first
-        my $db_conf = db_config( $db_key );
-
-        if ( !@args ) {
-            die "Database key '$db_key' does not exist" unless keys %$db_conf;
-            my $out_fmt = ETL::Yertl::Format::yaml->new;
-            print $out_fmt->write( $db_conf );
-            return 0;
-        }
-
-        # Set via options
-        GetOptionsFromArray( \@args, $db_conf,
-            'driver|t=s',
-            'database|db=s',
-            'host|h=s',
-            'port|p=s',
-            'user|u=s',
-            'password|pass=s',
-        );
-        #; use Data::Dumper;
-        #; say "Got from options: " . Dumper $db_conf;
-        #; say "Left in \@args: " . Dumper \@args;
-
-        # Set via DSN
-        if ( @args ) {
-            delete $db_conf->{ $_ } for qw( driver database host port );
-            my ( undef, $driver, undef, undef, $driver_dsn ) = DBI->parse_dsn( $args[0] );
-            $db_conf->{ driver } = $driver;
-
-            # The driver_dsn part is up to the driver, but we can make some guesses
-            if ( $driver_dsn !~ /[=:;@]/ ) {
-                $db_conf->{ database } = $driver_dsn;
-            }
-            elsif ( $driver_dsn =~ /^(\w+)\@([\w.]+)(?:\:(\d+))?$/ ) {
-                $db_conf->{ database } = $1;
-                $db_conf->{ host } = $2;
-                $db_conf->{ port } = $3;
-            }
-            elsif ( my @parts = split /\;/, $driver_dsn ) {
-                for my $part ( @parts ) {
-                    my ( $part_key, $part_value ) = split /=/, $part;
-                    if ( $part_key eq 'dbname' ) {
-                        $part_key = 'database';
-                    }
-                    $db_conf->{ $part_key } = $part_value;
-                }
-            }
-            else {
-                die "Unknown driver DSN: $driver_dsn";
-            }
-        }
-
-        # Check if the driver is installed
-        my $driver = $db_conf->{driver};
-        if ( !grep { /^$driver$/ } DBI->available_drivers ) {
-            my @possible = grep { /^$driver$/i } DBI->available_drivers;
-            my $suggest = @possible ? " Did you mean: $possible[0]" : '';
-            warn "Driver '$driver' does not exist." . $suggest . "\n";
-        }
-
-        # Write back the config
-        db_config( $db_key => $db_conf );
-    }
-    elsif ( $command eq 'drivers' ) {
-        my $ignore = join "|", qw( ExampleP Sponge File );
-        say join "\n", grep { !/^(?:$ignore)$/ } DBI->available_drivers;
     }
 }
 

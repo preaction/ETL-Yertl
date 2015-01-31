@@ -19,7 +19,7 @@ subtest 'error checking' => sub {
     subtest 'no arguments' => sub {
         my ( $stdout, $stderr, $exit ) = capture { ysql->main() };
         isnt $exit, 0, 'error status';
-        like $stderr, qr{ERROR: Must give a command}, 'contains error message';
+        like $stderr, qr{ERROR: Must specify a database!}, 'contains error message';
     };
 };
 
@@ -32,7 +32,7 @@ subtest 'config' => sub {
 
             subtest 'sqlite' => sub {
                 my ( $stdout, $stderr, $exit ) = capture {
-                    ysql->main( 'config', 'test' );
+                    ysql->main( '--config', 'test' );
                 };
                 ok !$stderr, 'nothing on stderr' or diag $stderr;
                 is $exit, 0, 'success exit status';
@@ -52,7 +52,7 @@ subtest 'config' => sub {
 
             subtest 'mysql' => sub {
                 my ( $stdout, $stderr, $exit ) = capture {
-                    ysql->main( 'config', 'dev' );
+                    ysql->main( '--config', 'dev' );
                 };
                 ok !$stderr, 'nothing on stderr' or diag $stderr;
                 is $exit, 0, 'success exit status';
@@ -76,7 +76,7 @@ subtest 'config' => sub {
 
             subtest 'does not exist' => sub {
                 my ( $stdout, $stderr, $exit ) = capture {
-                    ysql->main( 'config', 'DOES_NOT_EXIST' );
+                    ysql->main( '--config', 'DOES_NOT_EXIST' );
                 };
                 ok !$stdout, 'nothing on stdout' or diag $stdout;
                 like $stderr, qr{ERROR: Database key 'DOES_NOT_EXIST' does not exist};
@@ -124,7 +124,7 @@ subtest 'config' => sub {
             local $ENV{HOME} = $SHARE_DIR->child( 'command', 'ysql' )->stringify;
 
             my ( $stdout, $stderr, $exit ) = capture {
-                ysql->main( 'config' );
+                ysql->main( '--config' );
             };
             ok !$stderr, 'nothing on stderr' or diag $stderr;
             is $exit, 0, 'success exit status';
@@ -205,7 +205,7 @@ subtest 'config' => sub {
         my $conf_test = sub {
             my ( $home, $args, $expect, $opt ) = @_;
             my ( $stdout, $stderr, $exit ) = capture {
-                ysql->main( 'config', 'test', @$args );
+                ysql->main( '--config', 'test', @$args );
             };
             ok !$stdout, 'nothing on stdout' or diag $stdout;
 
@@ -427,7 +427,7 @@ subtest 'config' => sub {
 
 subtest 'drivers' => sub {
     my ( $stdout, $stderr, $exit ) = capture {
-        ysql->main( 'drivers' );
+        ysql->main( '--drivers' );
     };
     is $exit, 0;
     ok !$stderr, 'nothing on stderr' or diag $stderr;
@@ -470,7 +470,7 @@ subtest 'query' => sub {
         local $ENV{HOME} = "$home";
 
         my ( $stdout, $stderr, $exit ) = capture {
-            ysql->main( 'query', 'testdb', 'SELECT * FROM person' );
+            ysql->main( 'testdb', 'SELECT * FROM person' );
         };
         is $exit, 0;
         ok !$stderr, 'nothing on stderr' or diag $stderr;
@@ -499,7 +499,7 @@ subtest 'query' => sub {
 
             subtest 'save the query' => sub {
                 my ( $stdout, $stderr, $exit ) = capture {
-                    ysql->main( 'query', 'testdb', '--save', 'testquery',
+                    ysql->main( 'testdb', '--save', 'testquery',
                         'SELECT * FROM person',
                     );
                 };
@@ -523,7 +523,7 @@ subtest 'query' => sub {
 
             subtest 'run the saved query' => sub {
                 my ( $stdout, $stderr, $exit ) = capture {
-                    ysql->main( 'query', 'testdb', 'testquery' );
+                    ysql->main( 'testdb', 'testquery' );
                 };
                 is $exit, 0;
                 ok !$stderr, 'nothing on stderr' or diag $stderr;
@@ -552,7 +552,7 @@ subtest 'query' => sub {
 
             subtest 'save the query' => sub {
                 my ( $stdout, $stderr, $exit ) = capture {
-                    ysql->main( 'query', 'testdb', '--save', 'testquery',
+                    ysql->main( 'testdb', '--save', 'testquery',
                         'SELECT * FROM person WHERE email=?',
                     );
                 };
@@ -576,7 +576,7 @@ subtest 'query' => sub {
 
             subtest 'run the saved query' => sub {
                 my ( $stdout, $stderr, $exit ) = capture {
-                    ysql->main( 'query', 'testdb', 'testquery', 'hank@example.com' );
+                    ysql->main( 'testdb', 'testquery', 'hank@example.com' );
                 };
                 is $exit, 0;
                 ok !$stderr, 'nothing on stderr' or diag $stderr;
@@ -614,7 +614,7 @@ subtest 'query' => sub {
         local *STDIN = $SHARE_DIR->child( 'command', 'ysql', 'write.yml' )->openr;
 
         my ( $stdout, $stderr, $exit ) = capture {
-            ysql->main( 'query', 'testdb',
+            ysql->main( 'testdb',
                 'INSERT INTO person (id, name, email) VALUES ($.id, $.name, $.email)',
             );
         };
@@ -651,7 +651,7 @@ subtest 'query' => sub {
             local *STDIN = $SHARE_DIR->child( 'command', 'ysql', 'deep.yml' )->openr;
 
             my ( $stdout, $stderr, $exit ) = capture {
-                ysql->main( 'query', 'testdb',
+                ysql->main( 'testdb',
                     'INSERT INTO person (id, name, email) VALUES ($.id, $.profile.name, $.email)',
                 );
             };
@@ -675,7 +675,7 @@ subtest 'query' => sub {
 
         subtest 'SQL error in prepare' => sub {
             my ( $stdout, $stderr, $exit ) = capture {
-                ysql->main( 'query', 'testdb', 'SELECT FROM person' );
+                ysql->main( 'testdb', 'SELECT FROM person' );
             };
             isnt $exit, 0, 'error happened';
             ok !$stdout, 'nothing on stdout' or diag $stdout;
@@ -685,7 +685,7 @@ subtest 'query' => sub {
 
         subtest 'SQL error in execute' => sub {
             my ( $stdout, $stderr, $exit ) = capture {
-                ysql->main( 'query', 'testdb', 'SELECT * FROM person WHERE id=?', 1, 2 );
+                ysql->main( 'testdb', 'SELECT * FROM person WHERE id=?', 1, 2 );
             };
             isnt $exit, 0, 'error happened';
             ok !$stdout, 'nothing on stdout' or diag $stdout;

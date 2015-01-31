@@ -10,7 +10,7 @@ This document describes how to do some common ETL tasks
 When you've got serialized JSON in a database field, you can use C<jq> to deserialize
 it:
 
-    ysql query TESTDB 'SELECT json_field FROM table'        # Query the database
+    ysql TESTDB 'SELECT json_field FROM table'              # Query the database
         | yto json                                          # Convert to JSON for jq
         | js '.json_field | fromjson'                       # Inflate the JSON
         | yfrom json                                        # Convert back to Yertl
