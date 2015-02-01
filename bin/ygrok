@@ -98,6 +98,14 @@ A single word, C<\b\w+\b>.
 
 A non-slurpy section of data, C<.*?>.
 
+=item INT
+
+An integer, positive or negative.
+
+=item NUM
+
+A floating-point number, positive or negative, with optional exponent.
+
 =back
 
 =item Date/Time Patterns
@@ -108,6 +116,20 @@ A non-slurpy section of data, C<.*?>.
 
 An ISO8601 date/time
 
+=item DATETIME.HTTP
+
+An RFC822 date/time, used by HTTP.
+
+=back
+
+=item Operating System Patterns
+
+=over 4
+
+=item OS.USER
+
+A username.
+
 =back
 
 =item Networking Patterns
@@ -117,6 +139,38 @@ An ISO8601 date/time
 =item NET.IPV4
 
 An IPV4 address.
+
+=item NET.HOSTNAME
+
+A network host name. Either an RFC1101 domain or an IPv4 or IPv6 address.
+
+=back
+
+=item URL Patterns
+
+=over 4
+
+=item URL
+
+A full URL with scheme
+
+=item URL.PATH
+
+The path part of a URL
+
+=back
+
+=item Log File Patterns
+
+=over 4
+
+=item LOG.HTTP_COMMON
+
+The Apache Common Log Format.
+
+=item LOG.HTTP_COMBINED
+
+The Apache Combined Log Format.
 
 =back
 
