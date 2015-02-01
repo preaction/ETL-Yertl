@@ -1,0 +1,2 @@
+1 fizz 1 buzz
+2 fizz 5 fizz 15

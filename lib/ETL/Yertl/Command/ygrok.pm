@@ -2,53 +2,17 @@ package ETL::Yertl::Command::ygrok;
 # ABSTRACT: Parse lines of text into documents
 
 use ETL::Yertl;
+use Getopt::Long qw( GetOptionsFromArray );
 use ETL::Yertl::Format::yaml;
 use Regexp::Common;
-
-sub main {
-    my $class = shift;
-
-    my %opt;
-    if ( ref $_[-1] eq 'HASH' ) {
-        %opt = %{ pop @_ };
-    }
-
-    my ( $pattern, @files ) = @_;
-    die "Must give a pattern\n" unless $pattern;
-
-    my $re = $class->parse_pattern( $pattern );
-
-    my $out_formatter = ETL::Yertl::Format::yaml->new;
-    push @files, "-" unless @files;
-    for my $file ( @files ) {
-
-        # We're doing a similar behavior to <>, but manually for easier testing.
-        my $fh;
-        if ( $file eq '-' ) {
-            # Use the existing STDIN so tests can fake it
-            $fh = \*STDIN;
-        }
-        else {
-            unless ( open $fh, '<', $file ) {
-                warn "Could not open file '$file' for reading: $!\n";
-                next;
-            }
-        }
-
-        while ( my $line = <$fh> ) {
-            #; say STDERR "$line =~ $re";
-            if ( $line =~ /^$re$/ ) {
-                print $out_formatter->write( { %+ } );
-            }
-        }
-    }
-}
+use File::HomeDir;
+use Hash::Merge::Simple qw( merge );
 
 our %PATTERNS = (
     WORD => '\b\w+\b',
     DATA => '.*?',
-    NUM => $RE{num}{real},
-    INT => $RE{num}{int},
+    NUM => $RE{num}{real}."",   # stringify to allow YAML serialization
+    INT => $RE{num}{int}."",    # stringify to allow YAML serialization
 
     DATETIME => {
         ISO8601 => '\d{4}-?\d{2}-?\d{2}[T ]\d{2}:?\d{2}:?\d{2}(?:Z|[+-]\d{4})',
@@ -85,6 +49,93 @@ our %PATTERNS = (
 
 );
 
+sub main {
+    my $class = shift;
+
+    my %opt;
+    if ( ref $_[-1] eq 'HASH' ) {
+        %opt = %{ pop @_ };
+    }
+
+    my @args = @_;
+    GetOptionsFromArray( \@args, \%opt,
+        'pattern',
+    );
+
+    # Manage patterns
+    if ( $opt{pattern} ) {
+        my ( $pattern_name, $pattern ) = @args;
+
+        if ( $pattern ) {
+            # Edit a pattern
+            config_pattern( $pattern_name, $pattern );
+        }
+        else {
+            my $patterns = $class->_all_patterns;
+
+            if ( $pattern_name ) {
+                # Show a single pattern
+                my $pattern = $patterns;
+                my @parts = split /[.]/, $pattern_name;
+                for my $part ( @parts ) {
+                    $pattern = $pattern->{ $part } ||= {};
+                }
+
+                if ( !ref $pattern ) {
+                    say $pattern;
+                }
+                else {
+                    my $out_fmt = ETL::Yertl::Format::yaml->new;
+                    say $out_fmt->write( $pattern );
+                }
+            }
+            else {
+                # Show all patterns we know about
+                my $out_fmt = ETL::Yertl::Format::yaml->new;
+                say $out_fmt->write( $patterns );
+            }
+        }
+
+        return 0;
+    }
+
+    # Grok incoming lines
+    my ( $pattern, @files ) = @args;
+    die "Must give a pattern\n" unless $pattern;
+
+    my $re = $class->parse_pattern( $pattern );
+
+    my $out_formatter = ETL::Yertl::Format::yaml->new;
+    push @files, "-" unless @files;
+    for my $file ( @files ) {
+
+        # We're doing a similar behavior to <>, but manually for easier testing.
+        my $fh;
+        if ( $file eq '-' ) {
+            # Use the existing STDIN so tests can fake it
+            $fh = \*STDIN;
+        }
+        else {
+            unless ( open $fh, '<', $file ) {
+                warn "Could not open file '$file' for reading: $!\n";
+                next;
+            }
+        }
+
+        while ( my $line = <$fh> ) {
+            #; say STDERR "$line =~ $re";
+            if ( $line =~ /^$re$/ ) {
+                print $out_formatter->write( { %+ } );
+            }
+        }
+    }
+}
+
+sub _all_patterns {
+    my ( $class ) = @_;
+    return merge( \%PATTERNS, config() );
+}
+
 sub _get_pattern {
     my ( $class, $pattern_name, $field_name ) = @_;
 
@@ -92,7 +143,7 @@ sub _get_pattern {
 
     # Handle nested patterns
     my @parts = split /[.]/, $pattern_name;
-    my $pattern = $PATTERNS{ shift @parts };
+    my $pattern = $class->_all_patterns->{ shift @parts };
     for my $part ( @parts ) {
         if ( !$pattern->{ $part } ) {
             # warn "Could not find pattern $pattern_name for field $field_name\n";
@@ -121,6 +172,38 @@ sub parse_pattern {
     $pattern =~ s/\%\{([^:}]+)(?::([^:}]+))?\}/$class->_get_pattern( $1, $2 )/ge;
     #; say STDERR 'PATTERN: ' . $pattern;
     return $pattern;
+}
+
+sub config {
+    my $conf_file = path( File::HomeDir->my_home, '.yertl', 'ygrok.yml' );
+    my $config = {};
+    if ( $conf_file->exists ) {
+        my $yaml = ETL::Yertl::Format::yaml->new( input => $conf_file->openr );
+        ( $config ) = $yaml->read;
+    }
+    return $config;
+}
+
+sub config_pattern {
+    my ( $pattern_name, $pattern ) = @_;
+    my $all_config = config();
+    my $pattern_category = $all_config;
+    my @parts = split /[.]/, $pattern_name;
+    for my $part ( @parts[0..$#parts-1] ) {
+        $pattern_category = $pattern_category->{ $part } ||= {};
+    }
+
+    if ( $pattern ) {
+        my $conf_file = path( File::HomeDir->my_home, '.yertl', 'ygrok.yml' );
+        if ( !$conf_file->exists ) {
+            $conf_file->touchpath;
+        }
+        $pattern_category->{ $parts[-1] } = $pattern;
+        my $yaml = ETL::Yertl::Format::yaml->new;
+        $conf_file->spew( $yaml->write( $all_config ) );
+        return;
+    }
+    return $pattern_category->{ $parts[-1] } || '';
 }
 
 1;

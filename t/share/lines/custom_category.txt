@@ -1,0 +1,2 @@
+1 fizz1buzz
+2 fizz5fizz15

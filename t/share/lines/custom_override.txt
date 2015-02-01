@@ -1,0 +1,2 @@
+1 ~www.example.com
+2 ~www4.example.net

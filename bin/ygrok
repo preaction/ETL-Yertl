@@ -4,7 +4,7 @@ package ygrok;
 
 use ETL::Yertl;
 use Pod::Usage::Return qw( pod2usage );
-use Getopt::Long qw( GetOptionsFromArray );
+use Getopt::Long qw( GetOptionsFromArray :config pass_through );
 use ETL::Yertl::Command::ygrok;
 
 $|++; # no buffering
@@ -38,7 +38,7 @@ __END__
 =head1 SYNOPSIS
 
     ygrok <pattern> [<file>...]
-
+    ygrok --pattern [<pattern_name> [<pattern>]]
     yfrom -h|--help|--version
 
 =head1 DESCRIPTION
@@ -53,12 +53,33 @@ The pattern to match with. Any line that does not match the pattern will be igno
 
 See the full documentation for pattern syntax.
 
-=head2 <file>
+=head2 file
 
 A file to read. The special file "-" refers to STDIN. If no files are
 specified, read STDIN.
 
 =head1 OPTIONS
+
+=head2 --pattern
+
+View, add, and edit patterns. With no arguments, shows all the patterns. With
+C<pattern_name>, shows the specific pattern or pattern category. With C<pattern>,
+adds a custom pattern that can then be used in future patterns.
+
+    # Show all patterns
+    ygrok --pattern
+
+    # Show all "NET" patterns
+    ygrok --pattern NET
+
+    # Show the "NET.HOSTNAME" pattern
+    ygrok --pattern NET.HOSTNAME
+
+    # Add a new pattern
+    ygrok --pattern HOSTS_LINE '%{NET.HOSTNAME:host} %{NET.IPV4:ip}'
+
+    # Use the new pattern
+    ygrok '%{HOSTS_LINE}' < /etc/hosts
 
 =head2 -h | --help
 
