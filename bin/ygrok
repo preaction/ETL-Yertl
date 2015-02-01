@@ -104,7 +104,7 @@ A non-slurpy section of data, C<.*?>.
 
 =over 4
 
-=item DATETIME
+=item DATETIME.ISO8601
 
 An ISO8601 date/time
 
@@ -114,7 +114,7 @@ An ISO8601 date/time
 
 =over 4
 
-=item IPV4
+=item NET.IPV4
 
 An IPV4 address.
 

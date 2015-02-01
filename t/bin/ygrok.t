@@ -43,7 +43,7 @@ sub test_ygrok {
 
 subtest 'parse lines' => sub {
     my $file = $SHARE_DIR->child( lines => 'irc.txt' );
-    my $pattern = '%{DATETIME:timestamp} %{WORD:user}@%{IPV4:ip}> %{DATA:text}';
+    my $pattern = '%{DATETIME.ISO8601:timestamp} %{WORD:user}@%{NET.IPV4:ip}> %{DATA:text}';
     my @expect = (
         {
             timestamp => '2014-01-01T00:00:00Z',
@@ -72,9 +72,9 @@ subtest 'http logs' => sub {
 
     subtest 'common log format' => sub {
         my $file = $SHARE_DIR->child( lines => 'http_common_log.txt' );
-        my $pattern = join " ", '%{HOSTNAME:remote_addr}', '%{USER:ident}', '%{USER:user}',
-                                '\[%{DATETIME_HTTP:timestamp}]',
-                                '"%{WORD:method} %{URL_PATH:path} HTTP/%{NUM:http_version}"',
+        my $pattern = join " ", '%{NET.HOSTNAME:remote_addr}', '%{OS.USER:ident}', '%{OS.USER:user}',
+                                '\[%{DATETIME.HTTP:timestamp}]',
+                                '"%{WORD:method} %{URL.PATH:path} HTTP/%{NUM:http_version}"',
                                 '%{INT:status}', '%{INT:content_length}',
                                 ;
 
@@ -129,14 +129,14 @@ subtest 'http logs' => sub {
         );
 
         test_ygrok( $file, $pattern, \@expect );
-        test_ygrok( $file, "%{COMMONLOG}", \@expect )
+        test_ygrok( $file, "%{LOG.HTTP_COMMON}", \@expect )
     };
 
     subtest 'combined log format' => sub {
         my $file = $SHARE_DIR->child( lines => 'http_combined_log.txt' );
-        my $pattern = join " ", '%{HOSTNAME:remote_addr}', '%{USER:ident}', '%{USER:user}',
-                                '\[%{DATETIME_HTTP:timestamp}]',
-                                '"%{WORD:method} %{URL_PATH:path} HTTP/%{NUM:http_version}"',
+        my $pattern = join " ", '%{NET.HOSTNAME:remote_addr}', '%{OS.USER:ident}', '%{OS.USER:user}',
+                                '\[%{DATETIME.HTTP:timestamp}]',
+                                '"%{WORD:method} %{URL.PATH:path} HTTP/%{NUM:http_version}"',
                                 '%{INT:status}', '%{INT:content_length}',
                                 '"%{URL:referer}"', '"%{DATA:user_agent}"',
                                 ;
@@ -200,7 +200,7 @@ subtest 'http logs' => sub {
         );
 
         test_ygrok( $file, $pattern, \@expect );
-        test_ygrok( $file, "%{COMBINEDLOG}", \@expect )
+        test_ygrok( $file, "%{LOG.HTTP_COMBINED}", \@expect )
     };
 
 };

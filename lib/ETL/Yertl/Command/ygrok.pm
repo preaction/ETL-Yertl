@@ -45,47 +45,76 @@ sub main {
 }
 
 our %PATTERNS = (
-    DATETIME => '\d{4}-?\d{2}-?\d{2}[T ]\d{2}:?\d{2}:?\d{2}(?:Z|[+-]\d{4})',
     WORD => '\b\w+\b',
-    USER => '[a-zA-Z0-9._-]+',
-    IPV4 => '\d{1,3}[.]\d{1,3}[.]\d{1,3}[.]\d{1,3}',
     DATA => '.*?',
     NUM => $RE{num}{real},
     INT => $RE{num}{int},
-    DATETIME_HTTP => '\d{2}/\w{3}/\d{4}:\d{2}:\d{2}:\d{2} [+-]\d{4}',
-    HOSTNAME => join( "|", $RE{net}{IPv4}, $RE{net}{IPv6}, $RE{net}{domain}{-rfc1101} ),
-    URL_PATH => '[^?#]*(?:\?[^#]*)?',
-    # URL regex from URI.pm
-    URL => '(?:[^:/?#]+:)?(?://[^/?#]*)?[^?#]*(?:\?[^#]*)?(?:#.*)?',
-    COMMONLOG => join( " ", '%{HOSTNAME:remote_addr}', '%{USER:ident}', '%{USER:user}',
-                            '\[%{DATETIME_HTTP:timestamp}]',
-                            '"%{WORD:method} %{URL_PATH:path} HTTP/%{NUM:http_version}"',
-                            '%{INT:status}', '%{INT:content_length}',
-                        ),
-    COMBINEDLOG => join( " ", '%{HOSTNAME:remote_addr}', '%{USER:ident}', '%{USER:user}',
-                            '\[%{DATETIME_HTTP:timestamp}]',
-                            '"%{WORD:method} %{URL_PATH:path} HTTP/%{NUM:http_version}"',
-                            '%{INT:status}', '%{INT:content_length}',
-                            '"%{URL:referer}"', '"%{DATA:user_agent}"',
-                        ),
+
+    DATETIME => {
+        ISO8601 => '\d{4}-?\d{2}-?\d{2}[T ]\d{2}:?\d{2}:?\d{2}(?:Z|[+-]\d{4})',
+        HTTP => '\d{2}/\w{3}/\d{4}:\d{2}:\d{2}:\d{2} [+-]\d{4}',
+    },
+
+    OS => {
+        USER => '[a-zA-Z0-9._-]+',
+    },
+
+    NET => {
+        HOSTNAME => join( "|", $RE{net}{IPv4}, $RE{net}{IPv6}, $RE{net}{domain}{-rfc1101} ),
+        IPV4 => '\d{1,3}[.]\d{1,3}[.]\d{1,3}[.]\d{1,3}',
+    },
+
+    URL => {
+        PATH => '[^?#]*(?:\?[^#]*)?',
+        # URL regex from URI.pm
+        URL => '(?:[^:/?#]+:)?(?://[^/?#]*)?[^?#]*(?:\?[^#]*)?(?:#.*)?',
+    },
+
+    LOG => {
+        HTTP_COMMON => join( " ",
+            '%{NET.HOSTNAME:remote_addr}', '%{OS.USER:ident}', '%{OS.USER:user}',
+            '\[%{DATETIME.HTTP:timestamp}]',
+            '"%{WORD:method} %{URL.PATH:path} HTTP/%{NUM:http_version}"',
+            '%{INT:status}', '%{INT:content_length}',
+        ),
+        HTTP_COMBINED => join( " ",
+            '%{NET.HOSTNAME:remote_addr}', '%{OS.USER:ident}', '%{OS.USER:user}',
+            '\[%{DATETIME.HTTP:timestamp}]',
+            '"%{WORD:method} %{URL.PATH:path} HTTP/%{NUM:http_version}"',
+            '%{INT:status}', '%{INT:content_length}',
+            '"%{URL:referer}"', '"%{DATA:user_agent}"',
+        ),
+    },
+
 );
 
 sub _get_pattern {
     my ( $class, $pattern_name, $field_name ) = @_;
-    if ( my $pattern = $PATTERNS{$pattern_name} ) {
-        if ( $field_name ) {
-            return "(?<$field_name>" . $class->parse_pattern( $pattern ) . ")";
+
+    # Handle nested patterns
+    my @parts = split /[.]/, $pattern_name;
+    my $pattern = $PATTERNS{ shift @parts };
+    for my $part ( @parts ) {
+        if ( !$pattern->{ $part } ) {
+            # warn "Could not find pattern $pattern_name for field $field_name\n";
+            if ( $field_name ) {
+                return "%{$pattern_name:$field_name}";
+            }
+            return "%{$pattern_name}";
         }
-        else {
-            return "(?:" . $class->parse_pattern( $pattern ) . ")";
-        }
+
+        $pattern = $pattern->{ $part };
     }
 
-    # warn "Could not find pattern $pattern_name for field $field_name\n";
-    if ( $field_name ) {
-        return "%{$pattern_name:$field_name}";
+    # Handle the "default" pattern for a pattern group
+    if ( ref $pattern eq 'HASH' ) {
+        $pattern = $pattern->{ $parts[-1] || $pattern_name };
     }
-    return "%{$pattern_name}";
+
+    if ( $field_name ) {
+        return "(?<$field_name>" . $class->parse_pattern( $pattern ) . ")";
+    }
+    return "(?:" . $class->parse_pattern( $pattern ) . ")";
 }
 
 sub parse_pattern {
