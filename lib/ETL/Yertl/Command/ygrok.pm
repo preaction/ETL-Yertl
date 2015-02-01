@@ -14,7 +14,7 @@ our %PATTERNS = (
     NUM => $RE{num}{real}."",   # stringify to allow YAML serialization
     INT => $RE{num}{int}."",    # stringify to allow YAML serialization
 
-    DATETIME => {
+    DATE => {
         ISO8601 => '\d{4}-?\d{2}-?\d{2}[T ]\d{2}:?\d{2}:?\d{2}(?:Z|[+-]\d{4})',
         HTTP => '\d{2}/\w{3}/\d{4}:\d{2}:\d{2}:\d{2} [+-]\d{4}',
     },
@@ -37,7 +37,7 @@ our %PATTERNS = (
     LOG => {
         HTTP_COMMON => join( " ",
             '%{NET.HOSTNAME:remote_addr}', '%{OS.USER:ident}', '%{OS.USER:user}',
-            '\[%{DATETIME.HTTP:timestamp}]',
+            '\[%{DATE.HTTP:timestamp}]',
             '"%{WORD:method} %{URL.PATH:path} HTTP/%{NUM:http_version}"',
             '%{INT:status}', '%{INT:content_length}',
         ),

@@ -133,11 +133,11 @@ A floating-point number, positive or negative, with optional exponent.
 
 =over 4
 
-=item DATETIME.ISO8601
+=item DATE.ISO8601
 
 An ISO8601 date/time
 
-=item DATETIME.HTTP
+=item DATE.HTTP
 
 An RFC822 date/time, used by HTTP.
 

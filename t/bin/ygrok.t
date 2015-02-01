@@ -43,7 +43,7 @@ sub test_ygrok {
 
 subtest 'parse lines' => sub {
     my $file = $SHARE_DIR->child( lines => 'irc.txt' );
-    my $pattern = '%{DATETIME.ISO8601:timestamp} %{WORD:user}@%{NET.IPV4:ip}> %{DATA:text}';
+    my $pattern = '%{DATE.ISO8601:timestamp} %{WORD:user}@%{NET.IPV4:ip}> %{DATA:text}';
     my @expect = (
         {
             timestamp => '2014-01-01T00:00:00Z',
@@ -73,7 +73,7 @@ subtest 'http logs' => sub {
     subtest 'common log format' => sub {
         my $file = $SHARE_DIR->child( lines => 'http_common_log.txt' );
         my $pattern = join " ", '%{NET.HOSTNAME:remote_addr}', '%{OS.USER:ident}', '%{OS.USER:user}',
-                                '\[%{DATETIME.HTTP:timestamp}]',
+                                '\[%{DATE.HTTP:timestamp}]',
                                 '"%{WORD:method} %{URL.PATH:path} HTTP/%{NUM:http_version}"',
                                 '%{INT:status}', '%{INT:content_length}',
                                 ;
