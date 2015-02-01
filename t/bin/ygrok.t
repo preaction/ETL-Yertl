@@ -134,10 +134,7 @@ subtest 'http logs' => sub {
 
     subtest 'combined log format' => sub {
         my $file = $SHARE_DIR->child( lines => 'http_combined_log.txt' );
-        my $pattern = join " ", '%{NET.HOSTNAME:remote_addr}', '%{OS.USER:ident}', '%{OS.USER:user}',
-                                '\[%{DATETIME.HTTP:timestamp}]',
-                                '"%{WORD:method} %{URL.PATH:path} HTTP/%{NUM:http_version}"',
-                                '%{INT:status}', '%{INT:content_length}',
+        my $pattern = join " ", '%{LOG.HTTP_COMMON}',
                                 '"%{URL:referer}"', '"%{DATA:user_agent}"',
                                 ;
 

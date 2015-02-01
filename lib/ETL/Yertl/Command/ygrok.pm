@@ -78,10 +78,7 @@ our %PATTERNS = (
             '%{INT:status}', '%{INT:content_length}',
         ),
         HTTP_COMBINED => join( " ",
-            '%{NET.HOSTNAME:remote_addr}', '%{OS.USER:ident}', '%{OS.USER:user}',
-            '\[%{DATETIME.HTTP:timestamp}]',
-            '"%{WORD:method} %{URL.PATH:path} HTTP/%{NUM:http_version}"',
-            '%{INT:status}', '%{INT:content_length}',
+            '%{LOG.HTTP_COMMON}',
             '"%{URL:referer}"', '"%{DATA:user_agent}"',
         ),
     },
@@ -90,6 +87,8 @@ our %PATTERNS = (
 
 sub _get_pattern {
     my ( $class, $pattern_name, $field_name ) = @_;
+
+    #; say STDERR "_get_pattern( $pattern_name, $field_name )";
 
     # Handle nested patterns
     my @parts = split /[.]/, $pattern_name;
@@ -119,8 +118,9 @@ sub _get_pattern {
 
 sub parse_pattern {
     my ( $class, $pattern ) = @_;
-    $pattern =~ s/\%\{([^:]+)(?::([^:]+))?\}/$class->_get_pattern( $1, $2 )/ge;
-    return qr{$pattern};
+    $pattern =~ s/\%\{([^:}]+)(?::([^:}]+))?\}/$class->_get_pattern( $1, $2 )/ge;
+    #; say STDERR 'PATTERN: ' . $pattern;
+    return $pattern;
 }
 
 1;
