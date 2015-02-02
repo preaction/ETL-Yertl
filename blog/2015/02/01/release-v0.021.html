@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="/ETL-Yertl//theme/css/normalize.css" rel="stylesheet">
+        <link href="/ETL-Yertl//theme/css/skeleton.css" rel="stylesheet">
+        <link href="/ETL-Yertl//theme/css/statocles-default.css" rel="stylesheet">
+        <title>Yertl</title>
+        
+    </head>
+    <body>
+        <header>
+            <nav class="navbar">
+                <div class="container">
+                    <a class="brand" href="/ETL-Yertl//">Yertl</a>
+                    <ul>
+                        <li>
+                            <a href="/ETL-Yertl//blog">Blog</a>
+                        </li>
+                        <li>
+                            <a href="/ETL-Yertl//pod">Docs</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl">Code</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl/issues">Bugs</a>
+                        </li>
+                        <li>
+                            <a href="http://metacpan.org/pod/ETL::Yertl">CPAN</a>
+                        </li>
+                        <li>
+                            <a href="https://chat.mibbit.com/?channel=%23yertl&amp;server=irc.perl.org">IRC</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+        </header>
+        <div class="main container">
+            <div class="row">
+
+    <div class="nine columns">
+        <main>
+            <header>
+                <h1>Release v0.021</h1>
+                <p class="tags">Tags:
+                    <a href="/ETL-Yertl//blog/tag/release/index.html" rel="tag">release</a>
+                </p>
+                <aside>
+                    <p><time datetime="2015-02-01">
+                        Posted on 2015-02-01
+                    </time>
+                    </p>
+                </aside>
+            </header>
+            <section id="section-1">
+                <p>A breaking change in this release: <code>ysql</code> no longer needs the word <code>query</code> to
+run a query.  With the earlier removal of the <code>write</code> command, the <code>query</code>
+command was the only way to run a query. Instead of requiring the additional
+command, now we can save a little bit of typing.</p>
+
+<p>This release has plenty of additions to the <code>ygrok</code> script, allowing it to
+easily parse logs from Apache HTTPD and Syslog, the output of <code>ls -l</code> and <code>ps</code>.
+There&#39;s also a new <code>-l</code> flag to allow loose matching of input lines.</p>
+
+<p>This release also allows you to add your own <code>ygrok</code> patterns. In addition to
+adding your own custom patterns, you can list all the existing patterns by
+doing <code>ygrok --pattern</code>. See <a href="/ETL-Yertl//pod/ygrok">the ygrok documentation</a> for more
+details.</p>
+
+<p>With all the possibilities, <code>ygrok</code> patterns can now be organized into
+namespaces. This will hopefully make it easier to manage as we add more
+patterns to the Yertl core.</p>
+
+<p>Full changelog below:</p>
+
+            </section>
+            <section id="section-2">
+                <ul>
+<li><a href="https://github.com/preaction/Statocles/commit/b1302b5d17781c6fe17fcd6b6ecccab4011b2409">add --loose flag to ygrok to match partial lines</a> (<a href="https://github.com/preaction/Statocles/issues/120">#120</a>)</li>
+<li><a href="https://github.com/preaction/Statocles/commit/11e99aa926db9b1b4aa657940103e7371db86aa4">add ygrok patterns for ps, ps u, and ps x</a></li>
+<li><a href="https://github.com/preaction/Statocles/commit/d086c452ecaed0e281ad5fe89f8d6c8d5353d271">add ygrok pattern for POSIX <code>ls -l</code></a> (<a href="https://github.com/preaction/Statocles/issues/116">#116</a>)</li>
+<li><a href="https://github.com/preaction/Statocles/commit/97369b3847b8cd66a677d0b3de1de1b88dd6e5e3">add ygrok to the main page synopsis</a> (<a href="https://github.com/preaction/Statocles/issues/112">#112</a>)</li>
+<li><a href="https://github.com/preaction/Statocles/commit/eae9af551a6273579e13c6cb562e73c6ed95764f">add syslog pattern to ygrok</a> (<a href="https://github.com/preaction/Statocles/issues/108">#108</a>)</li>
+<li><a href="https://github.com/preaction/Statocles/commit/ab84ebb175099d1727ba3bd5c2cb09c075235c0e">allow adding, editing, and listing ygrok patterns</a> (<a href="https://github.com/preaction/Statocles/issues/107">#107</a>)</li>
+<li><a href="https://github.com/preaction/Statocles/commit/e05f872c571cee75521e1fa1b52aee3b5c133d7b">fix multiply-nested patterns</a></li>
+<li><a href="https://github.com/preaction/Statocles/commit/282433dba939c0f4f66e06888c59c370f1dc42ee">document all existing ygrok patterns</a> (<a href="https://github.com/preaction/Statocles/issues/111">#111</a>)</li>
+<li><a href="https://github.com/preaction/Statocles/commit/ca49f9b0e2951c90875bafc186ffe2bde9fc49ac">add pattern categories to ygrok</a> (<a href="https://github.com/preaction/Statocles/issues/109">#109</a>)</li>
+<li><a href="https://github.com/preaction/Statocles/commit/beab13b66ce946f638dece748127917718f278ef">add ysql help guide</a></li>
+<li><a href="https://github.com/preaction/Statocles/commit/970b3f477c2da5e201fd42f11b2dea04320b1170">remove need for &quot;query&quot; when using ysql</a> (<a href="https://github.com/preaction/Statocles/issues/119">#119</a>)</li>
+<li><a href="https://github.com/preaction/Statocles/commit/e2d390c4fa8c25c055195ad4be3b4a980f102c0c">add combined log format pattern for grok</a></li>
+<li><a href="https://github.com/preaction/Statocles/commit/295305fb31e73584a7b0113494ace2ab63af571e">allow recursive grok patterns</a></li>
+<li><a href="https://github.com/preaction/Statocles/commit/ba5ba63f6a183845ab095d30b806be35c692b9b4">add ygrok patterns to parse http common log format</a></li>
+<li><a href="https://github.com/preaction/Statocles/commit/f2b146afe89b725dfcaa3dec493f892d3e566c3f">fix warnings when an unknown grok pattern is used</a></li>
+<li><a href="https://github.com/preaction/Statocles/commit/aa22a8a0b876c2796e38de48570f034a36ec0413">fix spurious contributor</a> (<a href="https://github.com/preaction/Statocles/issues/106">#106</a>)</li>
+</ul>
+
+            </section>
+        </main>
+    </div>
+
+    <div class="three columns sidebar">
+        
+        <nav id="tags">
+            <h1>Tags</h1>
+            <ul class="list-inline">
+                <li><a href="/ETL-Yertl//blog/tag/release/index.html">release</a></li>
+            </ul>
+        </nav>
+    </div>
+
+</div>
+
+        </div>
+        <footer>
+            
+            <div class="container tagline">
+                <a href="http://preaction.github.io/Statocles">Made with Statocles</a><br>
+                <a href="http://www.perl.org">Powered by Perl</a>
+            </div>
+        </footer>
+    </body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="/ETL-Yertl//theme/css/normalize.css" rel="stylesheet">
+        <link href="/ETL-Yertl//theme/css/skeleton.css" rel="stylesheet">
+        <link href="/ETL-Yertl//theme/css/statocles-default.css" rel="stylesheet">
+        <title>Yertl</title>
+        
+    </head>
+    <body>
+        <header>
+            <nav class="navbar">
+                <div class="container">
+                    <a class="brand" href="/ETL-Yertl//">Yertl</a>
+                    <ul>
+                        <li>
+                            <a href="/ETL-Yertl//blog">Blog</a>
+                        </li>
+                        <li>
+                            <a href="/ETL-Yertl//pod">Docs</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl">Code</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl/issues">Bugs</a>
+                        </li>
+                        <li>
+                            <a href="http://metacpan.org/pod/ETL::Yertl">CPAN</a>
+                        </li>
+                        <li>
+                            <a href="https://chat.mibbit.com/?channel=%23yertl&amp;server=irc.perl.org">IRC</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+        </header>
+        <div class="main container">
+            <h1 id="NAME">NAME</h1>
+
+<p>ysql - Query SQL databases in a Yertl workflow</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    ysql [&lt;db_name&gt; | --dsn &lt;dsn&gt;] [&lt;query&gt; | &lt;query_name&gt;] [&lt;value&gt;...]
+
+    ysql &lt;db_name&gt; --save &lt;query_name&gt; &lt;query&gt;
+
+    ysql --config &lt;db_name&gt; [--driver &lt;driver&gt;] [--database &lt;database] [--host &lt;host&gt;]
+        [--port &lt;port&gt;] [--user &lt;user&gt;] [--password &lt;password&gt;]
+    ysql --config &lt;db_name&gt; [--dsn] &lt;dsn&gt; [--user &lt;user&gt;] [--password &lt;password&gt;]
+    ysql --config [&lt;db_name&gt;]
+
+    ysql -h|--help|--version</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This program queries a SQL database and prints the result as YAML.</p>
+
+<h2 id="Reading">Reading</h2>
+
+<p>Run a query to read data from the database. <code>query</code> is either the name of a saved query, or SQL (usually a <code>SELECT</code>). <code>value</code> is used to fill in <code>?</code> placeholders.</p>
+
+<pre><code>    $ ysql db_name &#39;SELECT * FROM person&#39;
+    ---
+    name: Hazel &quot;Hank&quot; Murphy
+    email: captain@example.com
+    dept: Captain
+    ---
+    name: Quinn Quinlan
+    email: dr.quinn@example.com
+    dept: Science</code></pre>
+
+<h2 id="Writing">Writing</h2>
+
+<p>If there are documents to read on STDIN, the <code>query</code> will be executed once for each document read. In order to map keys in the YAML document to fields in the SQL query, <code>ysql</code> supports named placeholders, which begin with <code>$.</code>. For example:</p>
+
+<pre><code>    # input.yml
+    ---
+    name: Stormy Waters
+    email: stormy@example.com
+    profile:
+        dept: Pilot
+    ---
+    name: Debbie Dupree
+    email: debbie@example.com
+    profile:
+        dept: Wildlife
+
+    $ ysql db_name &#39;INSERT INTO person ( name, email, dept ) \
+                    VALUES ( $.name, $.email, $.profile.dept )&#39; \
+                    &lt; input.yml</code></pre>
+
+<h1 id="ARGUMENTS">ARGUMENTS</h1>
+
+<h2 id="db_name">db_name</h2>
+
+<p>The saved database name to use. Add and edit databases using the <code>--config</code> option.</p>
+
+<h2 id="query">query</h2>
+
+<p>The SQL query to run against the database.</p>
+
+<h2 id="query_name">query_name</h2>
+
+<p>The name of a saved query. Add and edit saved queries using the <code>--save</code> option.</p>
+
+<h1 id="OPTIONS">OPTIONS</h1>
+
+<h2 id="config">--config</h2>
+
+<p>View, add, and edit database configuration.</p>
+
+<h2 id="save-query_name">--save &lt;query_name&gt;</h2>
+
+<p>Save a query to run later.</p>
+
+<h2 id="driver-driver">--driver &lt;driver&gt;</h2>
+
+<p>The database driver to use, corresponding to a DBD::* module. Some examples: <code>SQLite</code>, <code>mysql</code>, <code>Pg</code>.</p>
+
+<h2 id="database-database">--database &lt;database&gt;</h2>
+
+<p>The name of the database. For SQLite, the name of the database file.</p>
+
+<h2 id="host-host">--host &lt;host&gt;</h2>
+
+<p>The hostname to connect to. Optional.</p>
+
+<h2 id="port-port">--port &lt;port&gt;</h2>
+
+<p>The port to connect to. Optional.</p>
+
+<h2 id="user-user">--user &lt;user&gt;</h2>
+
+<p>The user to connect as. Optional.</p>
+
+<h2 id="password-password">--password &lt;password&gt;</h2>
+
+<p>The password to connect with. Optional. This is stored in plain text, so beware.</p>
+
+<h2 id="dsn-dsn">--dsn &lt;dsn&gt;</h2>
+
+<p>The <a href="https://metacpan.org/pod/DBI">DBI</a> Data Source Name. A string that DBI uses to connect to the database.</p>
+
+<p>Some examples:</p>
+
+<pre><code>    # A SQLite database in &quot;test.db&quot;
+    dbi:SQLite:test.db
+
+    # A MySQL database named &quot;example&quot;
+    dbi:mysql:example
+
+    # A Postgres database named &quot;foo&quot;
+    dbi:Pg:foo</code></pre>
+
+<h2 id="drivers">--drivers</h2>
+
+<p>List the available drivers</p>
+
+<h2 id="h---help">-h | --help</h2>
+
+<p>Show this help document.</p>
+
+<h2 id="version">--version</h2>
+
+<p>Print the current ysql and Perl versions.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<dl>
+
+<dt><a href="/ETL-Yertl//pod/ETL/Yertl/Help/ysql.html">ETL::Yertl::Help::ysql</a> - Using ysql to work with SQL databases</dt>
+<dd>
+
+</dd>
+</dl>
+
+
+
+        </div>
+        <footer>
+            
+            <div class="container tagline">
+                <a href="http://preaction.github.io/Statocles">Made with Statocles</a><br>
+                <a href="http://www.perl.org">Powered by Perl</a>
+            </div>
+        </footer>
+    </body>
+</html>

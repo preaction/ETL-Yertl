@@ -1,7 +1,12 @@
 ---
 author: preaction
-title: Yertl -- The ETL with a Shell
+title: Yertl -- ETL with a Shell
 ---
+
+# Yertl - ETL with a Shell
+
+Yertl is an ETL (Extract, Transform, Load) system for working with structured data
+with a command-line.
 
 ## Getting Started
 
@@ -9,18 +14,27 @@ Install the latest version of Yertl from CPAN.
 
     cpan ETL::Yertl
 
-Check out the documentation for the Yertl commands:
+## Documentation
+
+Check out the documentation for Yertl:
+
+### Guides
+
+Completely new to Yertl? Start here with the guides:
+
+* [ysql - Work with SQL databases](/pod/ETL/Yertl/Help/ysql.html)
 
 ### Input/Output
 
-* [yfrom - Convert formatted data (JSON, CSV) to a Yertl feed (YAML)](http://metacpan.org/pod/yfrom)
-* [yto - Convert Yertl feed (YAML) to an output format (JSON, CSV)](http://metacpan.org/pod/yto)
-* [ysql - Read/write to/from a SQL database](http://metacpan.org/pod/ysql)
+* [yfrom - Convert formatted data (JSON, CSV) to a Yertl feed (YAML)](/pod/yfrom.html)
+* [yto - Convert Yertl feed (YAML) to an output format (JSON, CSV)](/pod/yto.html)
+* [ygrok - Parse lines of plain text into documents](/pod/ygrok.html)
+* [ysql - Read/write to/from a SQL database](/pod/ysql.html)
 
 ### Filter/Transform
 
-* [ymask - Filter by properties using a simple mask](http://metacpan.org/pod/ymask)
-* [yq - A transform mini-language](http://metacpan.org/pod/yq)
+* [ymask - Filter by properties using a simple mask](/pod/ymask.html)
+* [yq - A transform mini-language](/pod/yq.html)
 
 ## Other Resources
 

@@ -42,45 +42,41 @@
     <div class="nine columns">
         <main>
             <header>
-                <h1>Initial Release</h1>
+                <h1>Release v0.020</h1>
                 <p class="tags">Tags:
                     <a href="/ETL-Yertl//blog/tag/release/index.html" rel="tag">release</a>
                 </p>
                 <aside>
-                    <p><time datetime="2015-01-11">
-                        Posted on 2015-01-11
+                    <p><time datetime="2015-02-01">
+                        Posted on 2015-02-01
                     </time>
-                        by preaction
                     </p>
                 </aside>
             </header>
             <section id="section-1">
-                <p>This is the first release with Yertl&#39;s new website! Yertl is an ETL (Extract,
-Transform, Load) for the shell, with tools designed to be quickly assembled
-together into useful ETL processes.</p>
+                <p>This release adds the first initial development of <code>ygrok</code>, the Yertl program
+for parsing lines of plain text input into documents.</p>
 
-<p>This release includes:</p>
+<p><code>ygrok</code> is perfect for parsing log files and command output.  By using simple
+patterns or named regex captures, we can parse a line of input into a document,
+which we can then write to a database using <code>ysql</code>, or convert to CSV or JSON
+with <code>yto</code>.</p>
 
-<ul>
-<li>Convert to and from YAML, JSON, and CSV (yto and yfrom)</li>
-<li>Read/write to/from SQL databases (ysql)</li>
-<li>Simple mask-style filtering (ymask)</li>
-<li>The beginning of a rich transform language (yq)</li>
+<p>Lots more development on <code>ygrok</code> to come!</p>
+
+<p>Full changelog below:</p>
+
+            </section>
+            <section id="section-2">
+                <ul>
+<li><a href="https://github.com/preaction/Statocles/commit/43ae7601fe059316e08da0c0736220435f6f8cb4">add short descriptions of all the Yertl tools</a></li>
+<li><a href="https://github.com/preaction/Statocles/commit/60b11d2bbcf0d3a27f3ee4bf0159307188ace100">add ysql to main page synopsis</a> (<a href="https://github.com/preaction/Statocles/issues/98">#98</a>)</li>
+<li><a href="https://github.com/preaction/Statocles/commit/11f5d1def364c186f4f65d8b71eff7b087b7c8d1">add links to yertl homepage</a> (<a href="https://github.com/preaction/Statocles/issues/99">#99</a>)</li>
+<li><a href="https://github.com/preaction/Statocles/commit/75abbd5884a52f2d71ad6db8c77928817da76435">exclude the website from the cpan dist</a> (<a href="https://github.com/preaction/Statocles/issues/104">#104</a>)</li>
+<li><a href="https://github.com/preaction/Statocles/commit/e1da406e1ec7b166764bed9099c5385291b7d406">fix &quot;prototype mismatch&quot; from Parse::RecDescent</a> (<a href="https://github.com/preaction/Statocles/issues/103">#103</a>)</li>
+<li><a href="https://github.com/preaction/Statocles/commit/af37bfa9e7b28df47b15a431717c74f0b446fdb5">add initial ygrok script</a> (<a href="https://github.com/preaction/Statocles/issues/105">#105</a>)</li>
+<li><a href="https://github.com/preaction/Statocles/commit/b18fcb7d80e657151dfa90ebac647cf5de64bd93">add dzil plugin for prereqs and compile tests</a></li>
 </ul>
-
-<p>Future plans include:</p>
-
-<ul>
-<li>Job distribution using ZeroMQ send/receive</li>
-<li>Perl API for adding Yertl workflows to larger Perl scripts</li>
-<li>API for ORMs (DBIx::Class)</li>
-<li>API for document and key/value stores (MongoDB, Redis, Memcached)</li>
-<li>API for downloading and scraping data from websites (curl, Web::Query, Mojo::DOM)</li>
-<li>More options for filtering and transforming data (LINQ, XPath)</li>
-</ul>
-
-<p>See <a href="https://github.com/preaction/ETL-Yertl/labels/feature">the Github feature tickets</a>
-for more future plans.</p>
 
             </section>
         </main>

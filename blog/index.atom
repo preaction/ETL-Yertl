@@ -2,14 +2,88 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>http://preaction.github.io/ETL-Yertl/blog/index.html</id>
     <title>Yertl</title>
-    <updated>2015-01-21T22:20:44Z</updated>
+    <updated>2015-02-01T23:52:59Z</updated>
     <link href="http://preaction.github.io/ETL-Yertl/blog/index.atom" rel="self" />
     <link href="http://preaction.github.io/ETL-Yertl/blog/index.html" rel="alternate" />
-    <generator version="0.034">Statocles</generator>
+    <generator version="0.035">Statocles</generator>
+    <entry>
+        <id>http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.022.html</id>
+        <title>Release v0.022</title>
+        <link href="http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.022.html" rel="alternate" />
+        <content type="html"><![CDATA[
+            <p>A quick release to fix up some incorrect documentation.</p>
+
+<p>Full changelog below:</p>
+
+                <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.022.html#section-2">Continue reading...</a></p>
+            <p>Tags:
+                <a href="/blog/tag/release/index.html">release</a>
+            </p>
+        ]]></content>
+        <updated>2015-02-01T00:00:00Z</updated>
+        <category term="Statocles::Link=HASH(0x7fc41f53b688)" />
+    </entry>
+    <entry>
+        <id>http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.021.html</id>
+        <title>Release v0.021</title>
+        <link href="http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.021.html" rel="alternate" />
+        <content type="html"><![CDATA[
+            <p>A breaking change in this release: <code>ysql</code> no longer needs the word <code>query</code> to
+run a query.  With the earlier removal of the <code>write</code> command, the <code>query</code>
+command was the only way to run a query. Instead of requiring the additional
+command, now we can save a little bit of typing.</p>
+
+<p>This release has plenty of additions to the <code>ygrok</code> script, allowing it to
+easily parse logs from Apache HTTPD and Syslog, the output of <code>ls -l</code> and <code>ps</code>.
+There's also a new <code>-l</code> flag to allow loose matching of input lines.</p>
+
+<p>This release also allows you to add your own <code>ygrok</code> patterns. In addition to
+adding your own custom patterns, you can list all the existing patterns by
+doing <code>ygrok --pattern</code>. See <a href="/pod/ygrok">the ygrok documentation</a> for more
+details.</p>
+
+<p>With all the possibilities, <code>ygrok</code> patterns can now be organized into
+namespaces. This will hopefully make it easier to manage as we add more
+patterns to the Yertl core.</p>
+
+<p>Full changelog below:</p>
+
+                <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.021.html#section-2">Continue reading...</a></p>
+            <p>Tags:
+                <a href="/blog/tag/release/index.html">release</a>
+            </p>
+        ]]></content>
+        <updated>2015-02-01T00:00:00Z</updated>
+        <category term="Statocles::Link=HASH(0x7fc41f53b298)" />
+    </entry>
+    <entry>
+        <id>http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.020.html</id>
+        <title>Release v0.020</title>
+        <link href="http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.020.html" rel="alternate" />
+        <content type="html"><![CDATA[
+            <p>This release adds the first initial development of <code>ygrok</code>, the Yertl program
+for parsing lines of plain text input into documents.</p>
+
+<p><code>ygrok</code> is perfect for parsing log files and command output.  By using simple
+patterns or named regex captures, we can parse a line of input into a document,
+which we can then write to a database using <code>ysql</code>, or convert to CSV or JSON
+with <code>yto</code>.</p>
+
+<p>Lots more development on <code>ygrok</code> to come!</p>
+
+<p>Full changelog below:</p>
+
+                <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.020.html#section-2">Continue reading...</a></p>
+            <p>Tags:
+                <a href="/blog/tag/release/index.html">release</a>
+            </p>
+        ]]></content>
+        <updated>2015-02-01T00:00:00Z</updated>
+        <category term="Statocles::Link=HASH(0x7fc41b7bc228)" />
+    </entry>
     <entry>
         <id>http://preaction.github.io/ETL-Yertl/blog/2015/01/21/release-v0.019.html</id>
         <title>Release v0.019</title>
-        <author><name /></author>
         <link href="http://preaction.github.io/ETL-Yertl/blog/2015/01/21/release-v0.019.html" rel="alternate" />
         <content type="html"><![CDATA[
             <p>This release fixes a few bugs and inconsistencies in the <code>ysql</code> command, in
@@ -28,7 +102,7 @@ else write's YAML with their ID in it.</p>
             </p>
         ]]></content>
         <updated>2015-01-21T00:00:00Z</updated>
-        <category term="ARRAY(0x7fb730b64538)" />
+        <category term="Statocles::Link=HASH(0x7fc41f533558)" />
     </entry>
     <entry>
         <id>http://preaction.github.io/ETL-Yertl/blog/2015/01/11/release-v0.017.html</id>
@@ -47,48 +121,7 @@ configuration.</p>
             </p>
         ]]></content>
         <updated>2015-01-11T00:00:00Z</updated>
-        <category term="ARRAY(0x7fb730b64e20)" />
-    </entry>
-    <entry>
-        <id>http://preaction.github.io/ETL-Yertl/blog/2015/01/11/initial-release.html</id>
-        <title>Initial Release</title>
-        <author><name>preaction</name></author>
-        <link href="http://preaction.github.io/ETL-Yertl/blog/2015/01/11/initial-release.html" rel="alternate" />
-        <content type="html"><![CDATA[
-            <p>This is the first release with Yertl's new website! Yertl is an ETL (Extract,
-Transform, Load) for the shell, with tools designed to be quickly assembled
-together into useful ETL processes.</p>
-
-<p>This release includes:</p>
-
-<ul>
-<li>Convert to and from YAML, JSON, and CSV (yto and yfrom)</li>
-<li>Read/write to/from SQL databases (ysql)</li>
-<li>Simple mask-style filtering (ymask)</li>
-<li>The beginning of a rich transform language (yq)</li>
-</ul>
-
-<p>Future plans include:</p>
-
-<ul>
-<li>Job distribution using ZeroMQ send/receive</li>
-<li>Perl API for adding Yertl workflows to larger Perl scripts</li>
-<li>API for ORMs (DBIx::Class)</li>
-<li>API for document and key/value stores (MongoDB, Redis, Memcached)</li>
-<li>API for downloading and scraping data from websites (curl, Web::Query, Mojo::DOM)</li>
-<li>More options for filtering and transforming data (LINQ, XPath)</li>
-</ul>
-
-<p>See <a href="https://github.com/preaction/ETL-Yertl/labels/feature">the Github feature tickets</a>
-for more future plans.</p>
-
-                <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/01/11/initial-release.html#section-2">Continue reading...</a></p>
-            <p>Tags:
-                <a href="/blog/tag/release/index.html">release</a>
-            </p>
-        ]]></content>
-        <updated>2015-01-11T00:00:00Z</updated>
-        <category term="ARRAY(0x7fb730b62cc0)" />
+        <category term="Statocles::Link=HASH(0x7fc41f0fbe20)" />
     </entry>
 </feed>
 

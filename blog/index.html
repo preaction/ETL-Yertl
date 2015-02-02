@@ -1,87 +1,39 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
-        <link href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/css/bootstrap-theme.min.css" rel="stylesheet">
-        <script src="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <link href="/ETL-Yertl//theme/css/normalize.css" rel="stylesheet">
+        <link href="/ETL-Yertl//theme/css/skeleton.css" rel="stylesheet">
+        <link href="/ETL-Yertl//theme/css/statocles-default.css" rel="stylesheet">
         <title>Yertl</title>
-        <style type="text/css">
-            main header h1
-            {
-                border-bottom: 4px solid #045578;
-            }
-            header aside {
-                margin-top: 0;
-                font-size: 12pt;
-            }
-            .sidebar h1 {
-                font-size: 14pt;
-            }
-
-            /** Add a line when using the "Continue reading..." link */
-            section:target {
-                padding-top: 0.5em;
-                border-top: 4px solid #045578;
-            }
-
-            /** Don't allow <pre> to push too much */
-            pre {
-                max-width: 100%;
-                overflow-x: scroll;
-            }
-
-            /** <code> is used for input and output, so let it wrap */
-            code {
-                white-space: normal;
-            }
-
-            .tags {
-                float: right;
-            }
-
-            /**
-             * Don't allow main content images to push things around
-             */
-            main img {
-                max-width: 100%;
-            }
-
-            footer .tagline {
-                font-size: smaller;
-                line-height: 1.3;
-                text-align: right;
-            }
-
-        </style>
-            <link href="/ETL-Yertl/blog/index.atom" rel="alternate" type="application/atom+xml">
-            <link href="/ETL-Yertl/blog/index.rss" rel="alternate" type="application/rss+xml">
+        <link href="/ETL-Yertl//blog/index.atom" rel="alternate" type="application/atom+xml">
+        <link href="/ETL-Yertl//blog/index.rss" rel="alternate" type="application/rss+xml">
         
     </head>
     <body>
         <header>
-            <nav class="navbar navbar-default navbar-static-top" role="navigation">
+            <nav class="navbar">
                 <div class="container">
-                <!-- Brand and toggle get grouped for better mobile display -->
-                    <div class="navbar-header">
-                        <button class="navbar-toggle" data-target="#top-navbar-collapse-1" data-toggle="collapse" type="button">
-                            <span class="sr-only">Toggle navigation</span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button>
-                        <a class="navbar-brand" href="/ETL-Yertl/">Yertl</a>
-                    </div>
-                    <!-- Collect the nav links, forms, and other content for toggling -->
-                    <div class="collapse navbar-collapse" id="top-navbar-collapse-1">
-                        <ul class="nav navbar-nav">
-                            <li><a href="/ETL-Yertl/blog">Blog</a></li>
-                            <li><a href="/ETL-Yertl/pod">Docs</a></li>
-                            <li><a href="http://github.com/preaction/ETL-Yertl">Code</a></li>
-                            <li><a href="http://github.com/preaction/ETL-Yertl/issues">Bugs</a></li>
-                            <li><a href="http://metacpan.org/pod/ETL-Yertl">CPAN</a></li>
-                            <li><a href="https://chat.mibbit.com/?channel=%23yertl&amp;server=irc.perl.org">IRC</a></li>
-                        </ul>
-                    </div>
+                    <a class="brand" href="/ETL-Yertl//">Yertl</a>
+                    <ul>
+                        <li>
+                            <a href="/ETL-Yertl//blog">Blog</a>
+                        </li>
+                        <li>
+                            <a href="/ETL-Yertl//pod">Docs</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl">Code</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl/issues">Bugs</a>
+                        </li>
+                        <li>
+                            <a href="http://metacpan.org/pod/ETL::Yertl">CPAN</a>
+                        </li>
+                        <li>
+                            <a href="https://chat.mibbit.com/?channel=%23yertl&amp;server=irc.perl.org">IRC</a>
+                        </li>
+                    </ul>
                 </div>
             </nav>
             
@@ -90,21 +42,125 @@
             
 <div class="row">
 
-    <div class="col-md-9">
+    <div class="nine columns">
         <main>
+
             <article>
                 <header>
-                    <h1><a href="/ETL-Yertl/blog/2015/01/21/release-v0.019.html">Release v0.019</a></h1>
+                    <h1><a href="/ETL-Yertl//blog/2015/02/01/release-v0.022.html">Release v0.022</a></h1>
+
                     <p class="tags">Tags:
-                        <a href="/ETL-Yertl/blog/tag/release/index.html" rel="tag">release</a>
+                        <a href="/ETL-Yertl//blog/tag/release/index.html" rel="tag">release</a>
                     </p>
+
+                    <aside>
+                        <p><time datetime="2015-02-01">
+                            Posted on 2015-02-01
+                        </time>
+                        </p>
+                    </aside>
+
+                </header>
+
+                <p>A quick release to fix up some incorrect documentation.</p>
+
+<p>Full changelog below:</p>
+
+
+                    <p><a href="/ETL-Yertl//blog/2015/02/01/release-v0.022.html#section-2">Continue reading Release v0.022...</a></p>
+
+            </article>
+            <article>
+                <header>
+                    <h1><a href="/ETL-Yertl//blog/2015/02/01/release-v0.021.html">Release v0.021</a></h1>
+
+                    <p class="tags">Tags:
+                        <a href="/ETL-Yertl//blog/tag/release/index.html" rel="tag">release</a>
+                    </p>
+
+                    <aside>
+                        <p><time datetime="2015-02-01">
+                            Posted on 2015-02-01
+                        </time>
+                        </p>
+                    </aside>
+
+                </header>
+
+                <p>A breaking change in this release: <code>ysql</code> no longer needs the word <code>query</code> to
+run a query.  With the earlier removal of the <code>write</code> command, the <code>query</code>
+command was the only way to run a query. Instead of requiring the additional
+command, now we can save a little bit of typing.</p>
+
+<p>This release has plenty of additions to the <code>ygrok</code> script, allowing it to
+easily parse logs from Apache HTTPD and Syslog, the output of <code>ls -l</code> and <code>ps</code>.
+There&#39;s also a new <code>-l</code> flag to allow loose matching of input lines.</p>
+
+<p>This release also allows you to add your own <code>ygrok</code> patterns. In addition to
+adding your own custom patterns, you can list all the existing patterns by
+doing <code>ygrok --pattern</code>. See <a href="/ETL-Yertl//pod/ygrok">the ygrok documentation</a> for more
+details.</p>
+
+<p>With all the possibilities, <code>ygrok</code> patterns can now be organized into
+namespaces. This will hopefully make it easier to manage as we add more
+patterns to the Yertl core.</p>
+
+<p>Full changelog below:</p>
+
+
+                    <p><a href="/ETL-Yertl//blog/2015/02/01/release-v0.021.html#section-2">Continue reading Release v0.021...</a></p>
+
+            </article>
+            <article>
+                <header>
+                    <h1><a href="/ETL-Yertl//blog/2015/02/01/release-v0.020.html">Release v0.020</a></h1>
+
+                    <p class="tags">Tags:
+                        <a href="/ETL-Yertl//blog/tag/release/index.html" rel="tag">release</a>
+                    </p>
+
+                    <aside>
+                        <p><time datetime="2015-02-01">
+                            Posted on 2015-02-01
+                        </time>
+                        </p>
+                    </aside>
+
+                </header>
+
+                <p>This release adds the first initial development of <code>ygrok</code>, the Yertl program
+for parsing lines of plain text input into documents.</p>
+
+<p><code>ygrok</code> is perfect for parsing log files and command output.  By using simple
+patterns or named regex captures, we can parse a line of input into a document,
+which we can then write to a database using <code>ysql</code>, or convert to CSV or JSON
+with <code>yto</code>.</p>
+
+<p>Lots more development on <code>ygrok</code> to come!</p>
+
+<p>Full changelog below:</p>
+
+
+                    <p><a href="/ETL-Yertl//blog/2015/02/01/release-v0.020.html#section-2">Continue reading Release v0.020...</a></p>
+
+            </article>
+            <article>
+                <header>
+                    <h1><a href="/ETL-Yertl//blog/2015/01/21/release-v0.019.html">Release v0.019</a></h1>
+
+                    <p class="tags">Tags:
+                        <a href="/ETL-Yertl//blog/tag/release/index.html" rel="tag">release</a>
+                    </p>
+
                     <aside>
                         <p><time datetime="2015-01-21">
                             Posted on 2015-01-21
                         </time>
-                        by </p>
+                        </p>
                     </aside>
+
                 </header>
+
                 <p>This release fixes a few bugs and inconsistencies in the <code>ysql</code> command, in
 anticipation of a blog post explaining how it works.</p>
 
@@ -115,95 +171,69 @@ else write&#39;s YAML with their ID in it.</p>
 
 <p>Full changelog below:</p>
 
-                    <p><a href="/ETL-Yertl/blog/2015/01/21/release-v0.019.html#section-2">Continue reading Release v0.019...</a></p>
+
+                    <p><a href="/ETL-Yertl//blog/2015/01/21/release-v0.019.html#section-2">Continue reading Release v0.019...</a></p>
+
             </article>
             <article>
                 <header>
-                    <h1><a href="/ETL-Yertl/blog/2015/01/11/release-v0.017.html">Release v0.017</a></h1>
+                    <h1><a href="/ETL-Yertl//blog/2015/01/11/release-v0.017.html">Release v0.017</a></h1>
+
                     <p class="tags">Tags:
-                        <a href="/ETL-Yertl/blog/tag/release/index.html" rel="tag">release</a>
+                        <a href="/ETL-Yertl//blog/tag/release/index.html" rel="tag">release</a>
                     </p>
+
                     <aside>
                         <p><time datetime="2015-01-11">
                             Posted on 2015-01-11
                         </time>
-                        by preaction</p>
+                            by preaction
+                        </p>
                     </aside>
+
                 </header>
+
                 <p>This release fixes a bunch of issues with <code>ysql</code>, and allows displaying of database
 configuration.</p>
 
 <p>Full changelog below:</p>
 
-                    <p><a href="/ETL-Yertl/blog/2015/01/11/release-v0.017.html#section-2">Continue reading Release v0.017...</a></p>
-            </article>
-            <article>
-                <header>
-                    <h1><a href="/ETL-Yertl/blog/2015/01/11/initial-release.html">Initial Release</a></h1>
-                    <p class="tags">Tags:
-                        <a href="/ETL-Yertl/blog/tag/release/index.html" rel="tag">release</a>
-                    </p>
-                    <aside>
-                        <p><time datetime="2015-01-11">
-                            Posted on 2015-01-11
-                        </time>
-                        by preaction</p>
-                    </aside>
-                </header>
-                <p>This is the first release with Yertl&#39;s new website! Yertl is an ETL (Extract,
-Transform, Load) for the shell, with tools designed to be quickly assembled
-together into useful ETL processes.</p>
 
-<p>This release includes:</p>
-
-<ul>
-<li>Convert to and from YAML, JSON, and CSV (yto and yfrom)</li>
-<li>Read/write to/from SQL databases (ysql)</li>
-<li>Simple mask-style filtering (ymask)</li>
-<li>The beginning of a rich transform language (yq)</li>
-</ul>
-
-<p>Future plans include:</p>
-
-<ul>
-<li>Job distribution using ZeroMQ send/receive</li>
-<li>Perl API for adding Yertl workflows to larger Perl scripts</li>
-<li>API for ORMs (DBIx::Class)</li>
-<li>API for document and key/value stores (MongoDB, Redis, Memcached)</li>
-<li>API for downloading and scraping data from websites (curl, Web::Query, Mojo::DOM)</li>
-<li>More options for filtering and transforming data (LINQ, XPath)</li>
-</ul>
-
-<p>See <a href="https://github.com/preaction/ETL-Yertl/labels/feature">the Github feature tickets</a>
-for more future plans.</p>
+                    <p><a href="/ETL-Yertl//blog/2015/01/11/release-v0.017.html#section-2">Continue reading Release v0.017...</a></p>
 
             </article>
         </main>
+
         <ul class="pager">
-            <li class="previous disabled">
-                <span>← Older</span>
+            <li class="prev">
+                <a class="button button-primary" href="/ETL-Yertl//blog/page-2.html" rel="next">
+                    ← Older
+                </a>
             </li>
-            <li class="next disabled">
-                <span>Newer →</span>
+            <li class="next">
+                <a class="button disabled" href="" rel="prev">
+                    Newer →
+                </a>
             </li>
         </ul>
+
     </div>
 
-    <div class="sidebar col-md-3">
+    <div class="three columns sidebar">
         
         <h1>Tags</h1>
         <ul class="list-inline">
-            <li><a href="/ETL-Yertl/blog/tag/release/index.html">release</a></li>
+            <li><a href="/ETL-Yertl//blog/tag/release/index.html">release</a></li>
         </ul>
         <h1>Feeds</h1>
         <ul class="list-inline">
             <li>
-                <a href="/ETL-Yertl/blog/index.atom" rel="alternate" type="application/atom+xml">
+                <a href="/ETL-Yertl//blog/index.atom" rel="alternate" type="application/atom+xml">
                     Atom
                 </a>
             </li>
             <li>
-                <a href="/ETL-Yertl/blog/index.rss" rel="alternate" type="application/rss+xml">
+                <a href="/ETL-Yertl//blog/index.rss" rel="alternate" type="application/rss+xml">
                     RSS
                 </a>
             </li>

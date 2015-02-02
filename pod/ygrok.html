@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="/ETL-Yertl//theme/css/normalize.css" rel="stylesheet">
+        <link href="/ETL-Yertl//theme/css/skeleton.css" rel="stylesheet">
+        <link href="/ETL-Yertl//theme/css/statocles-default.css" rel="stylesheet">
+        <title>Yertl</title>
+        
+    </head>
+    <body>
+        <header>
+            <nav class="navbar">
+                <div class="container">
+                    <a class="brand" href="/ETL-Yertl//">Yertl</a>
+                    <ul>
+                        <li>
+                            <a href="/ETL-Yertl//blog">Blog</a>
+                        </li>
+                        <li>
+                            <a href="/ETL-Yertl//pod">Docs</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl">Code</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl/issues">Bugs</a>
+                        </li>
+                        <li>
+                            <a href="http://metacpan.org/pod/ETL::Yertl">CPAN</a>
+                        </li>
+                        <li>
+                            <a href="https://chat.mibbit.com/?channel=%23yertl&amp;server=irc.perl.org">IRC</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+        </header>
+        <div class="main container">
+            <h1 id="NAME">NAME</h1>
+
+<p>ygrok - Build YAML by parsing lines of plain text</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    ygrok [-l|--loose] &lt;pattern&gt; [&lt;file&gt;...]
+    ygrok --pattern [&lt;pattern_name&gt; [&lt;pattern&gt;]]
+    yfrom -h|--help|--version</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This program takes lines of plain text and converts them into documents.</p>
+
+<h1 id="ARGUMENTS">ARGUMENTS</h1>
+
+<h2 id="pattern">pattern</h2>
+
+<p>The pattern to match with. Any line that does not match the pattern will be ignored.</p>
+
+<p>See the full documentation for pattern syntax.</p>
+
+<h2 id="file">file</h2>
+
+<p>A file to read. The special file &quot;-&quot; refers to STDIN. If no files are specified, read STDIN.</p>
+
+<h1 id="OPTIONS">OPTIONS</h1>
+
+<h2 id="l---loose">-l|--loose</h2>
+
+<p>Match anywhere in the line. Normally, the pattern must match the full line. Setting this allows the pattern to match anywhere in the line (but still only once).</p>
+
+<h2 id="pattern1">--pattern</h2>
+
+<p>View, add, and edit patterns. With no arguments, shows all the patterns. With <code>pattern_name</code>, shows the specific pattern or pattern category. With <code>pattern</code>, adds a custom pattern that can then be used in future patterns.</p>
+
+<pre><code>    # Show all patterns
+    ygrok --pattern
+
+    # Show all &quot;NET&quot; patterns
+    ygrok --pattern NET
+
+    # Show the &quot;NET.HOSTNAME&quot; pattern
+    ygrok --pattern NET.HOSTNAME
+
+    # Add a new pattern
+    ygrok --pattern HOSTS_LINE &#39;%{NET.HOSTNAME:host} %{NET.IPV4:ip}&#39;
+
+    # Use the new pattern
+    ygrok &#39;%{HOSTS_LINE}&#39; &lt; /etc/hosts</code></pre>
+
+<h2 id="h---help">-h | --help</h2>
+
+<p>Show this help document.</p>
+
+<h2 id="version">--version</h2>
+
+<p>Print the current ygrok and Perl versions.</p>
+
+<h1 id="PATTERNS">PATTERNS</h1>
+
+<p>A pattern is a match for the entire line, splitting the line into fields.</p>
+
+<p>A named ygrok match has the format: <code>%{PATTERN_NAME:field_name}</code>. The <code>PATTERN_NAME</code> is one of the available patterns, listed below. The <code>field_name</code> is the field to put the matched data.</p>
+
+<p>Additionally, the pattern is a Perl regular expression, so any regular expression syntax will work. Any named captures (<code>(?&lt;field_name&gt;PATTERN)</code>) will be part of the document.</p>
+
+<h2 id="BUILT-IN-PATTERNS">BUILT-IN PATTERNS</h2>
+
+<p>The built-in patterns are common patterns that are always available.</p>
+
+<dl>
+
+<dt>Simple Patterns</dt>
+<dd>
+
+<dl>
+
+<dt>WORD</dt>
+<dd>
+
+<p>A single word, <code>\b\w+\b</code>.</p>
+
+</dd>
+<dt>DATA</dt>
+<dd>
+
+<p>A non-slurpy section of data, <code>.*?</code>.</p>
+
+</dd>
+<dt>INT</dt>
+<dd>
+
+<p>An integer, positive or negative.</p>
+
+</dd>
+<dt>NUM</dt>
+<dd>
+
+<p>A floating-point number, positive or negative, with optional exponent.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt>Date/Time Patterns</dt>
+<dd>
+
+<dl>
+
+<dt>DATE.MONTH</dt>
+<dd>
+
+<p>A full or abbreviated month name for the &quot;C&quot; locale (January (Jan), February (Feb), etc...)</p>
+
+</dd>
+<dt>DATE.ISO8601</dt>
+<dd>
+
+<p>An ISO8601 date/time</p>
+
+</dd>
+<dt>DATE.HTTP</dt>
+<dd>
+
+<p>An RFC822 date/time, used by HTTP.</p>
+
+</dd>
+<dt>DATE.SYSLOG</dt>
+<dd>
+
+<p>A syslog date, like &quot;Jan 01 01:23:45&quot;</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt>Operating System Patterns</dt>
+<dd>
+
+<dl>
+
+<dt>OS.USER</dt>
+<dd>
+
+<p>A username.</p>
+
+</dd>
+<dt>OS.PROCNAME</dt>
+<dd>
+
+<p>A process name</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt>Networking Patterns</dt>
+<dd>
+
+<dl>
+
+<dt>NET.IPV4</dt>
+<dd>
+
+<p>An IPV4 address.</p>
+
+</dd>
+<dt>NET.HOSTNAME</dt>
+<dd>
+
+<p>A network host name. Either an RFC1101 domain or an IPv4 or IPv6 address.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt>URL Patterns</dt>
+<dd>
+
+<dl>
+
+<dt>URL</dt>
+<dd>
+
+<p>A full URL with scheme</p>
+
+</dd>
+<dt>URL.PATH</dt>
+<dd>
+
+<p>The path part of a URL</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt>Log File Patterns</dt>
+<dd>
+
+<dl>
+
+<dt>LOG.HTTP_COMMON</dt>
+<dd>
+
+<p>The Apache Common Log Format.</p>
+
+</dd>
+<dt>LOG.HTTP_COMBINED</dt>
+<dd>
+
+<p>The Apache Combined Log Format.</p>
+
+</dd>
+<dt>LOG.SYSLOG</dt>
+<dd>
+
+<p>The syslog format (RFC 3164)</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt>POSIX Command Output Patterns</dt>
+<dd>
+
+<dl>
+
+<dt>POSIX.LS</dt>
+<dd>
+
+<p>Parse the output of <code>ls -l</code></p>
+
+</dd>
+<dt>POSIX.PS</dt>
+<dd>
+
+<p>Parse the output of <code>ps</code></p>
+
+</dd>
+<dt>POSIX.PSX</dt>
+<dd>
+
+<p>Parse the output of <code>ps x</code> and <code>ps w</code></p>
+
+</dd>
+<dt>POSIX.PSU</dt>
+<dd>
+
+<p>Parse the output of <code>ps u</code></p>
+
+</dd>
+</dl>
+
+</dd>
+</dl>
+
+
+
+        </div>
+        <footer>
+            
+            <div class="container tagline">
+                <a href="http://preaction.github.io/Statocles">Made with Statocles</a><br>
+                <a href="http://www.perl.org">Powered by Perl</a>
+            </div>
+        </footer>
+    </body>
+</html>
