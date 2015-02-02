@@ -15,12 +15,15 @@ our %PATTERNS = (
     INT => $RE{num}{int}."",    # stringify to allow YAML serialization
 
     DATE => {
+        MONTH => '\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\b',
         ISO8601 => '\d{4}-?\d{2}-?\d{2}[T ]\d{2}:?\d{2}:?\d{2}(?:Z|[+-]\d{4})',
         HTTP => '\d{2}/\w{3}/\d{4}:\d{2}:\d{2}:\d{2} [+-]\d{4}',
+        SYSLOG => '%{DATE.MONTH} +\d{1,2} \d{1,2}:\d{1,2}:\d{1,2}',
     },
 
     OS => {
         USER => '[a-zA-Z0-9._-]+',
+        PROCNAME => '[\w._-]+',
     },
 
     NET => {
@@ -44,6 +47,13 @@ our %PATTERNS = (
         HTTP_COMBINED => join( " ",
             '%{LOG.HTTP_COMMON}',
             '"%{URL:referer}"', '"%{DATA:user_agent}"',
+        ),
+        SYSLOG => join( "",
+            '%{DATE.SYSLOG:timestamp} ',
+            '(?:<%{INT:facility}.%{INT:priority}> )?',
+            '%{NET.HOSTNAME:host} ',
+            '%{OS.PROCNAME:program}(?:\[%{INT:pid}\])?: ',
+            '%{DATA:text}',
         ),
     },
 

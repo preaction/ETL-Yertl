@@ -133,6 +133,11 @@ A floating-point number, positive or negative, with optional exponent.
 
 =over 4
 
+=item DATE.MONTH
+
+A full or abbreviated month name for the "C" locale (January (Jan), February
+(Feb), etc...)
+
 =item DATE.ISO8601
 
 An ISO8601 date/time
@@ -140,6 +145,10 @@ An ISO8601 date/time
 =item DATE.HTTP
 
 An RFC822 date/time, used by HTTP.
+
+=item DATE.SYSLOG
+
+A syslog date, like "Jan 01 01:23:45"
 
 =back
 
@@ -150,6 +159,10 @@ An RFC822 date/time, used by HTTP.
 =item OS.USER
 
 A username.
+
+=item OS.PROCNAME
+
+A process name
 
 =back
 
@@ -192,6 +205,10 @@ The Apache Common Log Format.
 =item LOG.HTTP_COMBINED
 
 The Apache Combined Log Format.
+
+=item LOG.SYSLOG
+
+The syslog format (RFC 3164)
 
 =back
 

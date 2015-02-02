@@ -68,9 +68,9 @@ subtest 'parse lines' => sub {
     test_ygrok( $file, $pattern, \@expect );
 };
 
-subtest 'http logs' => sub {
+subtest 'logs' => sub {
 
-    subtest 'common log format' => sub {
+    subtest 'http common log format' => sub {
         my $file = $SHARE_DIR->child( lines => 'http_common_log.txt' );
         my $pattern = join " ", '%{NET.HOSTNAME:remote_addr}', '%{OS.USER:ident}', '%{OS.USER:user}',
                                 '\[%{DATE.HTTP:timestamp}]',
@@ -132,7 +132,7 @@ subtest 'http logs' => sub {
         test_ygrok( $file, "%{LOG.HTTP_COMMON}", \@expect )
     };
 
-    subtest 'combined log format' => sub {
+    subtest 'http combined log format' => sub {
         my $file = $SHARE_DIR->child( lines => 'http_combined_log.txt' );
         my $pattern = join " ", '%{LOG.HTTP_COMMON}',
                                 '"%{URL:referer}"', '"%{DATA:user_agent}"',
@@ -198,6 +198,51 @@ subtest 'http logs' => sub {
 
         test_ygrok( $file, $pattern, \@expect );
         test_ygrok( $file, "%{LOG.HTTP_COMBINED}", \@expect )
+    };
+
+    subtest 'syslog' => sub {
+        my $file = $SHARE_DIR->child( lines => 'syslog.txt' );
+        my $pattern = join( "",
+            '(?<timestamp>%{DATE.MONTH} +\d{1,2} \d{1,2}:\d{1,2}:\d{1,2}) ',
+            '(?:[<]%{INT:facility}.%{INT:priority}[>] )?',
+            '%{NET.HOSTNAME:host} ',
+            '%{OS.PROCNAME:program}(?:\[%{INT:pid}\])?: ',
+            '%{DATA:text}',
+        );
+
+        my @expect = (
+            {
+                timestamp => 'Oct 17 08:59:00',
+                host => 'suod',
+                program => 'newsyslog',
+                pid => '6215',
+                text => 'logfile turned over',
+            },
+            {
+                timestamp => 'Oct 17 08:59:04',
+                host => 'cdr.cs.colorado.edu',
+                program => 'amd',
+                pid => '29648',
+                text => 'noconn option exists, and was turned on! (May cause NFS hangs on some systems...)',
+            },
+            {
+                timestamp => 'Oct 17 08:59:09',
+                host => 'freestuff.cs.colorado.edu',
+                program => 'ftpd',
+                pid => '4502',
+                text => 'FTP ACCESS REFUSED (anonymous password not rfc822) from sdn-ar-001nmalbuP302.dialsprint.net [168.191.180.168]',
+            },
+            {
+                timestamp => 'Oct 17 08:59:24',
+                host => 'peradam.cs.colorado.edu',
+                program => 'sendmail',
+                pid => '21601',
+                text => q{e9HExOW21601: SYSERR(root): Can't create transcript file ./xfe9HExOW21601: Permission denied},
+            },
+        );
+
+        test_ygrok( $file, $pattern, \@expect );
+        test_ygrok( $file, "%{LOG.SYSLOG}", \@expect )
     };
 
 };

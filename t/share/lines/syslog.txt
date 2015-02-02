@@ -1,0 +1,4 @@
+Oct 17 08:59:00 suod newsyslog[6215]: logfile turned over
+Oct 17 08:59:04 cdr.cs.colorado.edu amd[29648]: noconn option exists, and was turned on! (May cause NFS hangs on some systems...)
+Oct 17 08:59:09 freestuff.cs.colorado.edu ftpd[4502]: FTP ACCESS REFUSED (anonymous password not rfc822) from sdn-ar-001nmalbuP302.dialsprint.net [168.191.180.168]
+Oct 17 08:59:24 peradam.cs.colorado.edu sendmail[21601]: e9HExOW21601: SYSERR(root): Can't create transcript file ./xfe9HExOW21601: Permission denied
