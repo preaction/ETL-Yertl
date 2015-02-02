@@ -63,6 +63,7 @@ site:
                         - 'ysql'
                         - 'yq'
                         - 'ymask'
+                        - 'ygrok'
                     index_module: 'ETL::Yertl'
                     weave: 1
 
