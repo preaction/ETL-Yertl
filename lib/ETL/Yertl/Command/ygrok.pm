@@ -64,7 +64,7 @@ our %PATTERNS = (
             '%{OS.USER:owner}',
             '%{OS.USER:group}',
             '%{INT:bytes}',
-            '(?<modified>%{DATE.MONTH} +\d+ +\d+:\d+)',
+            '(?<modified>%{DATE.MONTH} +\d+ +\d+(?::\d+)?)',
             '%{DATA:name}',
         ),
     },

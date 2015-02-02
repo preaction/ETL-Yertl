@@ -257,7 +257,7 @@ subtest 'POSIX command parsing' => sub {
             '%{OS.USER:owner}',
             '%{OS.USER:group}',
             '%{INT:bytes}',
-            '(?<modified>%{DATE.MONTH} +\d+ +\d+:\d+)',
+            '(?<modified>%{DATE.MONTH} +\d+ +\d+(?::\d+)?)',
             '%{DATA:name}',
         );
 
@@ -295,7 +295,7 @@ subtest 'POSIX command parsing' => sub {
                 owner => 'doug',
                 group => 'staff',
                 bytes => 3654,
-                modified => 'Feb  1 00:07',
+                modified => 'Feb  1  2012',
                 name => 'dist.ini',
             },
         );
