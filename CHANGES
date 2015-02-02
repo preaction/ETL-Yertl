@@ -1,6 +1,14 @@
 Changelog for ETL-Yertl
 
-0.021 2015-02-02T05:20:13
+0.022 2015-02-02T05:51:12
+ - add guides to the site main page
+ - fix ysql synopsis missing -- before config option
+ - add site intro and fix links to internal docs
+ - fix link to Yertl on metacpan.org
+ - update statocles default theme
+ - add release v0.021 announcement
+
+0.021 2015-02-02T05:20:13Z
  - add ygrok to the Statocles-generated POD
  - add release v0.020 announcement
  - update statocles conf for new deploy system
