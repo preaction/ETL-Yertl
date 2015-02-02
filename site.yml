@@ -3,8 +3,14 @@ theme:
     args:
         store: site/theme
 
+gh_pages:
+    class: Statocles::Deploy::Git
+    args:
+        path: '.'
+        branch: gh-pages
+
 site:
-    class: Statocles::Site::Git
+    class: Statocles::Site
     args:
         title: Yertl
         base_url: http://preaction.github.io/ETL-Yertl/
@@ -23,8 +29,8 @@ site:
                 - title: IRC
                   href: 'https://chat.mibbit.com/?channel=%23yertl&server=irc.perl.org'
         build_store: 'site/_build'
-        deploy_store: '.'
-        deploy_branch: gh-pages
+        deploy:
+            $ref: gh_pages
         index: page
         theme:
             $ref: theme
