@@ -60,6 +60,9 @@ __END__
     $ yto csv work.yml
     $ yto json work.yml
 
+    # Parse HTTP logs into documents
+    $ ygrok '%{LOG.HTTP_COMMON}' httpd.log
+
     # Read data from a database
     $ ysql db_name 'SELECT * FROM employee'
 
@@ -114,6 +117,10 @@ Convert incoming data (CSV, JSON) to Yertl documents.
 =item L<yto>
 
 Convert Yertl documents into another format (CSV, JSON).
+
+=item L<ygrok>
+
+Parse lines of text into Yertl documents.
 
 =item L<ysql>
 
