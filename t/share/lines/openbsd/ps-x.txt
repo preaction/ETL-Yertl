@@ -1,0 +1,4 @@
+  PID TT  STAT       TIME COMMAND
+ 3713 ??  S       0:00.03 sshd: doug@ttyp0 (sshd)
+20045 p0  Ss      0:00.02 -ksh (ksh)
+ 4243 p0  R+      0:00.00 ps -x

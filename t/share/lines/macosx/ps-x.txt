@@ -1,0 +1,4 @@
+  PID   TT  STAT      TIME COMMAND
+  253   ??  Ss     0:00.07 /System/Library/Frameworks/QTKit.framework/Versions/A/XPCServices/com.apple.qtkitserver.xpc/Contents/MacOS/com.apple.qtkitserver
+  298   ??  S      0:21.06 /usr/libexec/UserEventAgent (Aqua)
+  300   ??  S      0:39.88 /usr/sbin/distnoted agent

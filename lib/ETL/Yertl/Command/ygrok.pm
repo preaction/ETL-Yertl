@@ -67,6 +67,43 @@ our %PATTERNS = (
             '(?<modified>%{DATE.MONTH} +\d+ +\d+(?::\d+)?)',
             '%{DATA:name}',
         ),
+
+        # -- Mac OSX
+        #       TTY field starts with "tty"
+        #       No STAT field
+        # -- OpenBSD
+        #       STAT field
+        PS => join( " +",
+            ' *%{INT:pid}',
+            '(?<tty>[\w?]+)',
+            '(?<status>(?:[\w+]+))?',
+            '(?<time>\d+:\d+[:.]\d+)',
+            '%{DATA:command}',
+        ),
+
+        # Mac OSX and OpenBSD are the same
+        PSU => join ( " +",
+            '%{OS.USER:user}',
+            '%{INT:pid}',
+            '%{NUM:cpu}',
+            '%{NUM:mem}',
+            '%{INT:vsz}',
+            '%{INT:rss}',
+            '(?<tty>[\w?]+)',
+            '(?<status>(?:[\w+]+))?',
+            '(?<started>[\w:]+)',
+            '(?<time>\d+:\d+[:.]\d+)',
+            '%{DATA:command}',
+        ),
+
+        # Max OSX and OpenBSD are the same
+        PSX => join ( " +",
+            ' *%{INT:pid}',
+            '(?<tty>[\w?]+)',
+            '(?<status>(?:[\w+]+))',
+            '(?<time>\d+:\d+[:.]\d+)',
+            '%{DATA:command}',
+        ),
     },
 
 );

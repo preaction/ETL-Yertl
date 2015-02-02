@@ -304,6 +304,217 @@ subtest 'POSIX command parsing' => sub {
         test_ygrok( $file, "%{POSIX.LS}", \@expect )
     };
 
+    subtest 'ps' => sub {
+        my $pattern = join( " +",
+            ' *%{INT:pid}',
+            '(?<tty>[\w?]+)',
+            '(?<status>(?:[\w+]+))?',
+            '(?<time>\d+:\d+[:.]\d+)',
+            '%{DATA:command}',
+        );
+
+        subtest 'Mac OSX' => sub {
+            my $file = $SHARE_DIR->child( lines => macosx => 'ps.txt' ),
+            my @expect = (
+                {
+                    pid => 20045,
+                    tty => 'ttys000',
+                    time => '0:00.01',
+                    command => '-ksh (ksh)',
+                },
+                {
+                    pid => 2643,
+                    tty => 'ttys001',
+                    time => '0:00.01',
+                    command => 'ps',
+                },
+            );
+
+            test_ygrok( $file, $pattern, \@expect );
+            test_ygrok( $file, "%{POSIX.PS}", \@expect )
+        };
+
+        subtest 'OpenBSD' => sub {
+            my $file = $SHARE_DIR->child( lines => openbsd => 'ps.txt' ),
+            my @expect = (
+                {
+                    pid => 20045,
+                    tty => 'p0',
+                    status => 'Ss',
+                    time => '0:00.01',
+                    command => '-ksh (ksh)',
+                },
+                {
+                    pid => 2643,
+                    tty => 'p0',
+                    status => 'R+',
+                    time => '0:00.01',
+                    command => 'ps',
+                },
+            );
+
+            test_ygrok( $file, $pattern, \@expect );
+            test_ygrok( $file, "%{POSIX.PS}", \@expect )
+        };
+
+    };
+
+    subtest 'ps -x' => sub {
+        my $pattern = join( " +",
+            ' *%{INT:pid}',
+            '(?<tty>[\w?]+)',
+            '(?<status>(?:[\w+]+))',
+            '(?<time>\d+:\d+[:.]\d+)',
+            '%{DATA:command}',
+        );
+
+        subtest 'Mac OSX' => sub {
+            my $file = $SHARE_DIR->child( lines => macosx => 'ps-x.txt' ),
+            my @expect = (
+                {
+                    pid => 253,
+                    tty => '??',
+                    status => 'Ss',
+                    time => '0:00.07',
+                    command => '/System/Library/Frameworks/QTKit.framework/Versions/A/XPCServices/com.apple.qtkitserver.xpc/Contents/MacOS/com.apple.qtkitserver',
+                },
+                {
+                    pid => 298,
+                    tty => '??',
+                    status => 'S',
+                    time => '0:21.06',
+                    command => '/usr/libexec/UserEventAgent (Aqua)',
+                },
+                {
+                    pid => 300,
+                    tty => '??',
+                    status => 'S',
+                    time => '0:39.88',
+                    command => '/usr/sbin/distnoted agent',
+                },
+            );
+
+            test_ygrok( $file, $pattern, \@expect );
+            test_ygrok( $file, "%{POSIX.PSX}", \@expect )
+        };
+
+        subtest 'OpenBSD' => sub {
+            my $file = $SHARE_DIR->child( lines => openbsd => 'ps-x.txt' ),
+            my @expect = (
+                {
+                    pid => 3713,
+                    tty => '??',
+                    status => 'S',
+                    time => '0:00.03',
+                    command => 'sshd: doug@ttyp0 (sshd)',
+                },
+                {
+                    pid => 20045,
+                    tty => 'p0',
+                    status => 'Ss',
+                    time => '0:00.02',
+                    command => '-ksh (ksh)',
+                },
+                {
+                    pid => 4243,
+                    tty => 'p0',
+                    status => 'R+',
+                    time => '0:00.00',
+                    command => 'ps -x',
+                },
+            );
+
+            test_ygrok( $file, $pattern, \@expect );
+            test_ygrok( $file, "%{POSIX.PSX}", \@expect )
+        };
+    };
+
+    subtest 'ps -u' => sub {
+        my $pattern = join( " +",
+            '%{OS.USER:user}',
+            '%{INT:pid}',
+            '%{NUM:cpu}',
+            '%{NUM:mem}',
+            '%{INT:vsz}',
+            '%{INT:rss}',
+            '(?<tty>[\w?]+)',
+            '(?<status>(?:[\w+]+))?',
+            '(?<started>[\w:]+)',
+            '(?<time>\d+:\d+[:.]\d+)',
+            '%{DATA:command}',
+        );
+
+        subtest 'Mac OSX' => sub {
+            my $file = $SHARE_DIR->child( lines => macosx => 'ps-u.txt' ),
+            my @expect = (
+                {
+                    user => 'doug',
+                    pid => 617,
+                    cpu => '0.0',
+                    mem => 0.1,
+                    vsz => 2499620,
+                    rss => 5432,
+                    tty => 's001',
+                    status => 'Ss',
+                    started => 'Sat12PM',
+                    time => '0:01.92',
+                    command => '-zsh',
+                },
+                {
+                    user => 'doug',
+                    pid => 7201,
+                    cpu => '0.0',
+                    mem => 0.1,
+                    vsz => 2500644,
+                    rss => 7404,
+                    tty => 's004',
+                    status => 'Ss',
+                    started => 'Sat07PM',
+                    time => '0:05.37',
+                    command => '-zsh',
+                },
+            );
+
+            test_ygrok( $file, $pattern, \@expect );
+            test_ygrok( $file, "%{POSIX.PSU}", \@expect )
+        };
+
+        subtest 'OpenBSD' => sub {
+            my $file = $SHARE_DIR->child( lines => openbsd => 'ps-u.txt' ),
+            my @expect = (
+                {
+                    user => 'doug',
+                    pid => 20045,
+                    cpu => '0.0',
+                    mem => '0.0',
+                    vsz => 680,
+                    rss => 492,
+                    tty => 'p0',
+                    status => 'Rs',
+                    started => '2:28PM',
+                    time => '0:00.01',
+                    command => '-ksh (ksh)',
+                },
+                {
+                    user => 'doug',
+                    pid => 27069,
+                    cpu => '0.0',
+                    mem => '0.0',
+                    vsz => 344,
+                    rss => 248,
+                    tty => 'p0',
+                    status => 'R+',
+                    started => '2:28PM',
+                    time => '0:00.00',
+                    command => 'ps -u',
+                },
+            );
+
+            test_ygrok( $file, $pattern, \@expect );
+            test_ygrok( $file, "%{POSIX.PSU}", \@expect )
+        };
+
+    };
 };
 
 subtest 'manage patterns' => sub {

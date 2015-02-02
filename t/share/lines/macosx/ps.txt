@@ -1,0 +1,3 @@
+  PID TTY           TIME CMD
+20045 ttys000    0:00.01 -ksh (ksh)
+ 2643 ttys001    0:00.01 ps

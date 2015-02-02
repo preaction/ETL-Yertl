@@ -1,0 +1,3 @@
+  PID TT  STAT       TIME COMMAND
+20045 p0  Ss      0:00.01 -ksh (ksh)
+ 2643 p0  R+      0:00.01 ps

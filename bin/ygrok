@@ -220,6 +220,18 @@ The syslog format (RFC 3164)
 
 Parse the output of C<ls -l>
 
+=item POSIX.PS
+
+Parse the output of C<ps>
+
+=item POSIX.PSX
+
+Parse the output of C<ps x> and C<ps w>
+
+=item POSIX.PSU
+
+Parse the output of C<ps u>
+
 =back
 
 =back
