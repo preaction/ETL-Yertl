@@ -247,6 +247,65 @@ subtest 'logs' => sub {
 
 };
 
+subtest 'POSIX command parsing' => sub {
+
+    subtest 'ls -l' => sub {
+        my $file = $SHARE_DIR->child( lines => 'ls-l.txt' );
+        my $pattern = join( " +",
+            '(?<mode>[bcdlsp-][rwxSsTt-]{9})',
+            '%{INT:links}',
+            '%{OS.USER:owner}',
+            '%{OS.USER:group}',
+            '%{INT:bytes}',
+            '(?<modified>%{DATE.MONTH} +\d+ +\d+:\d+)',
+            '%{DATA:name}',
+        );
+
+        my @expect = (
+            {
+                mode => 'drwxr-xr-x',
+                links => 15,
+                owner => 'doug',
+                group => 'staff',
+                bytes => 510,
+                modified => 'Jan 28 19:37',
+                name => 'ETL-Yertl-0.021',
+            },
+            {
+                mode => '-rw-r--r--',
+                links => 1,
+                owner => 'doug',
+                group => 'staff',
+                bytes => 43666,
+                modified => 'Jan 28 19:37',
+                name => 'ETL-Yertl-0.021.tar.gz',
+            },
+            {
+                mode => 'drwxr-xr-x',
+                links => 9,
+                owner => 'doug',
+                group => 'staff',
+                bytes => 306,
+                modified => 'Feb  1 19:44',
+                name => 'bin',
+            },
+            {
+                mode => '-rw-r--r--',
+                links => 1,
+                owner => 'doug',
+                group => 'staff',
+                bytes => 3654,
+                modified => 'Feb  1 00:07',
+                name => 'dist.ini',
+            },
+        );
+
+        test_ygrok( $file, $pattern, \@expect );
+        test_ygrok( $file, "%{POSIX.LS}", \@expect )
+    };
+
+};
+
 subtest 'manage patterns' => sub {
 
     my $test_conf = sub {

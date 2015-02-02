@@ -212,5 +212,15 @@ The syslog format (RFC 3164)
 
 =back
 
+=item POSIX Command Output Patterns
+
+=over 4
+
+=item POSIX.LS
+
+Parse the output of C<ls -l>
+
+=back
+
 =back
 

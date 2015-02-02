@@ -57,6 +57,18 @@ our %PATTERNS = (
         ),
     },
 
+    POSIX => {
+        LS => join( " +",
+            '(?<mode>[bcdlsp-][rwxSsTt-]{9})',
+            '%{INT:links}',
+            '%{OS.USER:owner}',
+            '%{OS.USER:group}',
+            '%{INT:bytes}',
+            '(?<modified>%{DATE.MONTH} +\d+ +\d+:\d+)',
+            '%{DATA:name}',
+        ),
+    },
+
 );
 
 sub main {
