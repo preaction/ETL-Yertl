@@ -19,7 +19,7 @@ my %module_build_args = (
     "Doug Bell <preaction\@cpan.org>"
   ],
   "dist_name" => "ETL-Yertl",
-  "dist_version" => "0.020",
+  "dist_version" => "0.021",
   "license" => "perl",
   "module_name" => "ETL::Yertl",
   "recommends" => {
@@ -38,6 +38,7 @@ my %module_build_args = (
     "File::HomeDir" => 0,
     "File::Spec" => 0,
     "Getopt::Long" => "2.36",
+    "Hash::Merge::Simple" => 0,
     "Import::Base" => "0.010",
     "List::Util" => "1.29",
     "Module::Runtime" => 0,

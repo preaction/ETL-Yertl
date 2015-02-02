@@ -36,6 +36,7 @@ my %WriteMakefileArgs = (
     "File::HomeDir" => 0,
     "File::Spec" => 0,
     "Getopt::Long" => "2.36",
+    "Hash::Merge::Simple" => 0,
     "Import::Base" => "0.010",
     "List::Util" => "1.29",
     "Module::Runtime" => 0,
@@ -63,7 +64,7 @@ my %WriteMakefileArgs = (
     "Test::Lib" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "0.020",
+  "VERSION" => "0.021",
   "test" => {
     "TESTS" => "t/*.t t/bin/*.t t/command/yq/*.t t/format/*.t"
   }
@@ -78,6 +79,7 @@ my %FallbackPrereqs = (
   "File::HomeDir" => 0,
   "File::Spec" => 0,
   "Getopt::Long" => "2.36",
+  "Hash::Merge::Simple" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Import::Base" => "0.010",

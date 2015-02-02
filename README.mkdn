@@ -4,7 +4,7 @@ ETL::Yertl - ETL with a Shell
 
 # VERSION
 
-version 0.020
+version 0.021
 
 # STATUS
 
@@ -24,11 +24,14 @@ version 0.020
     $ yto csv work.yml
     $ yto json work.yml
 
+    # Parse HTTP logs into documents
+    $ ygrok '%{LOG.HTTP_COMMON}' httpd.log
+
     # Read data from a database
-    $ ysql query devdb 'SELECT * FROM employee'
+    $ ysql db_name 'SELECT * FROM employee'
 
     # Write data to a database
-    $ ysql query devdb 'INSERT INTO employee ( id, name ) VALUES ( $.id, $.name )'
+    $ ysql db_name 'INSERT INTO employee ( id, name ) VALUES ( $.id, $.name )'
 
     ### In Perl...
     use ETL::Yertl;
@@ -65,6 +68,10 @@ Yertl will have tools for:
 
     Convert Yertl documents into another format (CSV, JSON).
 
+- [ygrok](https://metacpan.org/pod/ygrok)
+
+    Parse lines of text into Yertl documents.
+
 - [ysql](https://metacpan.org/pod/ysql)
 
     Read/write documents from SQL databases.
@@ -89,10 +96,6 @@ Here are some other tools that can be used with Yertl
 # AUTHOR
 
 Doug Bell <preaction@cpan.org>
-
-# CONTRIBUTOR
-
-Doug Bell <preaction@users.noreply.github.com>
 
 # COPYRIGHT AND LICENSE
 

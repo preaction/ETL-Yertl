@@ -1,6 +1,30 @@
 Changelog for ETL-Yertl
 
-0.020 2015-01-28T04:42:06
+0.021 2015-02-02T05:20:13
+ - add ygrok to the Statocles-generated POD
+ - add release v0.020 announcement
+ - update statocles conf for new deploy system
+ - add --loose flag to ygrok to match partial lines
+ - add ygrok patterns for ps, ps u, and ps x
+ - allow really old files in ls -l ygrok parsing
+ - add ygrok pattern for POSIX `ls -l`
+ - add ygrok to the main page synopsis
+ - add syslog pattern to ygrok
+ - simplify "DATETIME" to just "DATE" in ygrok
+ - allow adding, editing, and listing ygrok patterns
+ - fix multiply-nested patterns
+ - document all existing ygrok patterns
+ - add pattern categories to ygrok
+ - add ysql help guide
+ - remove need for "query" when using ysql
+ - add combined log format pattern for grok
+ - add missing test collateral
+ - allow recursive grok patterns
+ - add ygrok patterns to parse http common log format
+ - fix warnings when an unknown grok pattern is used
+ - fix spurious contributor
+
+0.020 2015-01-28T04:42:06Z
  - add short descriptions of all the Yertl tools
  - add ysql to main page synopsis
  - add links to yertl homepage

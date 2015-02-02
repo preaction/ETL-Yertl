@@ -2,6 +2,7 @@ requires "Data::Partial::Google" => "0";
 requires "File::HomeDir" => "0";
 requires "File::Spec" => "0";
 requires "Getopt::Long" => "2.36";
+requires "Hash::Merge::Simple" => "0";
 requires "Import::Base" => "0.010";
 requires "List::Util" => "1.29";
 requires "Module::Runtime" => "0";
