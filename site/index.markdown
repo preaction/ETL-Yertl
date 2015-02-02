@@ -14,7 +14,15 @@ Install the latest version of Yertl from CPAN.
 
     cpan ETL::Yertl
 
-Check out the documentation for the Yertl commands:
+## Documentation
+
+Check out the documentation for Yertl:
+
+### Guides
+
+Completely new to Yertl? Start here with the guides:
+
+* [ysql - Work with SQL databases](/pod/ETL/Yertl/Help/ysql.html)
 
 ### Input/Output
 

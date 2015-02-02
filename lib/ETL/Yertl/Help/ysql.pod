@@ -114,3 +114,18 @@ the C<--save E<lt>nameE<gt>> option:
 Then we can recall our query by the name we gave to the C<--save> option:
 
     $ ysql prod users | ysql dev update_users
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<ysql>
+
+The full documentation for the C<ysql> command
+
+=item L<ETL::Yertl>
+
+The main documentation
+
+=back
+
