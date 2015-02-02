@@ -25,7 +25,7 @@ site:
                 - title: Bugs
                   href: 'http://github.com/preaction/ETL-Yertl/issues'
                 - title: CPAN
-                  href: 'http://metacpan.org/pod/ETL-Yertl'
+                  href: 'http://metacpan.org/pod/ETL::Yertl'
                 - title: IRC
                   href: 'https://chat.mibbit.com/?channel=%23yertl&server=irc.perl.org'
         build_store: 'site/_build'
