@@ -17,10 +17,12 @@ subtest 'error checking' => sub {
 };
 
 sub test_ygrok {
-    my ( $file, $pattern, $expect ) = @_;
+    my ( $file, $pattern, $expect, $args ) = @_;
+
+    $args ||= [];
 
     subtest 'filename' => sub {
-        my ( $stdout, $stderr, $exit ) = capture { ygrok->main( $pattern, $file ) };
+        my ( $stdout, $stderr, $exit ) = capture { ygrok->main( @$args, $pattern, $file ) };
         is $exit, 0, 'exit 0';
         ok !$stderr, 'nothing on stderr' or diag $stderr;
         open my $fh, '<', \$stdout;
@@ -31,7 +33,7 @@ sub test_ygrok {
 
     subtest 'stdin' => sub {
         local *STDIN = $file->openr;
-        my ( $stdout, $stderr, $exit ) = capture { ygrok->main( $pattern ) };
+        my ( $stdout, $stderr, $exit ) = capture { ygrok->main( @$args, $pattern ) };
         is $exit, 0, 'exit 0';
         ok !$stderr, 'nothing on stderr' or diag $stderr;
         open my $fh, '<', \$stdout;
@@ -66,6 +68,25 @@ subtest 'parse lines' => sub {
     );
 
     test_ygrok( $file, $pattern, \@expect );
+
+    subtest 'loose parsing' => sub {
+        my $file = $SHARE_DIR->child( lines => 'irc.txt' );
+        my $pattern = '> %{DATA:text}$';
+        my @expect = (
+            {
+                text => 'Hello, world!',
+            },
+            {
+                text => 'Hello, preaction!',
+            },
+            {
+                text => 'Hello, jberger!',
+            },
+        );
+
+        test_ygrok( $file, $pattern, \@expect, [ '-l' ] );
+    };
+
 };
 
 subtest 'logs' => sub {

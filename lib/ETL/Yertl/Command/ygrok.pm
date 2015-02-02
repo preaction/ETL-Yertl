@@ -119,6 +119,7 @@ sub main {
     my @args = @_;
     GetOptionsFromArray( \@args, \%opt,
         'pattern',
+        'loose',
     );
 
     # Manage patterns
@@ -163,6 +164,9 @@ sub main {
     die "Must give a pattern\n" unless $pattern;
 
     my $re = $class->parse_pattern( $pattern );
+    if ( !$opt{loose} ) {
+        $re = qr{^$re$};
+    }
 
     my $out_formatter = ETL::Yertl::Format::yaml->new;
     push @files, "-" unless @files;
@@ -183,7 +187,7 @@ sub main {
 
         while ( my $line = <$fh> ) {
             #; say STDERR "$line =~ $re";
-            if ( $line =~ /^$re$/ ) {
+            if ( $line =~ $re ) {
                 print $out_formatter->write( { %+ } );
             }
         }

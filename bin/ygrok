@@ -13,6 +13,7 @@ sub main {
     my ( $class, @argv ) = @_;
     my %opt;
     GetOptionsFromArray( \@argv, \%opt,
+        'loose|l',
         'help|h',
         'version',
     );
@@ -37,7 +38,7 @@ __END__
 
 =head1 SYNOPSIS
 
-    ygrok <pattern> [<file>...]
+    ygrok [-l|--loose] <pattern> [<file>...]
     ygrok --pattern [<pattern_name> [<pattern>]]
     yfrom -h|--help|--version
 
@@ -59,6 +60,11 @@ A file to read. The special file "-" refers to STDIN. If no files are
 specified, read STDIN.
 
 =head1 OPTIONS
+
+=head2 -l|--loose
+
+Match anywhere in the line. Normally, the pattern must match the full line.
+Setting this allows the pattern to match anywhere in the line (but still only once).
 
 =head2 --pattern
 
