@@ -47,10 +47,10 @@ __END__
 
     ysql <db_name> --save <query_name> <query>
 
-    ysql config <db_name> [--driver <driver>] [--database <database] [--host <host>]
+    ysql --config <db_name> [--driver <driver>] [--database <database] [--host <host>]
         [--port <port>] [--user <user>] [--password <password>]
-    ysql config <db_name> [--dsn] <dsn> [--user <user>] [--password <password>]
-    ysql config [<db_name>]
+    ysql --config <db_name> [--dsn] <dsn> [--user <user>] [--password <password>]
+    ysql --config [<db_name>]
 
     ysql -h|--help|--version
 
