@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>http://preaction.github.io/ETL-Yertl/blog/tag/release/index.html</id>
+    <id>http://preaction.github.io/ETL-Yertl/blog/tag/release</id>
     <title>Yertl</title>
-    <updated>2015-02-01T23:52:59Z</updated>
+    <updated>2015-02-10T23:55:30Z</updated>
     <link href="http://preaction.github.io/ETL-Yertl/blog/tag/release.atom" rel="self" />
-    <link href="http://preaction.github.io/ETL-Yertl/blog/tag/release/index.html" rel="alternate" />
+    <link href="http://preaction.github.io/ETL-Yertl/blog/tag/release" rel="alternate" />
     <generator version="0.035">Statocles</generator>
     <entry>
         <id>http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.022.html</id>
@@ -17,11 +17,11 @@
 
                 <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.022.html#section-2">Continue reading...</a></p>
             <p>Tags:
-                <a href="/blog/tag/release/index.html">release</a>
+                <a href="/blog/tag/release">release</a>
             </p>
         ]]></content>
         <updated>2015-02-01T00:00:00Z</updated>
-        <category term="Statocles::Link=HASH(0x7fc41f53b688)" />
+        <category term="release" />
     </entry>
     <entry>
         <id>http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.021.html</id>
@@ -50,11 +50,11 @@ patterns to the Yertl core.</p>
 
                 <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.021.html#section-2">Continue reading...</a></p>
             <p>Tags:
-                <a href="/blog/tag/release/index.html">release</a>
+                <a href="/blog/tag/release">release</a>
             </p>
         ]]></content>
         <updated>2015-02-01T00:00:00Z</updated>
-        <category term="Statocles::Link=HASH(0x7fc41f53b298)" />
+        <category term="release" />
     </entry>
     <entry>
         <id>http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.020.html</id>
@@ -75,11 +75,11 @@ with <code>yto</code>.</p>
 
                 <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.020.html#section-2">Continue reading...</a></p>
             <p>Tags:
-                <a href="/blog/tag/release/index.html">release</a>
+                <a href="/blog/tag/release">release</a>
             </p>
         ]]></content>
         <updated>2015-02-01T00:00:00Z</updated>
-        <category term="Statocles::Link=HASH(0x7fc41b7bc228)" />
+        <category term="release" />
     </entry>
     <entry>
         <id>http://preaction.github.io/ETL-Yertl/blog/2015/01/21/release-v0.019.html</id>
@@ -98,11 +98,11 @@ else write's YAML with their ID in it.</p>
 
                 <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/01/21/release-v0.019.html#section-2">Continue reading...</a></p>
             <p>Tags:
-                <a href="/blog/tag/release/index.html">release</a>
+                <a href="/blog/tag/release">release</a>
             </p>
         ]]></content>
         <updated>2015-01-21T00:00:00Z</updated>
-        <category term="Statocles::Link=HASH(0x7fc41f533558)" />
+        <category term="release" />
     </entry>
     <entry>
         <id>http://preaction.github.io/ETL-Yertl/blog/2015/01/11/release-v0.017.html</id>
@@ -117,11 +117,11 @@ configuration.</p>
 
                 <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/01/11/release-v0.017.html#section-2">Continue reading...</a></p>
             <p>Tags:
-                <a href="/blog/tag/release/index.html">release</a>
+                <a href="/blog/tag/release">release</a>
             </p>
         ]]></content>
         <updated>2015-01-11T00:00:00Z</updated>
-        <category term="Statocles::Link=HASH(0x7fc41f0fbe20)" />
+        <category term="release" />
     </entry>
 </feed>
 

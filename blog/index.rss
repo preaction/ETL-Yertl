@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>Yertl</title>
-        <link>http://preaction.github.io/ETL-Yertl/blog/index.html</link>
+        <link>http://preaction.github.io/ETL-Yertl/blog</link>
         <atom:link href="http://preaction.github.io/ETL-Yertl/blog/index.rss" rel="self" type="application/rss+xml" />
         <description>Blog feed of Yertl</description>
         <generator>Statocles 0.035</generator>
@@ -17,11 +17,11 @@
 
                     <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.022.html#section-2">Continue reading...</a></p>
                 <p>Tags:
-                    <a href="/blog/tag/release/index.html">release</a>
+                    <a href="/blog/tag/release">release</a>
                 </p>
             ]]></description>
             <pubDate>
-                Sun, 01 Feb 2015 00:00:00 -0600
+                Sun, 01 Feb 2015 00:00:00 +0000
             </pubDate>
         </item>
         <item>
@@ -51,11 +51,11 @@ patterns to the Yertl core.</p>
 
                     <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.021.html#section-2">Continue reading...</a></p>
                 <p>Tags:
-                    <a href="/blog/tag/release/index.html">release</a>
+                    <a href="/blog/tag/release">release</a>
                 </p>
             ]]></description>
             <pubDate>
-                Sun, 01 Feb 2015 00:00:00 -0600
+                Sun, 01 Feb 2015 00:00:00 +0000
             </pubDate>
         </item>
         <item>
@@ -77,11 +77,11 @@ with <code>yto</code>.</p>
 
                     <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.020.html#section-2">Continue reading...</a></p>
                 <p>Tags:
-                    <a href="/blog/tag/release/index.html">release</a>
+                    <a href="/blog/tag/release">release</a>
                 </p>
             ]]></description>
             <pubDate>
-                Sun, 01 Feb 2015 00:00:00 -0600
+                Sun, 01 Feb 2015 00:00:00 +0000
             </pubDate>
         </item>
         <item>
@@ -101,11 +101,11 @@ else write's YAML with their ID in it.</p>
 
                     <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/01/21/release-v0.019.html#section-2">Continue reading...</a></p>
                 <p>Tags:
-                    <a href="/blog/tag/release/index.html">release</a>
+                    <a href="/blog/tag/release">release</a>
                 </p>
             ]]></description>
             <pubDate>
-                Wed, 21 Jan 2015 00:00:00 -0600
+                Wed, 21 Jan 2015 00:00:00 +0000
             </pubDate>
         </item>
         <item>
@@ -120,11 +120,11 @@ configuration.</p>
 
                     <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/01/11/release-v0.017.html#section-2">Continue reading...</a></p>
                 <p>Tags:
-                    <a href="/blog/tag/release/index.html">release</a>
+                    <a href="/blog/tag/release">release</a>
                 </p>
             ]]></description>
             <pubDate>
-                Sun, 11 Jan 2015 00:00:00 -0600
+                Sun, 11 Jan 2015 00:00:00 +0000
             </pubDate>
         </item>
     </channel>
