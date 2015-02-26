@@ -67,7 +67,8 @@ subtest 'finish() gets called' => sub {
     my $filter = 'group_by( .foo )';
     my ( $output, $stderr ) = capture { yq->main( $filter ) };
     ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
-    my @got = YAML::Load( $output );
+    open my $out_fh, '<', \$output;
+    my @got = ETL::Yertl::Format::yaml->new( input => $out_fh )->read;
 
     cmp_deeply \@got, [
         {
@@ -88,7 +89,7 @@ subtest 'finish() gets called' => sub {
                 },
             ],
         },
-    ];
+    ] or diag explain \@got;
 };
 
 subtest 'version check' => sub {

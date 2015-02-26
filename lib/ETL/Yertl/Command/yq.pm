@@ -2,7 +2,7 @@ package ETL::Yertl::Command::yq;
 # ABSTRACT: Filter and construct documents using a mini-language
 
 use ETL::Yertl;
-use YAML;
+use ETL::Yertl::Format::yaml;
 use boolean qw( :all );
 use Module::Runtime qw( use_module );
 our $VERBOSE = $ENV{YERTL_VERBOSE} // 0;
@@ -38,22 +38,10 @@ sub main {
             }
         }
 
-        my $buffer;
+        my $in_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
         my $scope = {};
-        while ( my $line = <$fh> ) {
-            # --- is the start of a new document
-            if ( $buffer && $line =~ /^---/ ) {
-                # Flush the previous document
-                my @output = $class->filter( $filter, YAML::Load( $buffer ), $scope );
-                $class->write( @output );
-                $buffer = '';
-            }
-            $buffer .= $line;
-        }
-        # Flush the buffer in the case of a single document with no ---
-        if ( $buffer =~ /\S/ ) {
-            #print STDERR "Buffer is: $buffer\n";
-            my @output = $class->filter( $filter, YAML::Load( $buffer ), $scope );
+        for my $doc ( $in_fmt->read ) {
+            my @output = $class->filter( $filter, $doc, $scope );
             $class->write( @output );
         }
 
@@ -64,16 +52,17 @@ sub main {
 
 sub write {
     my ( $class, @docs ) = @_;
+    my $out_fmt = ETL::Yertl::Format::yaml->new;
     for my $doc ( @docs ) {
         next if is_empty( $doc );
         if ( isTrue( $doc ) ) {
-            print YAML::Dump( "true" );
+            print $out_fmt->write( "true" );
         }
         elsif ( isFalse( $doc ) ) {
-            print YAML::Dump( "false" );
+            print $out_fmt->write( "false" );
         }
         else {
-            print YAML::Dump( $doc );
+            print $out_fmt->write( $doc );
         }
     }
 }
