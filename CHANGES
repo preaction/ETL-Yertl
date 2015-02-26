@@ -1,6 +1,12 @@
 Changelog for ETL-Yertl
 
-0.022 2015-02-02T05:51:12
+0.023 2015-02-26T18:35:35
+ - make yq use formatter modules
+ - update statocles theme from latest release
+ - update site theme for new statocles default theme
+ - add release v0.022 announcement
+
+0.022 2015-02-02T05:51:12Z
  - add guides to the site main page
  - fix ysql synopsis missing -- before config option
  - add site intro and fix links to internal docs
