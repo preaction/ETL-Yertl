@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="/ETL-Yertl//theme/css/normalize.css" rel="stylesheet">
+        <link href="/ETL-Yertl//theme/css/skeleton.css" rel="stylesheet">
+        <link href="/ETL-Yertl//theme/css/statocles-default.css" rel="stylesheet">
+        <title>Yertl</title>
+        
+    </head>
+    <body>
+        <header>
+            <nav class="navbar">
+                <div class="container">
+                    <a class="brand" href="/ETL-Yertl//">Yertl</a>
+                    <ul>
+                        <li>
+                            <a href="/ETL-Yertl//blog">Blog</a>
+                        </li>
+                        <li>
+                            <a href="/ETL-Yertl//pod">Docs</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl">Code</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl/issues">Bugs</a>
+                        </li>
+                        <li>
+                            <a href="http://metacpan.org/pod/ETL::Yertl">CPAN</a>
+                        </li>
+                        <li>
+                            <a href="https://chat.mibbit.com/?channel=%23yertl&amp;server=irc.perl.org">IRC</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+        </header>
+        <div class="main container">
+            <div class="row">
+
+    <div class="nine columns">
+        <main>
+            <header>
+                <h1>Release v0.023</h1>
+                <p class="tags">Tags:
+                    <a href="/ETL-Yertl//blog/tag/release" rel="tag">release</a>
+                </p>
+                <aside>
+                    <p><time datetime="2015-02-26">
+                        Posted on 2015-02-26
+                    </time>
+                    </p>
+                </aside>
+            </header>
+            <section id="section-1">
+                <p>A quick release to fix a bug in <code>yq</code> that would cause a confusing error. Since <code>yq</code>
+was using YAML exclusively, but other commands were using other YAML modules, there
+was a possibility for one command to write output that another command could not
+parse.</p>
+
+<p>Now this is fixed and <code>yq</code> uses the same formatting routines as everything else.</p>
+
+<p>Full changelog below:</p>
+
+            </section>
+            <section id="section-2">
+                <ul>
+<li><a href="https://github.com/preaction/Statocles/commit/966c355fa059af8b3b23fcfaf7ec6034b19534c1">make yq use formatter modules</a></li>
+</ul>
+
+            </section>
+        </main>
+    </div>
+
+    <div class="three columns sidebar">
+        
+        <nav id="tags">
+            <h1>Tags</h1>
+            <ul class="list-inline">
+                <li><a href="/ETL-Yertl//blog/tag/release">release</a></li>
+            </ul>
+        </nav>
+    </div>
+
+</div>
+
+        </div>
+        <footer>
+            
+            <div class="container tagline">
+                <a href="http://preaction.github.io/Statocles">Made with Statocles</a><br>
+                <a href="http://www.perl.org">Powered by Perl</a>
+            </div>
+        </footer>
+    </body>
+</html>

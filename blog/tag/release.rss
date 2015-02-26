@@ -5,7 +5,30 @@
         <link>http://preaction.github.io/ETL-Yertl/blog/tag/release</link>
         <atom:link href="http://preaction.github.io/ETL-Yertl/blog/tag/release.rss" rel="self" type="application/rss+xml" />
         <description>Blog feed of Yertl</description>
-        <generator>Statocles 0.035</generator>
+        <generator>Statocles 0.039</generator>
+        <item>
+            <title>Release v0.023</title>
+            <link>http://preaction.github.io/ETL-Yertl/blog/2015/02/26/release-v0.023</link>
+            <guid>http://preaction.github.io/ETL-Yertl/blog/2015/02/26/release-v0.023</guid>
+            <description><![CDATA[
+                <p>A quick release to fix a bug in <code>yq</code> that would cause a confusing error. Since <code>yq</code>
+was using YAML exclusively, but other commands were using other YAML modules, there
+was a possibility for one command to write output that another command could not
+parse.</p>
+
+<p>Now this is fixed and <code>yq</code> uses the same formatting routines as everything else.</p>
+
+<p>Full changelog below:</p>
+
+                    <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/02/26/release-v0.023#section-2">Continue reading...</a></p>
+                <p>Tags:
+                    <a href="/blog/tag/release">release</a>
+                </p>
+            ]]></description>
+            <pubDate>
+                Thu, 26 Feb 2015 12:43:58 +0000
+            </pubDate>
+        </item>
         <item>
             <title>Release v0.022</title>
             <link>http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.022.html</link>
@@ -21,7 +44,7 @@
                 </p>
             ]]></description>
             <pubDate>
-                Sun, 01 Feb 2015 00:00:00 +0000
+                Sun, 01 Feb 2015 23:51:48 +0000
             </pubDate>
         </item>
         <item>
@@ -55,7 +78,7 @@ patterns to the Yertl core.</p>
                 </p>
             ]]></description>
             <pubDate>
-                Sun, 01 Feb 2015 00:00:00 +0000
+                Sun, 01 Feb 2015 23:20:52 +0000
             </pubDate>
         </item>
         <item>
@@ -81,7 +104,7 @@ with <code>yto</code>.</p>
                 </p>
             ]]></description>
             <pubDate>
-                Sun, 01 Feb 2015 00:00:00 +0000
+                Sun, 01 Feb 2015 23:01:43 +0000
             </pubDate>
         </item>
         <item>
@@ -105,26 +128,7 @@ else write's YAML with their ID in it.</p>
                 </p>
             ]]></description>
             <pubDate>
-                Wed, 21 Jan 2015 00:00:00 +0000
-            </pubDate>
-        </item>
-        <item>
-            <title>Release v0.017</title>
-            <link>http://preaction.github.io/ETL-Yertl/blog/2015/01/11/release-v0.017.html</link>
-            <guid>http://preaction.github.io/ETL-Yertl/blog/2015/01/11/release-v0.017.html</guid>
-            <description><![CDATA[
-                <p>This release fixes a bunch of issues with <code>ysql</code>, and allows displaying of database
-configuration.</p>
-
-<p>Full changelog below:</p>
-
-                    <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/01/11/release-v0.017.html#section-2">Continue reading...</a></p>
-                <p>Tags:
-                    <a href="/blog/tag/release">release</a>
-                </p>
-            ]]></description>
-            <pubDate>
-                Sun, 11 Jan 2015 00:00:00 +0000
+                Wed, 21 Jan 2015 22:06:32 +0000
             </pubDate>
         </item>
     </channel>

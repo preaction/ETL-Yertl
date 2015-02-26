@@ -47,6 +47,36 @@
 
             <article>
                 <header>
+                    <h1><a href="/ETL-Yertl//blog/2015/02/26/release-v0.023">Release v0.023</a></h1>
+
+                    <p class="tags">Tags:
+                        <a href="/ETL-Yertl//blog/tag/release" rel="tag">release</a>
+                    </p>
+
+                    <aside>
+                        <p><time datetime="2015-02-26">
+                            Posted on 2015-02-26
+                        </time>
+                        </p>
+                    </aside>
+
+                </header>
+
+                <p>A quick release to fix a bug in <code>yq</code> that would cause a confusing error. Since <code>yq</code>
+was using YAML exclusively, but other commands were using other YAML modules, there
+was a possibility for one command to write output that another command could not
+parse.</p>
+
+<p>Now this is fixed and <code>yq</code> uses the same formatting routines as everything else.</p>
+
+<p>Full changelog below:</p>
+
+
+                    <p><a href="/ETL-Yertl//blog/2015/02/26/release-v0.023#section-2">Continue reading Release v0.023...</a></p>
+
+            </article>
+            <article>
+                <header>
                     <h1><a href="/ETL-Yertl//blog/2015/02/01/release-v0.022.html">Release v0.022</a></h1>
 
                     <p class="tags">Tags:
@@ -173,33 +203,6 @@ else write&#39;s YAML with their ID in it.</p>
 
 
                     <p><a href="/ETL-Yertl//blog/2015/01/21/release-v0.019.html#section-2">Continue reading Release v0.019...</a></p>
-
-            </article>
-            <article>
-                <header>
-                    <h1><a href="/ETL-Yertl//blog/2015/01/11/release-v0.017.html">Release v0.017</a></h1>
-
-                    <p class="tags">Tags:
-                        <a href="/ETL-Yertl//blog/tag/release" rel="tag">release</a>
-                    </p>
-
-                    <aside>
-                        <p><time datetime="2015-01-11">
-                            Posted on 2015-01-11
-                        </time>
-                            by preaction
-                        </p>
-                    </aside>
-
-                </header>
-
-                <p>This release fixes a bunch of issues with <code>ysql</code>, and allows displaying of database
-configuration.</p>
-
-<p>Full changelog below:</p>
-
-
-                    <p><a href="/ETL-Yertl//blog/2015/01/11/release-v0.017.html#section-2">Continue reading Release v0.017...</a></p>
 
             </article>
         </main>

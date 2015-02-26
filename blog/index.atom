@@ -2,10 +2,32 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>http://preaction.github.io/ETL-Yertl/blog</id>
     <title>Yertl</title>
-    <updated>2015-02-10T23:55:30Z</updated>
+    <updated>2015-02-26T12:45:53Z</updated>
     <link href="http://preaction.github.io/ETL-Yertl/blog/index.atom" rel="self" />
     <link href="http://preaction.github.io/ETL-Yertl/blog" rel="alternate" />
-    <generator version="0.035">Statocles</generator>
+    <generator version="0.039">Statocles</generator>
+    <entry>
+        <id>http://preaction.github.io/ETL-Yertl/blog/2015/02/26/release-v0.023</id>
+        <title>Release v0.023</title>
+        <link href="http://preaction.github.io/ETL-Yertl/blog/2015/02/26/release-v0.023" rel="alternate" />
+        <content type="html"><![CDATA[
+            <p>A quick release to fix a bug in <code>yq</code> that would cause a confusing error. Since <code>yq</code>
+was using YAML exclusively, but other commands were using other YAML modules, there
+was a possibility for one command to write output that another command could not
+parse.</p>
+
+<p>Now this is fixed and <code>yq</code> uses the same formatting routines as everything else.</p>
+
+<p>Full changelog below:</p>
+
+                <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/02/26/release-v0.023#section-2">Continue reading...</a></p>
+            <p>Tags:
+                <a href="/blog/tag/release">release</a>
+            </p>
+        ]]></content>
+        <updated>2015-02-26T12:43:58Z</updated>
+        <category term="release" />
+    </entry>
     <entry>
         <id>http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.022.html</id>
         <title>Release v0.022</title>
@@ -20,7 +42,7 @@
                 <a href="/blog/tag/release">release</a>
             </p>
         ]]></content>
-        <updated>2015-02-01T00:00:00Z</updated>
+        <updated>2015-02-01T23:51:48Z</updated>
         <category term="release" />
     </entry>
     <entry>
@@ -53,7 +75,7 @@ patterns to the Yertl core.</p>
                 <a href="/blog/tag/release">release</a>
             </p>
         ]]></content>
-        <updated>2015-02-01T00:00:00Z</updated>
+        <updated>2015-02-01T23:20:52Z</updated>
         <category term="release" />
     </entry>
     <entry>
@@ -78,7 +100,7 @@ with <code>yto</code>.</p>
                 <a href="/blog/tag/release">release</a>
             </p>
         ]]></content>
-        <updated>2015-02-01T00:00:00Z</updated>
+        <updated>2015-02-01T23:01:43Z</updated>
         <category term="release" />
     </entry>
     <entry>
@@ -101,26 +123,7 @@ else write's YAML with their ID in it.</p>
                 <a href="/blog/tag/release">release</a>
             </p>
         ]]></content>
-        <updated>2015-01-21T00:00:00Z</updated>
-        <category term="release" />
-    </entry>
-    <entry>
-        <id>http://preaction.github.io/ETL-Yertl/blog/2015/01/11/release-v0.017.html</id>
-        <title>Release v0.017</title>
-        <author><name>preaction</name></author>
-        <link href="http://preaction.github.io/ETL-Yertl/blog/2015/01/11/release-v0.017.html" rel="alternate" />
-        <content type="html"><![CDATA[
-            <p>This release fixes a bunch of issues with <code>ysql</code>, and allows displaying of database
-configuration.</p>
-
-<p>Full changelog below:</p>
-
-                <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/01/11/release-v0.017.html#section-2">Continue reading...</a></p>
-            <p>Tags:
-                <a href="/blog/tag/release">release</a>
-            </p>
-        ]]></content>
-        <updated>2015-01-11T00:00:00Z</updated>
+        <updated>2015-01-21T22:06:32Z</updated>
         <category term="release" />
     </entry>
 </feed>
