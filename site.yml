@@ -72,3 +72,5 @@ site:
                 $args:
                     store: site/blog
                     url_root: /blog
+        data:
+            google_analytics_id: 'UA-61295159-4'
