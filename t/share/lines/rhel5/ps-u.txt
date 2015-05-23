@@ -1,0 +1,5 @@
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+username 3075  0.0  0.0  89124  3336 pts/0    Ss   18:29   0:00 /usr2/local/bin/zsh
+username 5248  0.0  0.0  69824  1084 pts/0    R+   18:33   0:00 ps u
+username 5249  0.0  0.0  58940   576 pts/0    S+   18:33   0:00 head
+username 20645  0.0  0.0  64892  1436 pts/1    Ss+   2014   0:00 /bin/ksh

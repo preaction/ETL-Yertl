@@ -73,11 +73,14 @@ our %PATTERNS = (
         #       No STAT field
         # -- OpenBSD
         #       STAT field
+        # -- RHEL 5
+        #       tty can contain /
+        #       Seconds time optional
         PS => join( " +",
             ' *%{INT:pid}',
-            '(?<tty>[\w?]+)',
+            '(?<tty>[\w?/]+)',
             '(?<status>(?:[\w+]+))?',
-            '(?<time>\d+:\d+[:.]\d+)',
+            '(?<time>\d+:\d+(?:[:.]\d+)?)',
             '%{DATA:command}',
         ),
 
@@ -89,19 +92,19 @@ our %PATTERNS = (
             '%{NUM:mem}',
             '%{INT:vsz}',
             '%{INT:rss}',
-            '(?<tty>[\w?]+)',
+            '(?<tty>[\w?/]+)',
             '(?<status>(?:[\w+]+))?',
             '(?<started>[\w:]+)',
-            '(?<time>\d+:\d+[:.]\d+)',
+            '(?<time>\d+:\d+(?:[:.]\d+)?)',
             '%{DATA:command}',
         ),
 
         # Max OSX and OpenBSD are the same
         PSX => join ( " +",
             ' *%{INT:pid}',
-            '(?<tty>[\w?]+)',
+            '(?<tty>[\w?/]+)',
             '(?<status>(?:[\w+]+))',
-            '(?<time>\d+:\d+[:.]\d+)',
+            '(?<time>\d+:\d+(?:[:.]\d+)?)',
             '%{DATA:command}',
         ),
     },

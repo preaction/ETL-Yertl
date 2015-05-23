@@ -328,9 +328,9 @@ subtest 'POSIX command parsing' => sub {
     subtest 'ps' => sub {
         my $pattern = join( " +",
             ' *%{INT:pid}',
-            '(?<tty>[\w?]+)',
+            '(?<tty>[\w?/]+)',
             '(?<status>(?:[\w+]+))?',
-            '(?<time>\d+:\d+[:.]\d+)',
+            '(?<time>\d+:\d+(?:[:.]\d+)?)',
             '%{DATA:command}',
         );
 
@@ -378,14 +378,35 @@ subtest 'POSIX command parsing' => sub {
             test_ygrok( $file, "%{POSIX.PS}", \@expect )
         };
 
+        subtest 'RHEL5' => sub {
+            my $file = $SHARE_DIR->child( lines => rhel5 => 'ps.txt' ),
+            my @expect = (
+                {
+                    pid => 3075,
+                    tty => 'pts/0',
+                    time => '00:00:00',
+                    command => 'zsh',
+                },
+                {
+                    pid => 5076,
+                    tty => 'pts/0',
+                    time => '00:00:00',
+                    command => 'ps',
+                },
+            );
+
+            test_ygrok( $file, $pattern, \@expect );
+            test_ygrok( $file, "%{POSIX.PS}", \@expect )
+        };
+
     };
 
     subtest 'ps -x' => sub {
         my $pattern = join( " +",
             ' *%{INT:pid}',
-            '(?<tty>[\w?]+)',
+            '(?<tty>[\w?/]+)',
             '(?<status>(?:[\w+]+))',
-            '(?<time>\d+:\d+[:.]\d+)',
+            '(?<time>\d+:\d+(?:[:.]\d+)?)',
             '%{DATA:command}',
         );
 
@@ -448,6 +469,29 @@ subtest 'POSIX command parsing' => sub {
             test_ygrok( $file, $pattern, \@expect );
             test_ygrok( $file, "%{POSIX.PSX}", \@expect )
         };
+
+        subtest 'RHEL5' => sub {
+            my $file = $SHARE_DIR->child( lines => rhel5 => 'ps-x.txt' ),
+            my @expect = (
+                {
+                    pid => 3075,
+                    tty => 'pts/0',
+                    status => 'Ss',
+                    time => '0:00',
+                    command => '/usr/local/bin/zsh',
+                },
+                {
+                    pid => 5345,
+                    tty => '?',
+                    status => 'Sl',
+                    time => '219:15',
+                    command => 'starman master',
+                },
+            );
+
+            test_ygrok( $file, $pattern, \@expect );
+            test_ygrok( $file, "%{POSIX.PSX}", \@expect )
+        };
     };
 
     subtest 'ps -u' => sub {
@@ -458,10 +502,10 @@ subtest 'POSIX command parsing' => sub {
             '%{NUM:mem}',
             '%{INT:vsz}',
             '%{INT:rss}',
-            '(?<tty>[\w?]+)',
+            '(?<tty>[\w?/]+)',
             '(?<status>(?:[\w+]+))?',
             '(?<started>[\w:]+)',
-            '(?<time>\d+:\d+[:.]\d+)',
+            '(?<time>\d+:\d+(?:[:.]\d+)?)',
             '%{DATA:command}',
         );
 
@@ -528,6 +572,39 @@ subtest 'POSIX command parsing' => sub {
                     started => '2:28PM',
                     time => '0:00.00',
                     command => 'ps -u',
+                },
+            );
+
+            test_ygrok( $file, $pattern, \@expect );
+            test_ygrok( $file, "%{POSIX.PSU}", \@expect )
+        };
+
+        subtest 'RHEL5' => sub {
+            my $file = $SHARE_DIR->child( lines => rhel5 => 'ps-u.txt' ),
+            my @expect = (
+                {
+                    user => 'username', pid => 3075,        cpu => '0.0',
+                    mem => '0.0',       vsz => 89124,       rss => 3336,
+                    tty => 'pts/0',     status => 'Ss',     started => '18:29',
+                    time => '0:00',     command => '/usr2/local/bin/zsh',
+                },
+                {
+                    user => 'username', pid => 5248,        cpu => '0.0',
+                    mem => '0.0',       vsz => 69824,       rss => 1084,
+                    tty => 'pts/0',     status => 'R+',     started => '18:33',
+                    time => '0:00',     command => 'ps u',
+                },
+                {
+                    user => 'username', pid => 5249,        cpu => '0.0',
+                    mem => '0.0',       vsz => 58940,       rss => 576,
+                    tty => 'pts/0',     status => 'S+',     started => '18:33',
+                    time => '0:00',     command => 'head',
+                },
+                {
+                    user => 'username', pid => 20645,       cpu => '0.0',
+                    mem => '0.0',       vsz => 64892,       rss => 1436,
+                    tty => 'pts/1',     status => 'Ss+',    started => '2014',
+                    time => '0:00',     command => '/bin/ksh',
                 },
             );
 
