@@ -20,6 +20,7 @@ sub main {
         'help|h',
         'verbose|v+',
         'version',
+        'xargs|x',
     );
     return pod2usage(0) if $opt{help};
     if ( $opt{version} ) {
@@ -40,7 +41,7 @@ exit __PACKAGE__->main( @ARGV ) unless caller(0);
 
 =head1 SYNOPSIS
 
-    yq [-v] <script> [<file>...]
+    yq [-vx] <script> [<file>...]
 
     yq -h|--help|--version
 
@@ -66,6 +67,12 @@ specified, filter STDIN.
 
 Set verbose mode to print out some internal program messages on STDERR to help
 with debugging.
+
+=head2 -x | --xargs
+
+xargs mode. When the filter returns only a single item, simply print it out without
+using the serializer. This allows single values to be piped into other programs that
+may not know how to deal with serialized data, like xargs.
 
 =head2 -h | --help
 

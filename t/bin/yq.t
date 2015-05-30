@@ -92,6 +92,14 @@ subtest 'finish() gets called' => sub {
     ] or diag explain \@got;
 };
 
+subtest 'xargs (-x) output' => sub {
+    local *STDIN = $SHARE_DIR->child( yaml => 'noseperator.yaml' )->openr;
+    my $filter = '.foo, .baz';
+    my ( $output, $stderr ) = capture { yq->main( $filter, "-x" ) };
+    ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
+    eq_or_diff $output, "bar\nbuzz\n";
+};
+
 subtest 'version check' => sub {
     local $yq::VERSION = '1.00';
     my ( $output, $stderr, $exit ) = capture { yq->main( '--version' ) };

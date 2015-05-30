@@ -42,18 +42,24 @@ sub main {
         my $scope = {};
         for my $doc ( $in_fmt->read ) {
             my @output = $class->filter( $filter, $doc, $scope );
-            $class->write( @output );
+            $class->write( \@output, \%opt );
         }
 
         # Finish the scope, cleaning up any collections
-        $class->write( $class->finish( $scope ) );
+        $class->write( [ $class->finish( $scope ) ], \%opt );
     }
 }
 
 sub write {
-    my ( $class, @docs ) = @_;
+    my ( $class, $docs, $opt ) = @_;
+
+    if ( $opt->{xargs} ) {
+        print "$_\n" for @$docs;
+        return;
+    }
+
     my $out_fmt = ETL::Yertl::Format::yaml->new;
-    for my $doc ( @docs ) {
+    for my $doc ( @$docs ) {
         next if is_empty( $doc );
         if ( isTrue( $doc ) ) {
             print $out_fmt->write( "true" );
