@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="/ETL-Yertl/theme/css/normalize.css" rel="stylesheet">
+        <link href="/ETL-Yertl/theme/css/skeleton.css" rel="stylesheet">
+        <link href="/ETL-Yertl/theme/css/statocles-default.css" rel="stylesheet">
+        <title>Yertl</title>
+        
+    </head>
+    <body>
+        <header>
+            <nav class="navbar">
+                <div class="container">
+                    <a class="brand" href="/ETL-Yertl/">Yertl</a>
+                    <ul>
+                        <li>
+                            <a href="/ETL-Yertl/blog">Blog</a>
+                        </li>
+                        <li>
+                            <a href="/ETL-Yertl/pod">Docs</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl">Code</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl/issues">Bugs</a>
+                        </li>
+                        <li>
+                            <a href="http://metacpan.org/pod/ETL::Yertl">CPAN</a>
+                        </li>
+                        <li>
+                            <a href="https://chat.mibbit.com/?channel=%23yertl&amp;server=irc.perl.org">IRC</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+        </header>
+        <div class="main container">
+            <a href="/ETL-Yertl/pod/ysql.html">Back to documentation</a>
+<pre>#!/usr/bin/env perl
+package ysql;
+# ABSTRACT: Query SQL databases in a Yertl workflow
+
+use ETL::Yertl;
+use Pod::Usage::Return qw( pod2usage );
+use Getopt::Long qw( GetOptionsFromArray :config pass_through );
+use ETL::Yertl::Command::ysql;
+
+$|++; # no buffering
+
+sub main {
+    my ( $class, @argv ) = @_;
+    my %opt;
+    GetOptionsFromArray( \@argv, \%opt,
+        &#39;help|h&#39;,
+        &#39;version&#39;,
+        &#39;dsn=s&#39;,
+    );
+    return pod2usage(0) if $opt{help};
+    if ( $opt{version} ) {
+        print &quot;ysql version $ysql::VERSION (Perl $^V)\n&quot;;
+        return 0;
+    }
+
+    eval {
+        ETL::Yertl::Command::ysql-&gt;main( @argv, \%opt );
+    };
+    if ( $@ ) {
+        # SQL errors do not need usage information
+        if ( $@ =~ /^SQL error/ ) {
+            print STDERR &quot;ERROR: $@&quot;;
+            return 1;
+        }
+        return pod2usage( &quot;ERROR: $@&quot; );
+    }
+    return 0;
+}
+
+exit __PACKAGE__-&gt;main( @ARGV ) unless caller(0);
+
+__END__
+
+=head1 SYNOPSIS
+
+    ysql [&lt;db_name&gt; | --dsn &lt;dsn&gt;] [&lt;query&gt; | &lt;query_name&gt;] [&lt;value&gt;...]
+
+    ysql &lt;db_name&gt; --save &lt;query_name&gt; &lt;query&gt;
+
+    ysql --config &lt;db_name&gt; [--driver &lt;driver&gt;] [--database &lt;database] [--host &lt;host&gt;]
+        [--port &lt;port&gt;] [--user &lt;user&gt;] [--password &lt;password&gt;]
+    ysql --config &lt;db_name&gt; [--dsn] &lt;dsn&gt; [--user &lt;user&gt;] [--password &lt;password&gt;]
+    ysql --config [&lt;db_name&gt;]
+
+    ysql -h|--help|--version
+
+=head1 DESCRIPTION
+
+This program queries a SQL database and prints the result as YAML.
+
+=head2 Reading
+
+Run a query to read data from the database. C&lt;query&gt; is either the name of a saved
+query, or SQL (usually a C&lt;SELECT&gt;). C&lt;value&gt; is used to fill in C&lt;?&gt; placeholders.
+
+    $ ysql db_name &#39;SELECT * FROM person&#39;
+    ---
+    name: Hazel &quot;Hank&quot; Murphy
+    email: captain@example.com
+    dept: Captain
+    ---
+    name: Quinn Quinlan
+    email: dr.quinn@example.com
+    dept: Science
+
+=head2 Writing
+
+If there are documents to read on STDIN, the C&lt;query&gt; will be executed once for
+each document read. In order to map keys in the YAML document to fields in the
+SQL query, C&lt;ysql&gt; supports named placeholders, which begin with C&lt;$.&gt;. For
+example:
+
+    # input.yml
+    ---
+    name: Stormy Waters
+    email: stormy@example.com
+    profile:
+        dept: Pilot
+    ---
+    name: Debbie Dupree
+    email: debbie@example.com
+    profile:
+        dept: Wildlife
+
+    $ ysql db_name &#39;INSERT INTO person ( name, email, dept ) \
+                    VALUES ( $.name, $.email, $.profile.dept )&#39; \
+                    &lt; input.yml
+
+=head1 ARGUMENTS
+
+=head2 db_name
+
+The saved database name to use. Add and edit databases using the C&lt;--config&gt; option.
+
+=head2 query
+
+The SQL query to run against the database.
+
+=head2 query_name
+
+The name of a saved query. Add and edit saved queries using the C&lt;--save&gt; option.
+
+=head1 OPTIONS
+
+=head2 --config
+
+View, add, and edit database configuration.
+
+=head2 --save &lt;query_name&gt;
+
+Save a query to run later.
+
+=head2 --driver &lt;driver&gt;
+
+The database driver to use, corresponding to a DBD::* module. Some examples: C&lt;SQLite&gt;,
+C&lt;mysql&gt;, C&lt;Pg&gt;.
+
+=head2 --database &lt;database&gt;
+
+The name of the database. For SQLite, the name of the database file.
+
+=head2 --host &lt;host&gt;
+
+The hostname to connect to. Optional.
+
+=head2 --port &lt;port&gt;
+
+The port to connect to. Optional.
+
+=head2 --user &lt;user&gt;
+
+The user to connect as. Optional.
+
+=head2 --password &lt;password&gt;
+
+The password to connect with. Optional. This is stored in plain text, so beware.
+
+=head2 --dsn &lt;dsn&gt;
+
+The L&lt;DBI&gt; Data Source Name. A string that DBI uses to connect to the database.
+
+Some examples:
+
+    # A SQLite database in &quot;test.db&quot;
+    dbi:SQLite:test.db
+
+    # A MySQL database named &quot;example&quot;
+    dbi:mysql:example
+
+    # A Postgres database named &quot;foo&quot;
+    dbi:Pg:foo
+
+=head2 --drivers
+
+List the available drivers
+
+=head2 -h | --help
+
+Show this help document.
+
+=head2 --version
+
+Print the current ysql and Perl versions.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L&lt;ETL::Yertl::Help::ysql&gt; - Using ysql to work with SQL databases
+
+=back
+
+</pre>
+
+        </div>
+        <footer>
+            <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-61295159-4', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+            <div class="container tagline">
+                <a href="http://preaction.github.io/Statocles">Made with Statocles</a><br>
+                <a href="http://www.perl.org">Powered by Perl</a>
+            </div>
+        </footer>
+    </body>
+</html>

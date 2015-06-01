@@ -37,44 +37,76 @@
             
         </header>
         <div class="main container">
-            <div class="crumbtrail">
-<ul>
-    <li>
-        ETL
-    </li>
-    <li>
-        <a href="/ETL-Yertl/pod/index.html">Yertl</a>
-    </li>
-    <li>
-        Command
-    </li>
-    <li>
-        <a href="/ETL-Yertl/pod/ETL/Yertl/Command/yq.html">yq</a>
-    </li>
-</ul>
-(<a href="/ETL-Yertl/pod/ETL/Yertl/Command/yq.src.html">source</a>)
-</div>
-<h1 id="NAME">NAME</h1>
+            <a href="/ETL-Yertl/pod/yfrom.html">Back to documentation</a>
+<pre>#!/usr/bin/env perl
+package yfrom;
+# ABSTRACT: Build YAML from another format (like JSON or CSV)
 
-<p>ETL::Yertl::Command::yq - Filter and construct documents using a mini-language</p>
+use ETL::Yertl;
+use Pod::Usage::Return qw( pod2usage );
+use Getopt::Long qw( GetOptionsFromArray );
+use ETL::Yertl::Command::yfrom;
 
-<h1 id="SYNOPSIS">SYNOPSIS</h1>
+$|++; # no buffering
 
-<pre><code>    ### On a shell...
-    $ yq [-v] &lt;script&gt; [&lt;file&gt;...]
-    $ yq [-h|--help|--version]
+sub main {
+    my ( $class, @argv ) = @_;
+    my %opt;
+    GetOptionsFromArray( \@argv, \%opt,
+        &#39;help|h&#39;,
+        &#39;version&#39;,
+    );
+    return pod2usage(0) if $opt{help};
+    if ( $opt{version} ) {
+        print &quot;yfrom version $yfrom::VERSION (Perl $^V)\n&quot;;
+        return 0;
+    }
 
-    ### In Perl...
-    use ETL::Yertl;
-    yq( &#39;&lt;script&gt;&#39;, &#39;&lt;filename&gt;&#39;, { verbose =&gt; 1 } );</code></pre>
+    eval {
+        ETL::Yertl::Command::yfrom-&gt;main( @argv, \%opt );
+    };
+    if ( $@ ) {
+        return pod2usage( &quot;ERROR: $@&quot; );
+    }
+    return 0;
+}
 
-<h1 id="DESCRIPTION">DESCRIPTION</h1>
+exit __PACKAGE__-&gt;main( @ARGV ) unless caller(0);
 
-<h1 id="ARGUMENTS">ARGUMENTS</h1>
+__END__
 
-<h1 id="OPTIONS">OPTIONS</h1>
+=head1 SYNOPSIS
 
+    yfrom &lt;format&gt; [&lt;file&gt;...]
 
+    yfrom -h|--help|--version
+
+=head1 DESCRIPTION
+
+This program takes a stream of documents in the given format (on STDIN or file arguments),
+and prints them as YAML.
+
+=head1 ARGUMENTS
+
+=head2 format
+
+The format to read. Currently supported formats: JSON, CSV
+
+=head2 &lt;file&gt;
+
+A file to read. The special file &quot;-&quot; refers to STDIN. If no files are
+specified, read STDIN.
+
+=head1 OPTIONS
+
+=head2 -h | --help
+
+Show this help document.
+
+=head2 --version
+
+Print the current yfrom and Perl versions.
+</pre>
 
         </div>
         <footer>

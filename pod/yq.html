@@ -37,13 +37,21 @@
             
         </header>
         <div class="main container">
-            <h1 id="NAME">NAME</h1>
+            <div class="crumbtrail">
+<ul>
+    <li>
+        <a href="/ETL-Yertl/pod/yq.html">yq</a>
+    </li>
+</ul>
+(<a href="/ETL-Yertl/pod/yq.src.html">source</a>)
+</div>
+<h1 id="NAME">NAME</h1>
 
 <p>yq - Filter YAML through a command-line program</p>
 
 <h1 id="SYNOPSIS">SYNOPSIS</h1>
 
-<pre><code>    yq [-v] &lt;script&gt; [&lt;file&gt;...]
+<pre><code>    yq [-vx] &lt;script&gt; [&lt;file&gt;...]
 
     yq -h|--help|--version</code></pre>
 
@@ -66,6 +74,10 @@
 <h2 id="v---verbose">-v | --verbose</h2>
 
 <p>Set verbose mode to print out some internal program messages on STDERR to help with debugging.</p>
+
+<h2 id="x---xargs">-x | --xargs</h2>
+
+<p>xargs mode. When the filter returns only a single item, simply print it out without using the serializer. This allows single values to be piped into other programs that may not know how to deal with serialized data, like xargs.</p>
 
 <h2 id="h---help">-h | --help</h2>
 

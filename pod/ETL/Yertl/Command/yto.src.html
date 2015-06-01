@@ -37,44 +37,82 @@
             
         </header>
         <div class="main container">
-            <div class="crumbtrail">
-<ul>
-    <li>
-        ETL
-    </li>
-    <li>
-        <a href="/ETL-Yertl/pod/index.html">Yertl</a>
-    </li>
-    <li>
-        Command
-    </li>
-    <li>
-        <a href="/ETL-Yertl/pod/ETL/Yertl/Command/yq.html">yq</a>
-    </li>
-</ul>
-(<a href="/ETL-Yertl/pod/ETL/Yertl/Command/yq.src.html">source</a>)
-</div>
-<h1 id="NAME">NAME</h1>
+            <a href="/ETL-Yertl/pod/ETL/Yertl/Command/yto.html">Back to documentation</a>
+<pre>package ETL::Yertl::Command::yto;
+# ABSTRACT: Write documents to a format like JSON or CSV
 
-<p>ETL::Yertl::Command::yq - Filter and construct documents using a mini-language</p>
+use ETL::Yertl;
+use Module::Runtime qw( use_module compose_module_name is_module_spec );
+use ETL::Yertl::Format::yaml;
 
-<h1 id="SYNOPSIS">SYNOPSIS</h1>
+sub main {
+    my $class = shift;
 
-<pre><code>    ### On a shell...
-    $ yq [-v] &lt;script&gt; [&lt;file&gt;...]
-    $ yq [-h|--help|--version]
+    my %opt;
+    if ( ref $_[-1] eq &#39;HASH&#39; ) {
+        %opt = %{ pop @_ };
+    }
+
+    my ( $format, @files ) = @_;
+
+    die &quot;Must give a format\n&quot; unless $format;
+    my $formatter_class = eval { compose_module_name( &#39;ETL::Yertl::Format&#39;, $format ) };
+    if ( $@ ) {
+        die &quot;Unknown format &#39;$format&#39;\n&quot;;
+    }
+
+    eval {
+        use_module( $formatter_class );
+    };
+    if ( $@ ) {
+        if ( $@ =~ /^Can&#39;t locate \S+ in \@INC/ ) {
+            die &quot;Unknown format &#39;$format&#39;\n&quot;;
+        }
+        die &quot;Could not load format &#39;$format&#39;: $@&quot;;
+    }
+
+    my $out_fmt = $formatter_class-&gt;new( %opt );
+
+    push @files, &quot;-&quot; unless @files;
+    for my $file ( @files ) {
+        # We&#39;re doing a similar behavior to &lt;&gt;, but manually for easier testing.
+        my $fh;
+        if ( $file eq &#39;-&#39; ) {
+            # Use the existing STDIN so tests can fake it
+            $fh = \*STDIN;
+        }
+        else {
+            unless ( open $fh, &#39;&lt;&#39;, $file ) {
+                warn &quot;Could not open file &#39;$file&#39; for reading: $!\n&quot;;
+                next;
+            }
+        }
+
+        my $in_fmt = ETL::Yertl::Format::yaml-&gt;new( input =&gt; $fh );
+        print $out_fmt-&gt;write( $in_fmt-&gt;read );
+    }
+}
+
+1;
+__END__
+
+=head1 SYNOPSIS
+
+    ### On a shell...
+    $ yto [-v] &lt;format&gt; [&lt;file&gt;...]
+    $ yto [-h|--help|--version]
 
     ### In Perl...
     use ETL::Yertl;
-    yq( &#39;&lt;script&gt;&#39;, &#39;&lt;filename&gt;&#39;, { verbose =&gt; 1 } );</code></pre>
+    yto( &#39;&lt;format&gt;&#39;, &#39;&lt;filename&gt;&#39;, { verbose =&gt; 1 } );
 
-<h1 id="DESCRIPTION">DESCRIPTION</h1>
+=head1 DESCRIPTION
 
-<h1 id="ARGUMENTS">ARGUMENTS</h1>
+=head1 ARGUMENTS
 
-<h1 id="OPTIONS">OPTIONS</h1>
+=head1 OPTIONS
 
-
+</pre>
 
         </div>
         <footer>

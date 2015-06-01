@@ -37,44 +37,52 @@
             
         </header>
         <div class="main container">
-            <div class="crumbtrail">
-<ul>
-    <li>
-        ETL
-    </li>
-    <li>
-        <a href="/ETL-Yertl/pod/index.html">Yertl</a>
-    </li>
-    <li>
-        Command
-    </li>
-    <li>
-        <a href="/ETL-Yertl/pod/ETL/Yertl/Command/yq.html">yq</a>
-    </li>
+            <div class="row">
+
+    <div class="nine columns">
+        <main>
+            <header>
+                <h1>Release v0.024</h1>
+                <p class="tags">Tags:
+                    <a href="/ETL-Yertl/blog/tag/release/" rel="tag">release</a>
+                </p>
+                <aside>
+                    <p><time datetime="2015-05-31">
+                        Posted on 2015-05-31
+                    </time>
+                    </p>
+                </aside>
+            </header>
+            <section id="section-1">
+                <p>A small release to fix the <code>ps</code> grok patterns for GNU procutils and to add
+the <code>yq -x</code> option to make it a lot easier to pipe the output of yq into
+another program.</p>
+
+<p>Full changelog below</p>
+
+            </section>
+            <section id="section-2">
+                <ul>
+<li><a href="https://github.com/preaction/Statocles/commit/3eb42192089b91e545ac57dbc0aa76b84d0f1b28">add xargs mode to yq</a> (<a href="https://github.com/preaction/Statocles/issues/52">#52</a>)</li>
+<li><a href="https://github.com/preaction/Statocles/commit/eb41b737f2f14dcaf5f0058be4e0528c75f0dc2f">remove ModuleBuild to prevent toolchain confusion</a></li>
+<li><a href="https://github.com/preaction/Statocles/commit/8295b200d38d5fc01c30afc5bc785405684db010">fix ps grok patterns to work on RHEL 5</a> (<a href="https://github.com/preaction/Statocles/issues/127">#127</a>)</li>
 </ul>
-(<a href="/ETL-Yertl/pod/ETL/Yertl/Command/yq.src.html">source</a>)
+
+            </section>
+        </main>
+    </div>
+
+    <div class="three columns sidebar">
+        
+        <nav id="tags">
+            <h1>Tags</h1>
+            <ul class="list-inline">
+                <li><a href="/ETL-Yertl/blog/tag/release/">release</a></li>
+            </ul>
+        </nav>
+    </div>
+
 </div>
-<h1 id="NAME">NAME</h1>
-
-<p>ETL::Yertl::Command::yq - Filter and construct documents using a mini-language</p>
-
-<h1 id="SYNOPSIS">SYNOPSIS</h1>
-
-<pre><code>    ### On a shell...
-    $ yq [-v] &lt;script&gt; [&lt;file&gt;...]
-    $ yq [-h|--help|--version]
-
-    ### In Perl...
-    use ETL::Yertl;
-    yq( &#39;&lt;script&gt;&#39;, &#39;&lt;filename&gt;&#39;, { verbose =&gt; 1 } );</code></pre>
-
-<h1 id="DESCRIPTION">DESCRIPTION</h1>
-
-<h1 id="ARGUMENTS">ARGUMENTS</h1>
-
-<h1 id="OPTIONS">OPTIONS</h1>
-
-
 
         </div>
         <footer>

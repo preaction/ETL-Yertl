@@ -1,15 +1,34 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>http://preaction.github.io/ETL-Yertl/blog/tag/release</id>
+    <id>http://preaction.github.io/ETL-Yertl/blog/tag/release/</id>
     <title>Yertl</title>
-    <updated>2015-03-29T00:59:30Z</updated>
+    <updated>2015-05-31T21:39:18Z</updated>
     <link href="http://preaction.github.io/ETL-Yertl/blog/tag/release.atom" rel="self" />
-    <link href="http://preaction.github.io/ETL-Yertl/blog/tag/release" rel="alternate" />
-    <generator version="0.042">Statocles</generator>
+    <link href="http://preaction.github.io/ETL-Yertl/blog/tag/release/" rel="alternate" />
+    <generator version="0.046">Statocles</generator>
     <entry>
-        <id>http://preaction.github.io/ETL-Yertl/blog/2015/02/26/release-v0.023</id>
+        <id>http://preaction.github.io/ETL-Yertl/blog/2015/05/31/release-v0-024/</id>
+        <title>Release v0.024</title>
+        <link href="http://preaction.github.io/ETL-Yertl/blog/2015/05/31/release-v0-024/" rel="alternate" />
+        <content type="html"><![CDATA[
+            <p>A small release to fix the <code>ps</code> grok patterns for GNU procutils and to add
+the <code>yq -x</code> option to make it a lot easier to pipe the output of yq into
+another program.</p>
+
+<p>Full changelog below</p>
+
+                <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/05/31/release-v0-024/#section-2">Continue reading...</a></p>
+            <p>Tags:
+                <a href="/blog/tag/release/">release</a>
+            </p>
+        ]]></content>
+        <updated>2015-05-31T00:00:00Z</updated>
+        <category term="release" />
+    </entry>
+    <entry>
+        <id>http://preaction.github.io/ETL-Yertl/blog/2015/02/26/release-v0.023/</id>
         <title>Release v0.023</title>
-        <link href="http://preaction.github.io/ETL-Yertl/blog/2015/02/26/release-v0.023" rel="alternate" />
+        <link href="http://preaction.github.io/ETL-Yertl/blog/2015/02/26/release-v0.023/" rel="alternate" />
         <content type="html"><![CDATA[
             <p>A quick release to fix a bug in <code>yq</code> that would cause a confusing error. Since <code>yq</code>
 was using YAML exclusively, but other commands were using other YAML modules, there
@@ -20,9 +39,9 @@ parse.</p>
 
 <p>Full changelog below:</p>
 
-                <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/02/26/release-v0.023#section-2">Continue reading...</a></p>
+                <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/02/26/release-v0.023/#section-2">Continue reading...</a></p>
             <p>Tags:
-                <a href="/blog/tag/release">release</a>
+                <a href="/blog/tag/release/">release</a>
             </p>
         ]]></content>
         <updated>2015-02-26T00:00:00Z</updated>
@@ -39,7 +58,7 @@ parse.</p>
 
                 <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.022.html#section-2">Continue reading...</a></p>
             <p>Tags:
-                <a href="/blog/tag/release">release</a>
+                <a href="/blog/tag/release/">release</a>
             </p>
         ]]></content>
         <updated>2015-02-01T00:00:00Z</updated>
@@ -72,7 +91,7 @@ patterns to the Yertl core.</p>
 
                 <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.021.html#section-2">Continue reading...</a></p>
             <p>Tags:
-                <a href="/blog/tag/release">release</a>
+                <a href="/blog/tag/release/">release</a>
             </p>
         ]]></content>
         <updated>2015-02-01T00:00:00Z</updated>
@@ -97,33 +116,10 @@ with <code>yto</code>.</p>
 
                 <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.020.html#section-2">Continue reading...</a></p>
             <p>Tags:
-                <a href="/blog/tag/release">release</a>
+                <a href="/blog/tag/release/">release</a>
             </p>
         ]]></content>
         <updated>2015-02-01T00:00:00Z</updated>
-        <category term="release" />
-    </entry>
-    <entry>
-        <id>http://preaction.github.io/ETL-Yertl/blog/2015/01/21/release-v0.019.html</id>
-        <title>Release v0.019</title>
-        <link href="http://preaction.github.io/ETL-Yertl/blog/2015/01/21/release-v0.019.html" rel="alternate" />
-        <content type="html"><![CDATA[
-            <p>This release fixes a few bugs and inconsistencies in the <code>ysql</code> command, in
-anticipation of a blog post explaining how it works.</p>
-
-<p>We removed the "write" command in favor of making the "query" command accept
-input on <code>STDIN</code> and handle placeholders. So now you can run "SELECT" queries
-for each document as it comes in, perhaps to look up users as something
-else write's YAML with their ID in it.</p>
-
-<p>Full changelog below:</p>
-
-                <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/01/21/release-v0.019.html#section-2">Continue reading...</a></p>
-            <p>Tags:
-                <a href="/blog/tag/release">release</a>
-            </p>
-        ]]></content>
-        <updated>2015-01-21T00:00:00Z</updated>
         <category term="release" />
     </entry>
 </feed>

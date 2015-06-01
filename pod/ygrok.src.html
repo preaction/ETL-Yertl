@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="/ETL-Yertl/theme/css/normalize.css" rel="stylesheet">
+        <link href="/ETL-Yertl/theme/css/skeleton.css" rel="stylesheet">
+        <link href="/ETL-Yertl/theme/css/statocles-default.css" rel="stylesheet">
+        <title>Yertl</title>
+        
+    </head>
+    <body>
+        <header>
+            <nav class="navbar">
+                <div class="container">
+                    <a class="brand" href="/ETL-Yertl/">Yertl</a>
+                    <ul>
+                        <li>
+                            <a href="/ETL-Yertl/blog">Blog</a>
+                        </li>
+                        <li>
+                            <a href="/ETL-Yertl/pod">Docs</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl">Code</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl/issues">Bugs</a>
+                        </li>
+                        <li>
+                            <a href="http://metacpan.org/pod/ETL::Yertl">CPAN</a>
+                        </li>
+                        <li>
+                            <a href="https://chat.mibbit.com/?channel=%23yertl&amp;server=irc.perl.org">IRC</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+        </header>
+        <div class="main container">
+            <a href="/ETL-Yertl/pod/ygrok.html">Back to documentation</a>
+<pre>#!/usr/bin/env perl
+package ygrok;
+# ABSTRACT: Build YAML by parsing lines of plain text
+
+use ETL::Yertl;
+use Pod::Usage::Return qw( pod2usage );
+use Getopt::Long qw( GetOptionsFromArray :config pass_through );
+use ETL::Yertl::Command::ygrok;
+
+$|++; # no buffering
+
+sub main {
+    my ( $class, @argv ) = @_;
+    my %opt;
+    GetOptionsFromArray( \@argv, \%opt,
+        &#39;loose|l&#39;,
+        &#39;help|h&#39;,
+        &#39;version&#39;,
+    );
+    return pod2usage(0) if $opt{help};
+    if ( $opt{version} ) {
+        print &quot;ygrok version $ygrok::VERSION (Perl $^V)\n&quot;;
+        return 0;
+    }
+
+    eval {
+        ETL::Yertl::Command::ygrok-&gt;main( @argv, \%opt );
+    };
+    if ( $@ ) {
+        return pod2usage( &quot;ERROR: $@&quot; );
+    }
+    return 0;
+}
+
+exit __PACKAGE__-&gt;main( @ARGV ) unless caller(0);
+
+__END__
+
+=head1 SYNOPSIS
+
+    ygrok [-l|--loose] &lt;pattern&gt; [&lt;file&gt;...]
+    ygrok --pattern [&lt;pattern_name&gt; [&lt;pattern&gt;]]
+    yfrom -h|--help|--version
+
+=head1 DESCRIPTION
+
+This program takes lines of plain text and converts them into documents.
+
+=head1 ARGUMENTS
+
+=head2 pattern
+
+The pattern to match with. Any line that does not match the pattern will be ignored.
+
+See the full documentation for pattern syntax.
+
+=head2 file
+
+A file to read. The special file &quot;-&quot; refers to STDIN. If no files are
+specified, read STDIN.
+
+=head1 OPTIONS
+
+=head2 -l|--loose
+
+Match anywhere in the line. Normally, the pattern must match the full line.
+Setting this allows the pattern to match anywhere in the line (but still only once).
+
+=head2 --pattern
+
+View, add, and edit patterns. With no arguments, shows all the patterns. With
+C&lt;pattern_name&gt;, shows the specific pattern or pattern category. With C&lt;pattern&gt;,
+adds a custom pattern that can then be used in future patterns.
+
+    # Show all patterns
+    ygrok --pattern
+
+    # Show all &quot;NET&quot; patterns
+    ygrok --pattern NET
+
+    # Show the &quot;NET.HOSTNAME&quot; pattern
+    ygrok --pattern NET.HOSTNAME
+
+    # Add a new pattern
+    ygrok --pattern HOSTS_LINE &#39;%{NET.HOSTNAME:host} %{NET.IPV4:ip}&#39;
+
+    # Use the new pattern
+    ygrok &#39;%{HOSTS_LINE}&#39; &lt; /etc/hosts
+
+=head2 -h | --help
+
+Show this help document.
+
+=head2 --version
+
+Print the current ygrok and Perl versions.
+
+=head1 PATTERNS
+
+A pattern is a match for the entire line, splitting the line into fields.
+
+A named ygrok match has the format: C&lt;%{PATTERN_NAME:field_name}&gt;. The
+C&lt;PATTERN_NAME&gt; is one of the available patterns, listed below. The
+C&lt;field_name&gt; is the field to put the matched data.
+
+Additionally, the pattern is a Perl regular expression, so any regular
+expression syntax will work. Any named captures
+(C&lt;(?E&lt;lt&gt;field_nameE&lt;gt&gt;PATTERN)&gt;) will be part of the document.
+
+=head2 BUILT-IN PATTERNS
+
+The built-in patterns are common patterns that are always available.
+
+=over 4
+
+=item Simple Patterns
+
+=over 4
+
+=item WORD
+
+A single word, C&lt;\b\w+\b&gt;.
+
+=item DATA
+
+A non-slurpy section of data, C&lt;.*?&gt;.
+
+=item INT
+
+An integer, positive or negative.
+
+=item NUM
+
+A floating-point number, positive or negative, with optional exponent.
+
+=back
+
+=item Date/Time Patterns
+
+=over 4
+
+=item DATE.MONTH
+
+A full or abbreviated month name for the &quot;C&quot; locale (January (Jan), February
+(Feb), etc...)
+
+=item DATE.ISO8601
+
+An ISO8601 date/time
+
+=item DATE.HTTP
+
+An RFC822 date/time, used by HTTP.
+
+=item DATE.SYSLOG
+
+A syslog date, like &quot;Jan 01 01:23:45&quot;
+
+=back
+
+=item Operating System Patterns
+
+=over 4
+
+=item OS.USER
+
+A username.
+
+=item OS.PROCNAME
+
+A process name
+
+=back
+
+=item Networking Patterns
+
+=over 4
+
+=item NET.IPV4
+
+An IPV4 address.
+
+=item NET.HOSTNAME
+
+A network host name. Either an RFC1101 domain or an IPv4 or IPv6 address.
+
+=back
+
+=item URL Patterns
+
+=over 4
+
+=item URL
+
+A full URL with scheme
+
+=item URL.PATH
+
+The path part of a URL
+
+=back
+
+=item Log File Patterns
+
+=over 4
+
+=item LOG.HTTP_COMMON
+
+The Apache Common Log Format.
+
+=item LOG.HTTP_COMBINED
+
+The Apache Combined Log Format.
+
+=item LOG.SYSLOG
+
+The syslog format (RFC 3164)
+
+=back
+
+=item POSIX Command Output Patterns
+
+=over 4
+
+=item POSIX.LS
+
+Parse the output of C&lt;ls -l&gt;
+
+=item POSIX.PS
+
+Parse the output of C&lt;ps&gt;
+
+=item POSIX.PSX
+
+Parse the output of C&lt;ps x&gt; and C&lt;ps w&gt;
+
+=item POSIX.PSU
+
+Parse the output of C&lt;ps u&gt;
+
+=back
+
+=back
+
+</pre>
+
+        </div>
+        <footer>
+            <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-61295159-4', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+            <div class="container tagline">
+                <a href="http://preaction.github.io/Statocles">Made with Statocles</a><br>
+                <a href="http://www.perl.org">Powered by Perl</a>
+            </div>
+        </footer>
+    </body>
+</html>

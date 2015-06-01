@@ -37,79 +37,109 @@
             
         </header>
         <div class="main container">
-            <div class="crumbtrail">
-<ul>
-    <li>
-        <a href="/ETL-Yertl/pod/ymask.html">ymask</a>
-    </li>
-</ul>
-(<a href="/ETL-Yertl/pod/ymask.src.html">source</a>)
-</div>
-<h1 id="NAME">NAME</h1>
+            <a href="/ETL-Yertl/pod/ymask.html">Back to documentation</a>
+<pre>#!/usr/bin/env perl
+package ymask;
+# ABSTRACT: Mask a data structure to display only the desired fields
 
-<p>ymask - Mask a data structure to display only the desired fields</p>
+use ETL::Yertl;
+use Pod::Usage::Return qw( pod2usage );
+use Getopt::Long qw( GetOptionsFromArray );
+use ETL::Yertl::Command::ymask;
 
-<h1 id="SYNOPSIS">SYNOPSIS</h1>
+$|++; # no buffering
 
-<pre><code>    ymask &lt;mask&gt; [&lt;file&gt;...]
+sub main {
+    my ( $class, @argv ) = @_;
+    my %opt;
+    GetOptionsFromArray( \@argv, \%opt,
+        &#39;help|h&#39;,
+        &#39;version&#39;,
+    );
+    return pod2usage(0) if $opt{help};
+    if ( $opt{version} ) {
+        print &quot;ymask version $ymask::VERSION (Perl $^V)\n&quot;;
+        return 0;
+    }
 
-    ymask -h|--help|--version</code></pre>
+    eval {
+        ETL::Yertl::Command::ymask-&gt;main( @argv, \%opt );
+    };
+    if ( $@ ) {
+        return pod2usage( &quot;ERROR: $@&quot; );
+    }
+    return 0;
+}
 
-<h1 id="DESCRIPTION">DESCRIPTION</h1>
+exit __PACKAGE__-&gt;main( @ARGV ) unless caller(0);
 
-<p>This program takes a stream of YAML documents (on STDIN or file arguments), and prints only the fields specified by the <code>mask</code>.</p>
+__END__
 
-<h1 id="ARGUMENTS">ARGUMENTS</h1>
+=head1 SYNOPSIS
 
-<h2 id="mask">mask</h2>
+    ymask &lt;mask&gt; [&lt;file&gt;...]
 
-<p>See <a href="#MASK-SYNTAX">MASK SYNTAX</a> for more information</p>
+    ymask -h|--help|--version
 
-<h2 id="file">&lt;file&gt;</h2>
+=head1 DESCRIPTION
 
-<p>A YAML file to read. The special file &quot;-&quot; refers to STDIN. If no files are specified, read STDIN.</p>
+This program takes a stream of YAML documents (on STDIN or file arguments),
+and prints only the fields specified by the C&lt;mask&gt;.
 
-<h1 id="OPTIONS">OPTIONS</h1>
+=head1 ARGUMENTS
 
-<h2 id="h---help">-h | --help</h2>
+=head2 mask
 
-<p>Show this help document.</p>
+See L&lt;MASK SYNTAX|/MASK SYNTAX&gt; for more information
 
-<h2 id="version">--version</h2>
+=head2 &lt;file&gt;
 
-<p>Print the current ymask and Perl versions.</p>
+A YAML file to read. The special file &quot;-&quot; refers to STDIN. If no files are
+specified, read STDIN.
 
-<h1 id="MASK-SYNTAX">MASK SYNTAX</h1>
+=head1 OPTIONS
 
-<h2 id="PROPERTIES">PROPERTIES</h2>
+=head2 -h | --help
 
-<pre><code>    $ ymask &#39;name,rank,serial&#39;</code></pre>
+Show this help document.
 
-<p>Select multiple properties in a document using <code>,</code>. If a property does not exist, nothing will be added (and no error or warning will be output).</p>
+=head2 --version
 
-<h2 id="DESCENDANTS">DESCENDANTS</h2>
+Print the current ymask and Perl versions.
 
-<pre><code>    $ ymask &#39;squad/name&#39;</code></pre>
+=head1 MASK SYNTAX
 
-<p>Select an inner document&#39;s properties using <code>/</code>. Arrays are automatically looped over.</p>
+=head2 PROPERTIES
 
-<h2 id="SUB-SELECTION">SUB-SELECTION</h2>
+    $ ymask &#39;name,rank,serial&#39;
 
-<pre><code>    $ ymask &#39;squad(name,location)&#39;</code></pre>
+Select multiple properties in a document using C&lt;,&gt;. If a property does not exist,
+nothing will be added (and no error or warning will be output).
 
-<p>Select multiple parts of an inner document by using parentheses.</p>
+=head2 DESCENDANTS
 
-<h2 id="WILDCARDS">WILDCARDS</h2>
+    $ ymask &#39;squad/name&#39;
 
-<pre><code>    $ ymask &#39;squad/*/city&#39;</code></pre>
+Select an inner document&#39;s properties using C&lt;/&gt;. Arrays are automatically looped over.
 
-<p>Select every property in a document, which is useful for picking parts out of every inner document.</p>
+=head2 SUB-SELECTION
 
-<h1 id="EXAMPLES">EXAMPLES</h1>
+    $ ymask &#39;squad(name,location)&#39;
 
-<p>All these examples use the following documents:</p>
+Select multiple parts of an inner document by using parentheses.
 
-<pre><code>    ---
+=head2 WILDCARDS
+
+    $ ymask &#39;squad/*/city&#39;
+
+Select every property in a document, which is useful for picking parts out of
+every inner document.
+
+=head1 EXAMPLES
+
+All these examples use the following documents:
+
+    ---
     name: Hazel Murphy
     role: Captain
     nickname: Hank
@@ -137,11 +167,11 @@
           from: 2014-02-10
         - location: Sea Parks
           from: 2004-09-01
-          to: 2014-01-20</code></pre>
+          to: 2014-01-20
 
-<h2 id="SELECT-MULTIPLE-PROPERTIES">SELECT MULTIPLE PROPERTIES</h2>
+=head2 SELECT MULTIPLE PROPERTIES
 
-<pre><code>    $ ymask &#39;name,role,nickname&#39;
+    $ ymask &#39;name,role,nickname&#39;
     ---
     name: Hazel Murphy
     nickname: Hank
@@ -152,11 +182,11 @@
     role: Science Officer
     ---
     name: Debbie Dupree
-    role: Oceanographer</code></pre>
+    role: Oceanographer
 
-<h2 id="SELECT-PROPERTIES-IN-ARRAYS">SELECT PROPERTIES IN ARRAYS</h2>
+=head2 SELECT PROPERTIES IN ARRAYS
 
-<pre><code>    $ ymask &#39;name,history/location&#39;
+    $ ymask &#39;name,history/location&#39;
     ---
     history:
       - location: Sealab
@@ -171,18 +201,19 @@
     history:
       - location: Sealab
       - location: Sea Parks
-    name: Debbie Dupree</code></pre>
+    name: Debbie Dupree
 
-<h1 id="SEE-ALSO">SEE ALSO</h1>
+=head1 SEE ALSO
 
-<ul>
+=over 4
 
-<li><p><a href="https://metacpan.org/pod/Data::Partial::Google">Data::Partial::Google</a> - The implementation of this command</p>
+=item *
 
-</li>
-</ul>
+L&lt;Data::Partial::Google&gt; - The implementation of this command
 
+=back
 
+</pre>
 
         </div>
         <footer>

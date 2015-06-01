@@ -37,44 +37,24 @@
             
         </header>
         <div class="main container">
-            <div class="crumbtrail">
-<ul>
-    <li>
-        ETL
-    </li>
-    <li>
-        <a href="/ETL-Yertl/pod/index.html">Yertl</a>
-    </li>
-    <li>
-        Command
-    </li>
-    <li>
-        <a href="/ETL-Yertl/pod/ETL/Yertl/Command/yq.html">yq</a>
-    </li>
-</ul>
-(<a href="/ETL-Yertl/pod/ETL/Yertl/Command/yq.src.html">source</a>)
-</div>
-<h1 id="NAME">NAME</h1>
+            <a href="/ETL-Yertl/pod/ETL/Yertl/Help/Cookbook.html">Back to documentation</a>
+<pre># PODNAME: ETL::Yertl::Help::Cookbook
+# ABSTRACT: Some recipies for common ETL tasks
 
-<p>ETL::Yertl::Command::yq - Filter and construct documents using a mini-language</p>
+=head1 DESCRIPTION
 
-<h1 id="SYNOPSIS">SYNOPSIS</h1>
+This document describes how to do some common ETL tasks
 
-<pre><code>    ### On a shell...
-    $ yq [-v] &lt;script&gt; [&lt;file&gt;...]
-    $ yq [-h|--help|--version]
+=head1 EMBEDDED DOCUMENTS
 
-    ### In Perl...
-    use ETL::Yertl;
-    yq( &#39;&lt;script&gt;&#39;, &#39;&lt;filename&gt;&#39;, { verbose =&gt; 1 } );</code></pre>
+When you&#39;ve got serialized JSON in a database field, you can use C&lt;jq&gt; to deserialize
+it:
 
-<h1 id="DESCRIPTION">DESCRIPTION</h1>
-
-<h1 id="ARGUMENTS">ARGUMENTS</h1>
-
-<h1 id="OPTIONS">OPTIONS</h1>
-
-
+    ysql TESTDB &#39;SELECT json_field FROM table&#39;              # Query the database
+        | yto json                                          # Convert to JSON for jq
+        | js &#39;.json_field | fromjson&#39;                       # Inflate the JSON
+        | yfrom json                                        # Convert back to Yertl
+</pre>
 
         </div>
         <footer>

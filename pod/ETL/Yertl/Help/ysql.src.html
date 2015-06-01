@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="/ETL-Yertl/theme/css/normalize.css" rel="stylesheet">
+        <link href="/ETL-Yertl/theme/css/skeleton.css" rel="stylesheet">
+        <link href="/ETL-Yertl/theme/css/statocles-default.css" rel="stylesheet">
+        <title>Yertl</title>
+        
+    </head>
+    <body>
+        <header>
+            <nav class="navbar">
+                <div class="container">
+                    <a class="brand" href="/ETL-Yertl/">Yertl</a>
+                    <ul>
+                        <li>
+                            <a href="/ETL-Yertl/blog">Blog</a>
+                        </li>
+                        <li>
+                            <a href="/ETL-Yertl/pod">Docs</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl">Code</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl/issues">Bugs</a>
+                        </li>
+                        <li>
+                            <a href="http://metacpan.org/pod/ETL::Yertl">CPAN</a>
+                        </li>
+                        <li>
+                            <a href="https://chat.mibbit.com/?channel=%23yertl&amp;server=irc.perl.org">IRC</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+        </header>
+        <div class="main container">
+            <a href="/ETL-Yertl/pod/ETL/Yertl/Help/ysql.html">Back to documentation</a>
+<pre># PODNAME: ETL::Yertl::Help::ysql
+# ABSTRACT: A guide to using ysql to work with SQL databases
+
+=head1 Configure Databases
+
+To use ysql, first we have to configure a database. This saves us from having
+to type the full DBI data source name (C&lt;dbi:mysql:host=dev;database=mydb&gt;) every
+time. Instead, we can refer to our database by a nice name, like &quot;dev&quot;, or
+&quot;prod&quot;.
+
+    $ ysql --config dev dbi:SQLite:database.db
+
+Later, we can update our configuration if we need to:
+
+    $ ysql --config dev --database=dev.db
+
+We can examine our configuration as a YAML document:
+
+    $ ysql --config dev
+    ---
+    database: dev.db
+    driver: SQLite
+
+Let&#39;s add a production database as well:
+
+    $ ysql --config prod --driver=SQLite --database=prod.db
+
+And now we can check both of our configs:
+
+    $ ysql --config
+    ---
+    dev:
+      database: dev.db
+      driver: SQLite
+    prod:
+      database: prod.db
+      driver: SQLite
+
+=head1 Working with Data
+
+Now that we&#39;ve configured some databases, let&#39;s insert some data. First we need
+to make some tables:
+
+    $ ysql prod &#39;CREATE TABLE users ( id INTEGER PRIMARY KEY \
+        AUTOINCREMENT, name VARCHAR, email VARCHAR )&#39;
+    $ ysql dev &#39;CREATE TABLE users ( id INTEGER PRIMARY KEY \
+        AUTOINCREMENT, name VARCHAR, email VARCHAR )&#39;
+
+Next let&#39;s insert some data:
+
+    $ ysql prod &#39;INSERT INTO users ( name, email ) \
+        VALUES ( &quot;preaction&quot;, &quot;preaction@example.com&quot; )&#39;
+    $ ysql prod &#39;INSERT INTO users ( name, email ) \
+        VALUES ( &quot;postaction&quot;, &quot;postaction@example.com&quot; )&#39;
+
+Now, let&#39;s query for our data:
+
+    $ ysql prod &#39;SELECT * FROM users&#39;
+    ---
+    email: preaction@example.com
+    id: 1
+    name: preaction
+    ---
+    email: postaction.example.com
+    id: 2
+    name: postaction
+
+=head1 Converting Formats
+
+Yertl uses YAML as its default output, but we can easily convert to JSON or CSV
+using the L&lt;yto utility|yto&gt;.
+
+    $ ysql prod &#39;SELECT * FROM users&#39; | yto csv
+    email,id,name
+    preaction@example.com,1,preaction
+    postaction@example.com,2,postaction
+
+    $ ysql prod &#39;SELECT * FROM users&#39; | yto json
+    {
+       &quot;email&quot; : &quot;preaction@example.com&quot;,
+       &quot;id&quot; : &quot;1&quot;,
+       &quot;name&quot; : &quot;preaction&quot;
+    }
+    {
+       &quot;email&quot; : &quot;postaction@example.com&quot;,
+       &quot;id&quot; : &quot;2&quot;,
+       &quot;name&quot; : &quot;postaction&quot;
+    }
+
+=head1 Writing Data
+
+Now, lets say we want to copy our production database to dev for testing. To do
+that, Yertl allows us to read YAML from C&lt;STDIN&gt; and execute a query for each YAML
+document. Yertl uses a special interpolation syntax (starting with a C&lt;$&gt;) to
+pick parts of the document to fill in the query:
+
+    $ ysql prod &#39;SELECT * FROM users&#39; |
+        ysql dev &#39;INSERT INTO users ( id, name, email ) \
+            VALUES ( $.id, $.name, $.email )&#39;
+
+So this will take our users table from prod and write it to dev. C&lt;$.id&gt; picks
+the &quot;id&quot; field, C&lt;$.name&gt; the &quot;name&quot; field, etc...
+
+=head1 Saved Queries
+
+But all this would be a bear to type over and over again (imagine if we had a
+bunch of joins to do). So, ysql allows you to save queries for later use using
+the C&lt;--save E&lt;lt&gt;nameE&lt;gt&gt;&gt; option:
+
+    $ ysql prod --save users &#39;SELECT * FROM users&#39;
+    $ ysql dev --save update_users &#39;UPDATE users SET \
+        name=$.name, email=$.email WHERE id=$.id&#39;
+
+Then we can recall our query by the name we gave to the C&lt;--save&gt; option:
+
+    $ ysql prod users | ysql dev update_users
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L&lt;ysql&gt;
+
+The full documentation for the C&lt;ysql&gt; command
+
+=item L&lt;ETL::Yertl&gt;
+
+The main documentation
+
+=back
+
+</pre>
+
+        </div>
+        <footer>
+            <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-61295159-4', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+            <div class="container tagline">
+                <a href="http://preaction.github.io/Statocles">Made with Statocles</a><br>
+                <a href="http://www.perl.org">Powered by Perl</a>
+            </div>
+        </footer>
+    </body>
+</html>
