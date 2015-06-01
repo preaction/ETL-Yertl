@@ -1,6 +1,14 @@
 Changelog for ETL-Yertl
 
-0.023 2015-02-26T18:35:35
+0.024 2015-06-01T02:36:27
+ - add xargs mode to yq
+ - remove ModuleBuild to prevent toolchain confusion
+ - fix ps grok patterns to work on RHEL 5
+ - update default theme from statocles default
+ - add google analytics
+ - add release v0.023 announcement
+
+0.023 2015-02-26T18:35:35Z
  - make yq use formatter modules
  - update statocles theme from latest release
  - update site theme for new statocles default theme
