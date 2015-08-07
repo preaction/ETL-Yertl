@@ -2,3 +2,4 @@ www.preaction.me doug preaction [10/Oct/2000:13:55:36 -0700] "GET / HTTP/1.0" 20
 127.0.1.1 - jberger [21/Nov/2001:18:02:42 -0800] "GET /foo/bar/baz?fizz=no&buzz=yes HTTP/1.1" 200 236
 127.0.0.1 - preaction [01/Jan/2002:13:55:36 +0500] "POST /blog/edit HTTP/1.1" 200 326
 127.1.0.1 - murphy [24/Jun/2015:06:12:36 -0000] "GET /NOT_FOUND HTTP/1.0" 404 124
+bonzi.example.com - morty [04/Mar/2015:12:24:38 -0600] "read /ping PLUTO/1.16.2" 200 -

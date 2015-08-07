@@ -13,6 +13,7 @@ our %PATTERNS = (
     DATA => '.*?',
     NUM => $RE{num}{real}."",   # stringify to allow YAML serialization
     INT => $RE{num}{int}."",    # stringify to allow YAML serialization
+    VERSION => '\d+(?:[.]\d+)*',
 
     DATE => {
         MONTH => '\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\b',
@@ -41,8 +42,8 @@ our %PATTERNS = (
         HTTP_COMMON => join( " ",
             '%{NET.HOSTNAME:remote_addr}', '%{OS.USER:ident}', '%{OS.USER:user}',
             '\[%{DATE.HTTP:timestamp}]',
-            '"%{WORD:method} %{URL.PATH:path} HTTP/%{NUM:http_version}"',
-            '%{INT:status}', '%{INT:content_length}',
+            '"%{WORD:method} %{URL.PATH:path} [^/]+/%{VERSION:http_version}"',
+            '%{INT:status}', '(?<content_length>\d+|-)',
         ),
         HTTP_COMBINED => join( " ",
             '%{LOG.HTTP_COMMON}',

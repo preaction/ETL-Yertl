@@ -95,8 +95,8 @@ subtest 'logs' => sub {
         my $file = $SHARE_DIR->child( lines => 'http_common_log.txt' );
         my $pattern = join " ", '%{NET.HOSTNAME:remote_addr}', '%{OS.USER:ident}', '%{OS.USER:user}',
                                 '\[%{DATE.HTTP:timestamp}]',
-                                '"%{WORD:method} %{URL.PATH:path} HTTP/%{NUM:http_version}"',
-                                '%{INT:status}', '%{INT:content_length}',
+                                '"%{WORD:method} %{URL.PATH:path} [^/]+/%{VERSION:http_version}"',
+                                '%{INT:status}', '(?<content_length>\d+|-)',
                                 ;
 
         my @expect = (
@@ -146,6 +146,18 @@ subtest 'logs' => sub {
                 http_version => '1.0',
                 status => '404',
                 content_length => 124,
+            },
+
+            {
+                remote_addr => 'bonzi.example.com',
+                ident => '-',
+                user => 'morty',
+                timestamp => '04/Mar/2015:12:24:38 -0600',
+                method => 'read',
+                path => '/ping',
+                http_version => '1.16.2',
+                status => '200',
+                content_length => '-',
             },
         );
 
@@ -214,6 +226,20 @@ subtest 'logs' => sub {
                 content_length => 124,
                 referer => '-',
                 user_agent => 'GoogleBot/1.0',
+            },
+
+            {
+                remote_addr => 'bonzi.example.com',
+                ident => '-',
+                user => 'morty',
+                timestamp => '04/Mar/2015:12:24:38 -0600',
+                method => 'read',
+                path => '/ping',
+                http_version => '1.16.2',
+                status => '200',
+                content_length => '-',
+                referer => '-',
+                user_agent => 'Github/1.2 Something/2.4 Other/0.0',
             },
         );
 
