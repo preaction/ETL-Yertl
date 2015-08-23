@@ -125,7 +125,7 @@ sub main {
             die "Must specify a database!\n";
         }
 
-        my @dbi_args = $opt{dsn} ? ( $opt{dsn} ) : dbi_args( $db_key );
+        my @dbi_args = $opt{dsn} ? ( $opt{dsn}, undef, undef ) : dbi_args( $db_key );
         if ( !@dbi_args ) {
             die "Unknown database '$db_key'\n";
         }

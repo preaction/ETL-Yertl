@@ -703,6 +703,16 @@ subtest 'query' => sub {
             unlike $stderr, qr{Usage:}, "we don't need usage info";
         };
 
+        subtest 'SQL error in prepare using --dsn' => sub {
+            my ( $stdout, $stderr, $exit ) = capture {
+                ysql->main( '--dsn', 'dbi:SQLite:dbname=' . $home->child( 'test.db' ), 'SELECT FROM person' );
+            };
+            isnt $exit, 0, 'error happened';
+            ok !$stdout, 'nothing on stdout' or diag $stdout;
+            like $stderr, qr{ERROR: SQL error in prepare: near "FROM": syntax error};
+            unlike $stderr, qr{DBD::SQLite::db prepare failed:}, 'does not contain second error from DBI';
+            unlike $stderr, qr{Usage:}, "we don't need usage info";
+        };
     };
 };
 
