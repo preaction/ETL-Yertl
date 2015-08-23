@@ -131,6 +131,13 @@ sub main {
         }
 
         my $dbh = DBI->connect( @dbi_args, { PrintError => 0 } );
+        if ( !$dbh ) {
+            no warnings 'once';
+            die sprintf qq{Could not connect to database "\%s"\%s: \%s\n},
+                $dbi_args[0],
+                $dbi_args[1] ? qq{ (user: "$dbi_args[1]")} : '',
+                $DBI::errstr;
+        }
 
         my $query = shift @args;
         if ( $db_key ) {

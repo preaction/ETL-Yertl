@@ -28,7 +28,8 @@ sub main {
     };
     if ( $@ ) {
         # SQL errors do not need usage information
-        if ( $@ =~ /^SQL error/ ) {
+        # XXX: We need to have some kind of error return message
+        if ( $@ =~ /^SQL error/ || $@ =~ /^Could not connect/ ) {
             print STDERR "ERROR: $@";
             return 1;
         }

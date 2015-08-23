@@ -673,6 +673,16 @@ subtest 'query' => sub {
         my ( $home ) = $setup->();
         local $ENV{HOME} = "$home";
 
+        subtest 'error in connect' => sub {
+            my ( $stdout, $stderr, $exit ) = capture {
+                ysql->main( '--dsn', 'dbi:SQLite:dbname=' . $home->child( 'MISSINGDIR', 'test.db' ), 'SELECT * FROM person' );
+            };
+            isnt $exit, 0, 'error happened';
+            ok !$stdout, 'nothing on stdout' or diag $stdout;
+            like $stderr, qr{ERROR: Could not connect to database "dbi:SQLite:dbname=[^"]+": unable to open database file};
+            unlike $stderr, qr{Usage:}, "we don't need usage info";
+        };
+
         subtest 'SQL error in prepare' => sub {
             my ( $stdout, $stderr, $exit ) = capture {
                 ysql->main( 'testdb', 'SELECT FROM person' );
