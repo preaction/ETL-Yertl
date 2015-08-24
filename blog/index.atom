@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>http://preaction.github.io/ETL-Yertl/blog/</id>
     <title>Yertl</title>
-    <updated>2015-08-23T22:47:24Z</updated>
+    <updated>2015-08-23T22:48:30Z</updated>
     <link href="http://preaction.github.io/ETL-Yertl/blog/index.atom" rel="self" />
     <link href="http://preaction.github.io/ETL-Yertl/blog/" rel="alternate" />
     <generator version="0.055">Statocles</generator>
