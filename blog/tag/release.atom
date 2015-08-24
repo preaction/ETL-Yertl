@@ -2,10 +2,31 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>http://preaction.github.io/ETL-Yertl/blog/tag/release/</id>
     <title>Yertl</title>
-    <updated>2015-05-31T21:39:18Z</updated>
+    <updated>2015-08-23T22:47:25Z</updated>
     <link href="http://preaction.github.io/ETL-Yertl/blog/tag/release.atom" rel="self" />
     <link href="http://preaction.github.io/ETL-Yertl/blog/tag/release/" rel="alternate" />
-    <generator version="0.046">Statocles</generator>
+    <generator version="0.055">Statocles</generator>
+    <entry>
+        <id>http://preaction.github.io/ETL-Yertl/blog/2015/08/23/release-v0-025/</id>
+        <title>Release v0.025</title>
+        <link href="http://preaction.github.io/ETL-Yertl/blog/2015/08/23/release-v0-025/" rel="alternate" />
+        <content type="html"><![CDATA[
+            <p>Some minor bugfixes in this release. One that would make Yertl
+fail its tests (and therefore fail to install). Two that caused some
+very confusing error messages to be printed when using
+<a href="http://preaction.github.io/ETL-Yertl/pod/ysql.html">ysql</a>. And a final one that made it hard to use the
+HTTP log pattern with <a href="http://preaction.github.io/ETL-Yertl/pod/ygrok.html">ygrok</a>.</p>
+
+<p>Full changelog below...</p>
+
+                <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/08/23/release-v0-025/#section-2">Continue reading...</a></p>
+            <p>Tags:
+                <a href="/blog/tag/release/">release</a>
+            </p>
+        ]]></content>
+        <updated>2015-08-23T00:00:00Z</updated>
+        <category term="release" />
+    </entry>
     <entry>
         <id>http://preaction.github.io/ETL-Yertl/blog/2015/05/31/release-v0-024/</id>
         <title>Release v0.024</title>
@@ -76,11 +97,11 @@ command, now we can save a little bit of typing.</p>
 
 <p>This release has plenty of additions to the <code>ygrok</code> script, allowing it to
 easily parse logs from Apache HTTPD and Syslog, the output of <code>ls -l</code> and <code>ps</code>.
-There's also a new <code>-l</code> flag to allow loose matching of input lines.</p>
+There&#39;s also a new <code>-l</code> flag to allow loose matching of input lines.</p>
 
 <p>This release also allows you to add your own <code>ygrok</code> patterns. In addition to
 adding your own custom patterns, you can list all the existing patterns by
-doing <code>ygrok --pattern</code>. See <a href="/pod/ygrok">the ygrok documentation</a> for more
+doing <code>ygrok --pattern</code>. See <a href="http://preaction.github.io/ETL-Yertl/pod/ygrok">the ygrok documentation</a> for more
 details.</p>
 
 <p>With all the possibilities, <code>ygrok</code> patterns can now be organized into
@@ -90,31 +111,6 @@ patterns to the Yertl core.</p>
 <p>Full changelog below:</p>
 
                 <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.021.html#section-2">Continue reading...</a></p>
-            <p>Tags:
-                <a href="/blog/tag/release/">release</a>
-            </p>
-        ]]></content>
-        <updated>2015-02-01T00:00:00Z</updated>
-        <category term="release" />
-    </entry>
-    <entry>
-        <id>http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.020.html</id>
-        <title>Release v0.020</title>
-        <link href="http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.020.html" rel="alternate" />
-        <content type="html"><![CDATA[
-            <p>This release adds the first initial development of <code>ygrok</code>, the Yertl program
-for parsing lines of plain text input into documents.</p>
-
-<p><code>ygrok</code> is perfect for parsing log files and command output.  By using simple
-patterns or named regex captures, we can parse a line of input into a document,
-which we can then write to a database using <code>ysql</code>, or convert to CSV or JSON
-with <code>yto</code>.</p>
-
-<p>Lots more development on <code>ygrok</code> to come!</p>
-
-<p>Full changelog below:</p>
-
-                <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.020.html#section-2">Continue reading...</a></p>
             <p>Tags:
                 <a href="/blog/tag/release/">release</a>
             </p>
