@@ -1,82 +1,103 @@
-NAME
-    ETL::Yertl - ETL with a Shell
+=head1 SYNOPSIS
 
-VERSION
-    version 0.023
+    ### On a shell...
+    # Convert file to Yertl's format
+    $ yfrom csv file.csv >work.yml
+    $ yfrom json file.json >work.yml
 
-SYNOPSIS
-        ### On a shell...
-        # Convert file to Yertl's format
-        $ yfrom csv file.csv >work.yml
-        $ yfrom json file.json >work.yml
+    # Mask document
+    $ ymask 'field/inner' work.yml >masked.yml
 
-        # Mask document
-        $ ymask 'field/inner' work.yml >masked.yml
+    # Convert file to output format
+    $ yto csv work.yml
+    $ yto json work.yml
 
-        # Convert file to output format
-        $ yto csv work.yml
-        $ yto json work.yml
+    # Parse HTTP logs into documents
+    $ ygrok '%{LOG.HTTP_COMMON}' httpd.log
 
-        # Parse HTTP logs into documents
-        $ ygrok '%{LOG.HTTP_COMMON}' httpd.log
+    # Read data from a database
+    $ ysql db_name 'SELECT * FROM employee'
 
-        # Read data from a database
-        $ ysql db_name 'SELECT * FROM employee'
+    # Write data to a database
+    $ ysql db_name 'INSERT INTO employee ( id, name ) VALUES ( $.id, $.name )'
 
-        # Write data to a database
-        $ ysql db_name 'INSERT INTO employee ( id, name ) VALUES ( $.id, $.name )'
+    ### In Perl...
+    use ETL::Yertl;
 
-        ### In Perl...
-        use ETL::Yertl;
+    # XXX: To do: Perl API
 
-        # XXX: To do: Perl API
+=head1 DESCRIPTION
 
-DESCRIPTION
-    ETL::Yertl is an ETL for shells. It is designed to accept data from
-    multiple formats (CSV, JSON), manipulate them using simple tools, and
-    then convert them to an output format.
+ETL::Yertl is an ETL for shells. It is designed to accept data from multiple formats
+(CSV, JSON), manipulate them using simple tools, and then convert them to an output
+format.
 
-    Yertl will have tools for:
+Yertl will have tools for:
 
-    Extracting data from databases (MySQL, Postgres, MongoDB)
-    Loading data into databases
-    Extracting data from web services
-    Writing data to web services
-    Distributing data through messaging APIs (ZeroMQ)
+=over 4
 
-SEE ALSO
-    <http://preaction.github.io/ETL-Yertl>
-        The Yertl home page.
+=item Extracting data from databases (MySQL, Postgres, MongoDB)
 
-  Yertl Tools
-    yfrom
-        Convert incoming data (CSV, JSON) to Yertl documents.
+=item Loading data into databases
 
-    yto Convert Yertl documents into another format (CSV, JSON).
+=item Extracting data from web services
 
-    ygrok
-        Parse lines of text into Yertl documents.
+=item Writing data to web services
 
-    ysql
-        Read/write documents from SQL databases.
+=item Distributing data through messaging APIs (ZeroMQ)
 
-    ymask
-        Filter documents with a mask, letting only matching fields through.
+=back
 
-    yq  A powerful mini-language for munging and filtering.
+=head1 SEE ALSO
 
-  Other Tools
-    Here are some other tools that can be used with Yertl
+=over 4
 
-    jq  <http://stedolan.github.io/jq/> A filter for JSON documents. The
-        inspiration for yq.
+=item L<http://preaction.github.io/ETL-Yertl>
 
-AUTHOR
-    Doug Bell <preaction@cpan.org>
+The Yertl home page.
 
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2015 by Doug Bell.
+=back
 
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
+=head2 Yertl Tools
+
+=over 4
+
+=item L<yfrom>
+
+Convert incoming data (CSV, JSON) to Yertl documents.
+
+=item L<yto>
+
+Convert Yertl documents into another format (CSV, JSON).
+
+=item L<ygrok>
+
+Parse lines of text into Yertl documents.
+
+=item L<ysql>
+
+Read/write documents from SQL databases.
+
+=item L<ymask>
+
+Filter documents with a mask, letting only matching fields through.
+
+=item L<yq>
+
+A powerful mini-language for munging and filtering.
+
+=back
+
+=head2 Other Tools
+
+Here are some other tools that can be used with Yertl
+
+=over 4
+
+=item jq
+
+L<http://stedolan.github.io/jq/> A filter for JSON documents. The inspiration
+for L<yq>.
+
+=back
 

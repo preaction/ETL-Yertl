@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "Parse::RecDescent" => 0,
     "Path::Tiny" => "0.055",
     "Pod::Usage::Return" => 0,
-    "Regexp::Common" => 0,
+    "Regexp::Common" => "2013031301",
     "Text::Trim" => 0,
     "Type::Tiny" => 0,
     "Types::Standard" => 0,
@@ -58,7 +58,7 @@ my %WriteMakefileArgs = (
     "Test::Lib" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "0.024",
+  "VERSION" => "0.025",
   "test" => {
     "TESTS" => "t/*.t t/bin/*.t t/command/yq/*.t t/format/*.t"
   }
@@ -84,7 +84,7 @@ my %FallbackPrereqs = (
   "Parse::RecDescent" => 0,
   "Path::Tiny" => "0.055",
   "Pod::Usage::Return" => 0,
-  "Regexp::Common" => 0,
+  "Regexp::Common" => "2013031301",
   "Test::Deep" => 0,
   "Test::Differences" => 0,
   "Test::Exception" => 0,
