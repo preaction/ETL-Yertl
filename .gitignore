@@ -3,3 +3,4 @@
 *.tar.gz
 /ETL-Yertl-*
 site/_build
+.statocles
