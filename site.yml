@@ -36,7 +36,7 @@ site:
                 - title: IRC
                   href: 'https://chat.mibbit.com/?channel=%23yertl&server=irc.perl.org'
         deploy:
-            $ref: gh_pages
+            $ref: personal
         theme:
             $ref: theme
         apps:
