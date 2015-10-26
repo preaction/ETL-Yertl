@@ -9,11 +9,18 @@ gh_pages:
         path: '.'
         branch: gh-pages
 
+personal:
+    class: Statocles::Deploy::Git
+    args:
+        path: '.'
+        branch: deploy
+        remote: www
+
 site:
     class: Statocles::Site
     args:
         title: Yertl
-        base_url: http://preaction.github.io/ETL-Yertl/
+        base_url: http://preaction.me/yertl/
         nav:
             main:
                 - title: Blog
