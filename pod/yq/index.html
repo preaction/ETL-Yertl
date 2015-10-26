@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="/yertl/theme/css/normalize.css" rel="stylesheet">
+        <link href="/yertl/theme/css/skeleton.css" rel="stylesheet">
+        <link href="/yertl/theme/css/statocles-default.css" rel="stylesheet">
+        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+        <title>Yertl</title>
+        <meta content="Statocles 0.056" name="generator">
+        <link href="http://preaction.me/yertl/pod/yq/" rel="canonical">
+<script>
+    if ( location.href.indexOf( "http://preaction.me/yertl/" ) == -1 ) {
+        location.href = "http://preaction.me/yertl/pod/yq/";
+    }
+</script>
+
+    </head>
+    <body>
+        <header>
+            <nav class="navbar">
+                <div class="container">
+                    <a class="brand" href="/yertl/">Yertl</a>
+                    <ul>
+                        <li>
+                            <a href="/yertl/blog">Blog</a>
+                        </li>
+                        <li>
+                            <a href="/yertl/pod">Docs</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl">Code</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl/issues">Bugs</a>
+                        </li>
+                        <li>
+                            <a href="http://metacpan.org/pod/ETL::Yertl">CPAN</a>
+                        </li>
+                        <li>
+                            <a href="https://chat.mibbit.com/?channel=%23yertl&amp;server=irc.perl.org">IRC</a>
+                        </li>
+                    </ul>
+                    
+                </div>
+            </nav>
+            
+        </header>
+        <div class="main container">
+            <div class="crumbtrail">
+<ul>
+    <li>
+        <a href="/yertl/pod/yq/">yq</a>
+    </li>
+</ul>
+(<a href="/yertl/pod/yq/source.html">source</a>)
+</div>
+<h1 id="NAME">NAME</h1>
+
+<p>yq - Filter YAML through a command-line program</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    yq [-vx] &lt;script&gt; [&lt;file&gt;...]
+
+    yq -h|--help|--version</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This program takes a stream of YAML documents (on STDIN or file arguments), applies a filter, then writes the results to STDOUT.</p>
+
+<h1 id="ARGUMENTS">ARGUMENTS</h1>
+
+<h2 id="script">script</h2>
+
+<p>The script to run. For the script syntax, see <a href="https://metacpan.org/pod/SYNTAX" rel="external">SYNTAX</a>.</p>
+
+<h2 id="file">&lt;file&gt;</h2>
+
+<p>A YAML file to filter. The special file &quot;-&quot; refers to STDIN. If no files are specified, filter STDIN.</p>
+
+<h1 id="OPTIONS">OPTIONS</h1>
+
+<h2 id="v---verbose">-v | --verbose</h2>
+
+<p>Set verbose mode to print out some internal program messages on STDERR to help with debugging.</p>
+
+<h2 id="x---xargs">-x | --xargs</h2>
+
+<p>xargs mode. When the filter returns only a single item, simply print it out without using the serializer. This allows single values to be piped into other programs that may not know how to deal with serialized data, like xargs.</p>
+
+<h2 id="h---help">-h | --help</h2>
+
+<p>Show this help document.</p>
+
+<h2 id="version">--version</h2>
+
+<p>Print the current yq and Perl versions.</p>
+
+<h1 id="SYNTAX">SYNTAX</h1>
+
+<h2 id="EXPRESSIONS">EXPRESSIONS</h2>
+
+<p>An <code>EXPRESSION</code> is allowed to be either a <a href="https://metacpan.org/pod/FILTER" rel="external">FILTER</a>, <a href="https://metacpan.org/pod/VALUE" rel="external">VALUE</a>, or a <a href="https://metacpan.org/pod/COMPARISON" rel="external">COMPARISON</a>.</p>
+
+<h2 id="FILTERS">FILTERS</h2>
+
+<p>Filters select a portion of the incoming documents. Filters can be combined to reach deep inside the documents you&#39;re working with.</p>
+
+<dl>
+
+<dt>.</dt>
+<dd>
+
+<p>Returns the entire document, unfiltered. Useful in if/then statements.</p>
+
+<pre><code>    # INPUT
+    foo: bar
+    baz: fuzz
+
+    $ yq .
+    foo: bar
+    baz: fuzz</code></pre>
+
+</dd>
+<dt>.key</dt>
+<dd>
+
+<p>Extract a single item out of a hash.</p>
+
+<pre><code>    # INPUT
+    foo:
+        bar: baz
+        fizz: fuzz
+
+    $ yq .foo
+    bar: baz
+    fizz: fuzz
+
+    $ yq .foo.fizz
+    fuzz</code></pre>
+
+</dd>
+<dt>.[#]</dt>
+<dd>
+
+<p>Extract a single item out of an array.</p>
+
+<pre><code>    # INPUT
+    - foo: fuzz
+    - bar: buzz
+    - baz:
+        good: bad
+        new: old
+
+    $ yq .[1]
+    bar: buzz
+
+    $ yq .[2]
+    baz:
+        good: bad
+        new: old
+
+    $ yq .[2].baz
+    good: bad
+    new: old
+
+    $ yq .[2].baz.new
+    old</code></pre>
+
+</dd>
+<dt>[]</dt>
+<dd>
+
+<p>Use [] with no index to flatten an array.</p>
+
+<pre><code>    # INPUT
+    - foo: fuzz
+    - bar: buzz
+
+    $ yq &#39;.[]&#39;
+    foo: fuzz
+    ---
+    bar: buzz</code></pre>
+
+</dd>
+</dl>
+
+<h2 id="VALUES">VALUES</h2>
+
+<dl>
+
+<dt>&#39;STRING&#39; &quot;STRING&quot;</dt>
+<dd>
+
+<p>Both single- and double-quoted strings are allowed. Using \ will escape the string delimiter.</p>
+
+</dd>
+<dt>{ KEY: EXPRESSION, ... }</dt>
+<dd>
+
+<p>The hash constructor. <code>KEY</code> may be any <code>FILTER</code> or a bare value.</p>
+
+<pre><code>    # INPUT
+    foo: bar
+    baz: fuzz
+    ---
+    foo: 1
+    baz: 2
+
+    $ yq &#39;{ bar: .foo, .baz: foo }&#39;
+    bar: bar
+    fuzz: foo
+    ---
+    2: foo
+    bar: 1</code></pre>
+
+</dd>
+<dt>[ EXPRESSION, ... ]</dt>
+<dd>
+
+<p>The array constructor.</p>
+
+<pre><code>    # INPUT
+    foo: bar
+    baz: fuzz
+    ---
+    foo: 1
+    baz: 2
+
+    $ yq &#39;[ .foo, .baz ]&#39;
+    - bar
+    - fuzz
+    ---
+    - 1
+    - 2</code></pre>
+
+</dd>
+<dt>empty</dt>
+<dd>
+
+<p>The special value empty suppresses printing of a document. Normally, an undefined document will show up in the output as &quot;--- ~&quot;. If your filter instead yields empty, the document will not be printed at all.</p>
+
+<p>This is especially useful in conditionals:</p>
+
+<pre><code>    # INPUT
+    foo: bar
+    baz: fuzz
+
+    $ yq &#39;if .foo eq bar then . else empty&#39;
+    foo: bar
+    baz: fuzz
+
+    $ yq &#39;if .foo eq buzz then . else empty&#39;
+    $</code></pre>
+
+<p>... though see the <code>grep()</code> function for a shorter way of writing this.</p>
+
+</dd>
+<dt>Values</dt>
+<dd>
+
+<p>Any bareword that is not recognized as a syntax element is treated as a value. These barewords may only contain letters, numbers, and underscore.</p>
+
+<p><b>NOTE</b>: This may be subject to change to only allow quoted strings and bare numbers in a future version.</p>
+
+</dd>
+</dl>
+
+<h2 id="COMPARISONS">COMPARISONS</h2>
+
+<dl>
+
+<dt>eq</dt>
+<dd>
+
+<p>String equals comparison. Returns true if both sides are equal to each other when treated as a string.</p>
+
+<p>The two sides may be <a href="https://metacpan.org/pod/FILTERS" rel="external">FILTERS</a> or <a href="https://metacpan.org/pod/VALUES" rel="external">VALUES</a>.</p>
+
+<pre><code>    # INPUT
+    foo: bar
+    baz: fuzz
+    buzz: fuzz
+
+    $ yq &#39;.foo eq bar&#39;
+    true
+
+    $ yq &#39;.baz eq .buzz&#39;
+    true
+
+    $ yq &#39;.baz eq bar&#39;
+    false</code></pre>
+
+<p>YAML treats the string &quot;true&quot; as a true value, and the string &quot;false&quot; as a false value.</p>
+
+</dd>
+<dt>ne</dt>
+<dd>
+
+<p>String not equals comparison. Returns true if one side is not equal to the other side when compared as a string.</p>
+
+<p>The two sides may be <a href="https://metacpan.org/pod/FILTERS" rel="external">FILTERS</a> or <a href="https://metacpan.org/pod/VALUES" rel="external">VALUES</a>.</p>
+
+<pre><code>    # INPUT
+    foo: bar
+    baz: fuzz
+    buzz: fuzz
+
+    $ yq &#39;.foo eq bar&#39;
+    true
+
+    $ yq &#39;.baz eq .buzz&#39;
+    true
+
+    $ yq &#39;.baz eq bar&#39;
+    false</code></pre>
+
+<p>YAML treats the string &quot;true&quot; as a true value, and the string &quot;false&quot; as a false value.</p>
+
+</dd>
+<dt>==</dt>
+<dd>
+
+<p>Numeric equals comparison. Returns true if both sides are equal to each other when treated as numbers. If one of the items is not a number, will print a warning to STDERR but try to compare anyway.</p>
+
+<p>The two sides may be <a href="https://metacpan.org/pod/FILTERS" rel="external">FILTERS</a> or <a href="https://metacpan.org/pod/VALUES" rel="external">VALUES</a>.</p>
+
+<pre><code>    # INPUT
+    one: 1
+    two: 2
+    uno: 1
+
+    $ yq &#39;.one == 1&#39;
+    true
+
+    $ yq &#39;.one == 2&#39;
+    false
+
+    $ yq &#39;.one == .uno&#39;
+    true</code></pre>
+
+</dd>
+<dt>!=</dt>
+<dd>
+
+<p>Numeric not equals comparison. Returns true if both sides are equal to each other when treated as numbers. If one of the items is not a number, will print a warning to STDERR but try to compare anyway.</p>
+
+<p>The two sides may be <a href="https://metacpan.org/pod/FILTERS" rel="external">FILTERS</a> or <a href="https://metacpan.org/pod/VALUES" rel="external">VALUES</a>.</p>
+
+<pre><code>    # INPUT
+    one: 1
+    two: 2
+    uno: 1
+
+    $ yq &#39;.two != 1&#39;
+    true
+
+    $ yq &#39;.two != 2&#39;
+    false
+
+    $ yq &#39;.one != .uno&#39;
+    false</code></pre>
+
+</dd>
+<dt>&gt; / &gt;=</dt>
+<dd>
+
+<p>Numeric greater-than (or equal-to) comparison. Returns true if the left side is greater than (or equal-to) the right side. If one of the items is not a number, will print a warning to STDERR but try to compare anyway.</p>
+
+<p>The two sides may be <a href="https://metacpan.org/pod/FILTERS" rel="external">FILTERS</a> or <a href="https://metacpan.org/pod/VALUES" rel="external">VALUES</a>.</p>
+
+<pre><code>    # INPUT
+    one: 1
+    two: 2
+    uno: 1
+
+    $ yq &#39;.two &gt;= 1&#39;
+    true
+
+    $ yq &#39;.two &gt; 2&#39;
+    false
+
+    $ yq &#39;.one &gt;= .uno&#39;
+    true</code></pre>
+
+</dd>
+<dt>&lt; / &lt;=</dt>
+<dd>
+
+<p>Numeric less-than (or equal-to) comparison. Returns true if the left side is less than (or equal-to) the right side. If one of the items is not a number, will print a warning to STDERR but try to compare anyway.</p>
+
+<p>The two sides may be <a href="https://metacpan.org/pod/FILTERS" rel="external">FILTERS</a> or <a href="https://metacpan.org/pod/VALUES" rel="external">VALUES</a>.</p>
+
+<pre><code>    # INPUT
+    one: 1
+    two: 2
+    uno: 1
+
+    $ yq &#39;.two &lt;= 1&#39;
+    false
+
+    $ yq &#39;.two &lt; 2&#39;
+    false
+
+    $ yq &#39;.one &lt;= .uno&#39;
+    true</code></pre>
+
+</dd>
+</dl>
+
+<h2 id="FUNCTIONS">FUNCTIONS</h2>
+
+<dl>
+
+<dt>length( EXPRESSION )</dt>
+<dd>
+
+<p>Returns the length of the thing returned by EXPRESSION. Depending on what type of thing that is:</p>
+
+<pre><code>    string/number   - Returns the number of characters
+    array           - Returns the number of items
+    hash            - Returns the number of pairs</code></pre>
+
+<p>If EXPRESSION is missing, gives the length of the entire document (<code>length(.)</code>). Returns a number suitable for assignment.</p>
+
+<p>Although length() takes an expression, certain constructs are redundant:</p>
+
+<pre><code>    length( keys( EXPRESSION ) ) -&gt; length( EXPRESSION )
+    # length() works on hashes</code></pre>
+
+<p>A future version may optimize these away, or warn you of their redundancy.</p>
+
+<pre><code>    # INPUT
+    foo:
+        one: 1
+        two: onetwothreefourfive
+        three: 3
+    baz: [ 3, 2, 1 ],
+
+    $ yq &#39;length(.)&#39;
+    2
+
+    $ yq &#39;length&#39;
+    2
+
+    $ yq &#39;length( .foo )&#39;
+    3
+
+    $ yq &#39;length( .baz )&#39;
+    3
+
+    $ yq &#39;length( .foo.two )&#39;
+    19
+
+    $ yq &#39;{ l: length( .foo.two ) }&#39;
+    l: 19</code></pre>
+
+</dd>
+<dt>keys( EXPRESSION )</dt>
+<dd>
+
+<p>Return the keys of the hash or the indicies of the array returned by EXPRESSION. If EXPRESSION is missing, gives the keys of the entire document (<code>keys(.)</code>).</p>
+
+<p>Returns an array suitable for assignment.</p>
+
+<pre><code>    # INPUT
+    foo:
+        one: 1
+        two: 2
+        three: 3
+    baz: [ 3, 2, 1 ]
+
+    $ yq &#39;keys( .foo )&#39;
+    - one
+    - two
+    - three
+
+    $ yq &#39;keys( .baz )&#39;
+    - 0
+    - 1
+    - 2
+
+    $ yq &#39;keys( . )&#39;
+    - foo
+    - baz
+
+    $ yq &#39;keys&#39;
+    - foo
+    - baz
+
+    $ yq &#39;{ k: keys( .foo ) }&#39;
+    k:
+        - one
+        - two
+        - three</code></pre>
+
+</dd>
+<dt>grep( EXPRESSION )</dt>
+<dd>
+
+<p>If <code>EXPRESSION</code> is true, return the current document. Otherwise, return <code>empty</code>.</p>
+
+<p>This is exactly the same as:</p>
+
+<pre><code>    if EXPRESSION then . else empty</code></pre>
+
+</dd>
+<dt>select( EXPRESSION )</dt>
+<dd>
+
+<p>Another name for <code>grep()</code> to match <code>jq</code>&#39;s syntax.</p>
+
+</dd>
+<dt>group_by( EXPRESSION )</dt>
+<dd>
+
+<p>Group incoming documents based on the result of <code>EXPRESSION</code>, yielding a single document containing a hash of arrays.</p>
+
+<pre><code>    # INPUT
+    ---
+    foo: &#39;bar&#39;
+    baz: 1
+    ---
+    foo: &#39;bar&#39;
+    baz: 2
+    ---
+    foo: &#39;baz&#39;
+    baz: 3
+
+    $ yq &#39;group_by( .foo )&#39;
+    bar:
+        - foo: bar
+          baz: 1
+        - foo: bar
+          baz: 2
+    baz:
+        - foo: baz
+          baz: 3</code></pre>
+
+<p>NOTE: If you are filtering a lot of documents, this will consume a lot of memory.</p>
+
+</dd>
+</dl>
+
+<h2 id="CONDITIONALS">CONDITIONALS</h2>
+
+<dl>
+
+<dt>if EXPRESSION then TRUE_FILTER else FALSE_FILTER</dt>
+<dd>
+
+<p>If the <code>EXPRESSION</code> is true, return the result of <code>TRUE_FILTER</code>, otherwise return the result of <code>FALSE_FILTER</code>.</p>
+
+<pre><code>    # INPUT
+    foo: bar
+    baz: fuzz
+
+    $ yq &#39;if .foo eq bar then .baz else .foo&#39;
+    fuzz
+
+    $ yq &#39;if .foo eq buzz then .baz else .foo&#39;
+    bar
+
+    $ yq &#39;if .foo then .baz&#39;
+    fuzz
+
+    $ yq &#39;if .herp then .derp else .&#39;
+    foo: bar
+    baz: fuzz</code></pre>
+
+<p>The <code>else FALSE_FILTER</code> is optional and defaults to returning undefined.</p>
+
+</dd>
+</dl>
+
+<h2 id="COMBINATORS">COMBINATORS</h2>
+
+<p>Combinators combine multiple expressions to yield one or more documents in the output stream.</p>
+
+<dl>
+
+<dt>,</dt>
+<dd>
+
+<p>Multiple EXPRESSIONS may be separated by commas to yield multiple documents in the output.</p>
+
+<pre><code>    # INPUT
+    foo: bar
+    baz: fuzz
+
+    $ yq &#39;.foo, .baz&#39;
+    bar
+    ---
+    fuzz</code></pre>
+
+</dd>
+<dt>|</dt>
+<dd>
+
+<p>Multiple EXPRESSIONS may be separated by pipes to give the output of the left expression as the input of the right expression (much like how shell pipes work).</p>
+
+<pre><code>    # INPUT
+    foo: bar
+    baz: fuzz
+    pop: more
+    ---
+    foo: buzz
+    baz: fizz
+    pop: jump
+
+    $ yq &#39;{ foo: .foo, val: .pop } | group_by( .foo )&#39;
+    bar:
+        - foo: bar
+          val: more
+    buzz:
+        - foo: buzz
+          val: jump</code></pre>
+
+<p>The above example can be useful to avoid <code>group_by</code> memory issues when dealing with very large streams: Reduce the size of the working document by keeping only the keys you want, then group those documents.</p>
+
+</dd>
+</dl>
+
+<h1 id="ENVIRONMENT">ENVIRONMENT</h1>
+
+<dl>
+
+<dt>YQ_VERBOSE</dt>
+<dd>
+
+<p>Set the verbosity level. Useful when running the tests.</p>
+
+</dd>
+</dl>
+
+
+
+        </div>
+        <footer>
+            <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-61295159-4', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+            <div class="container tagline">
+                <a href="http://preaction.github.io/Statocles">Made with Statocles</a><br>
+                <a href="http://www.perl.org">Powered by Perl</a>
+            </div>
+        </footer>
+    </body>
+</html>

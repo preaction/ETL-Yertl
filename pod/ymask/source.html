@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="/yertl/theme/css/normalize.css" rel="stylesheet">
+        <link href="/yertl/theme/css/skeleton.css" rel="stylesheet">
+        <link href="/yertl/theme/css/statocles-default.css" rel="stylesheet">
+        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+        <title>Yertl</title>
+        <meta content="Statocles 0.056" name="generator">
+        <link href="http://preaction.me/yertl/pod/ymask/source.html" rel="canonical">
+<script>
+    if ( location.href.indexOf( "http://preaction.me/yertl/" ) == -1 ) {
+        location.href = "http://preaction.me/yertl/pod/ymask/source.html";
+    }
+</script>
+
+    </head>
+    <body>
+        <header>
+            <nav class="navbar">
+                <div class="container">
+                    <a class="brand" href="/yertl/">Yertl</a>
+                    <ul>
+                        <li>
+                            <a href="/yertl/blog">Blog</a>
+                        </li>
+                        <li>
+                            <a href="/yertl/pod">Docs</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl">Code</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl/issues">Bugs</a>
+                        </li>
+                        <li>
+                            <a href="http://metacpan.org/pod/ETL::Yertl">CPAN</a>
+                        </li>
+                        <li>
+                            <a href="https://chat.mibbit.com/?channel=%23yertl&amp;server=irc.perl.org">IRC</a>
+                        </li>
+                    </ul>
+                    
+                </div>
+            </nav>
+            
+        </header>
+        <div class="main container">
+            <a class="button" href="/yertl/pod/ymask/">
+    Back to documentation
+</a>
+<pre>#!/usr/bin/env perl
+package ymask;
+# ABSTRACT: Mask a data structure to display only the desired fields
+
+use ETL::Yertl;
+use Pod::Usage::Return qw( pod2usage );
+use Getopt::Long qw( GetOptionsFromArray );
+use ETL::Yertl::Command::ymask;
+
+$|++; # no buffering
+
+sub main {
+    my ( $class, @argv ) = @_;
+    my %opt;
+    GetOptionsFromArray( \@argv, \%opt,
+        &#39;help|h&#39;,
+        &#39;version&#39;,
+    );
+    return pod2usage(0) if $opt{help};
+    if ( $opt{version} ) {
+        print &quot;ymask version $ymask::VERSION (Perl $^V)\n&quot;;
+        return 0;
+    }
+
+    eval {
+        ETL::Yertl::Command::ymask-&gt;main( @argv, \%opt );
+    };
+    if ( $@ ) {
+        return pod2usage( &quot;ERROR: $@&quot; );
+    }
+    return 0;
+}
+
+exit __PACKAGE__-&gt;main( @ARGV ) unless caller(0);
+
+__END__
+
+=head1 SYNOPSIS
+
+    ymask &lt;mask&gt; [&lt;file&gt;...]
+
+    ymask -h|--help|--version
+
+=head1 DESCRIPTION
+
+This program takes a stream of YAML documents (on STDIN or file arguments),
+and prints only the fields specified by the C&lt;mask&gt;.
+
+=head1 ARGUMENTS
+
+=head2 mask
+
+See L&lt;MASK SYNTAX|/MASK SYNTAX&gt; for more information
+
+=head2 &lt;file&gt;
+
+A YAML file to read. The special file &quot;-&quot; refers to STDIN. If no files are
+specified, read STDIN.
+
+=head1 OPTIONS
+
+=head2 -h | --help
+
+Show this help document.
+
+=head2 --version
+
+Print the current ymask and Perl versions.
+
+=head1 MASK SYNTAX
+
+=head2 PROPERTIES
+
+    $ ymask &#39;name,rank,serial&#39;
+
+Select multiple properties in a document using C&lt;,&gt;. If a property does not exist,
+nothing will be added (and no error or warning will be output).
+
+=head2 DESCENDANTS
+
+    $ ymask &#39;squad/name&#39;
+
+Select an inner document&#39;s properties using C&lt;/&gt;. Arrays are automatically looped over.
+
+=head2 SUB-SELECTION
+
+    $ ymask &#39;squad(name,location)&#39;
+
+Select multiple parts of an inner document by using parentheses.
+
+=head2 WILDCARDS
+
+    $ ymask &#39;squad/*/city&#39;
+
+Select every property in a document, which is useful for picking parts out of
+every inner document.
+
+=head1 EXAMPLES
+
+All these examples use the following documents:
+
+    ---
+    name: Hazel Murphy
+    role: Captain
+    nickname: Hank
+    history:
+        - location: Sealab
+          from: 2014-01-01
+        - location: USS Hunley
+          from: 2012-06-01
+          to: 2013-11-28
+    ---
+    name: Quinn Quinlan
+    role: Science Officer
+    nickname: Doctor
+    history:
+        - location: Sealab
+          from: 2014-04-01
+        - location: MIT
+          from: 2008-08-01
+          to: 2012-06-05
+    ---
+    name: Debbie Dupree
+    role: Oceanographer
+    history:
+        - location: Sealab
+          from: 2014-02-10
+        - location: Sea Parks
+          from: 2004-09-01
+          to: 2014-01-20
+
+=head2 SELECT MULTIPLE PROPERTIES
+
+    $ ymask &#39;name,role,nickname&#39;
+    ---
+    name: Hazel Murphy
+    nickname: Hank
+    role: Captain
+    ---
+    name: Quinn Quinlan
+    nickname: Doctor
+    role: Science Officer
+    ---
+    name: Debbie Dupree
+    role: Oceanographer
+
+=head2 SELECT PROPERTIES IN ARRAYS
+
+    $ ymask &#39;name,history/location&#39;
+    ---
+    history:
+      - location: Sealab
+      - location: USS Hunley
+    name: Hazel Murphy
+    ---
+    history:
+      - location: Sealab
+      - location: MIT
+    name: Quinn Quinlan
+    ---
+    history:
+      - location: Sealab
+      - location: Sea Parks
+    name: Debbie Dupree
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L&lt;Data::Partial::Google&gt; - The implementation of this command
+
+=back
+
+</pre>
+
+        </div>
+        <footer>
+            <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-61295159-4', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+            <div class="container tagline">
+                <a href="http://preaction.github.io/Statocles">Made with Statocles</a><br>
+                <a href="http://www.perl.org">Powered by Perl</a>
+            </div>
+        </footer>
+    </body>
+</html>

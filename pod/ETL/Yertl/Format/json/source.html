@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="/yertl/theme/css/normalize.css" rel="stylesheet">
+        <link href="/yertl/theme/css/skeleton.css" rel="stylesheet">
+        <link href="/yertl/theme/css/statocles-default.css" rel="stylesheet">
+        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+        <title>Yertl</title>
+        <meta content="Statocles 0.056" name="generator">
+        <link href="http://preaction.me/yertl/pod/ETL/Yertl/Format/json/source.html" rel="canonical">
+<script>
+    if ( location.href.indexOf( "http://preaction.me/yertl/" ) == -1 ) {
+        location.href = "http://preaction.me/yertl/pod/ETL/Yertl/Format/json/source.html";
+    }
+</script>
+
+    </head>
+    <body>
+        <header>
+            <nav class="navbar">
+                <div class="container">
+                    <a class="brand" href="/yertl/">Yertl</a>
+                    <ul>
+                        <li>
+                            <a href="/yertl/blog">Blog</a>
+                        </li>
+                        <li>
+                            <a href="/yertl/pod">Docs</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl">Code</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl/issues">Bugs</a>
+                        </li>
+                        <li>
+                            <a href="http://metacpan.org/pod/ETL::Yertl">CPAN</a>
+                        </li>
+                        <li>
+                            <a href="https://chat.mibbit.com/?channel=%23yertl&amp;server=irc.perl.org">IRC</a>
+                        </li>
+                    </ul>
+                    
+                </div>
+            </nav>
+            
+        </header>
+        <div class="main container">
+            <a class="button" href="/yertl/pod/ETL/Yertl/Format/json/">
+    Back to documentation
+</a>
+<pre>package ETL::Yertl::Format::json;
+# ABSTRACT: JSON read/write support for Yertl
+
+use ETL::Yertl &#39;Class&#39;;
+use Module::Runtime qw( use_module );
+use List::Util qw( pairs pairkeys pairfirst );
+
+=attr input
+
+The filehandle to read from for input.
+
+=cut
+
+has input =&gt; (
+    is =&gt; &#39;ro&#39;,
+    isa =&gt; FileHandle,
+);
+
+=attr format_module
+
+The module being used for this format. Possible modules, in order of importance:
+
+=over 4
+
+=item L&lt;JSON::XS&gt; (any version)
+
+=item L&lt;JSON::PP&gt; (any version)
+
+=back
+
+=cut
+
+# Pairs of module =&gt; supported version
+our @FORMAT_MODULES = (
+    &#39;JSON::XS&#39; =&gt; 0,
+    &#39;JSON::PP&#39; =&gt; 0,
+);
+
+has format_module =&gt; (
+    is =&gt; &#39;rw&#39;,
+    isa =&gt; sub {
+        my ( $format_module ) = @_;
+        die &quot;format_module must be one of: &quot; . join &quot; &quot;, pairkeys @FORMAT_MODULES
+            unless pairfirst { $a eq $format_module } @FORMAT_MODULES;
+        eval {
+            use_module( $format_module );
+        };
+        if ( $@ ) {
+            die &quot;Could not load format module &#39;$format_module&#39;&quot;;
+        }
+    },
+    lazy =&gt; 1,
+    default =&gt; sub {
+        for my $format_module ( pairs @FORMAT_MODULES ) {
+            eval {
+                # Prototypes on use_module() make @$format_module not work correctly
+                use_module( $format_module-&gt;[0], $format_module-&gt;[1] );
+            };
+            if ( !$@ ) {
+                return $format_module-&gt;[0];
+            }
+        }
+        die &quot;Could not load a formatter for JSON. Please install one of the following modules:\n&quot;
+            . join &quot;&quot;,
+                map { sprintf &quot;\t%s (%s)&quot;, $_-&gt;[0], $_-&gt;[1] ? &quot;version $_-&gt;[1]&quot; : &quot;Any version&quot; }
+                pairs @FORMAT_MODULES;
+    },
+);
+
+
+# Hash of MODULE =&gt; formatter sub
+my %FORMAT_SUB = (
+
+    &#39;JSON::XS&#39; =&gt; {
+        write =&gt; sub {
+            my $self = shift;
+            state $json = JSON::XS-&gt;new-&gt;canonical-&gt;pretty-&gt;allow_nonref;
+            return join( &quot;&quot;, map { $json-&gt;encode( $_ ) } @_ );
+        },
+        read =&gt; sub {
+            my $self = shift;
+            state $json = JSON::XS-&gt;new-&gt;relaxed;
+            return $json-&gt;incr_parse( do { local $/; readline $self-&gt;input } );
+        },
+    },
+
+    &#39;JSON::PP&#39; =&gt; {
+        write =&gt; sub {
+            my $self = shift;
+            state $json = JSON::PP-&gt;new-&gt;canonical-&gt;pretty-&gt;indent_length(3)-&gt;allow_nonref;
+            return join &quot;&quot;, map { $json-&gt;encode( $_ ) } @_;
+        },
+        read =&gt; sub {
+            my $self = shift;
+            state $json = JSON::PP-&gt;new-&gt;relaxed;
+            require Storable;
+            local $Storable::canonical = 1;
+
+            # Work around a bug in JSON::PP.
+            # incr_parse() only returns the first item, see: https://github.com/makamaka/JSON-PP/pull/7
+            my $text = do { local $/; readline $self-&gt;input };
+            my @objs = $json-&gt;incr_parse( $text );
+            if ( scalar @objs == 1 ) {
+                my @more_objs = $json-&gt;incr_parse( $text );
+                while ( Storable::freeze( $objs[0] ) ne Storable::freeze( $more_objs[0] ) ) {
+                    push @objs, @more_objs;
+                    @more_objs = $json-&gt;incr_parse( $text );
+                    last if !@more_objs;
+                }
+            }
+
+            return @objs;
+        },
+    },
+
+);
+
+=method write( DOCUMENTS )
+
+Convert the given C&lt;DOCUMENTS&gt; to JSON. Returns a JSON string.
+
+=cut
+
+sub write {
+    my $self = shift;
+    return $FORMAT_SUB{ $self-&gt;format_module }{write}-&gt;( $self, @_ );
+}
+
+=method read()
+
+Read a JSON string from L&lt;input&gt; and return all the documents
+
+=cut
+
+sub read {
+    my $self = shift;
+    return $FORMAT_SUB{ $self-&gt;format_module }{read}-&gt;( $self );
+}
+
+1;
+__END__
+
+=head1 SYNOPSIS
+
+</pre>
+
+        </div>
+        <footer>
+            <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-61295159-4', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+            <div class="container tagline">
+                <a href="http://preaction.github.io/Statocles">Made with Statocles</a><br>
+                <a href="http://www.perl.org">Powered by Perl</a>
+            </div>
+        </footer>
+    </body>
+</html>

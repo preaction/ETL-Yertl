@@ -1,25 +1,25 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>http://preaction.github.io/ETL-Yertl/blog/tag/release/</id>
+    <id>http://preaction.me/yertl/blog/tag/release/</id>
     <title>Yertl</title>
-    <updated>2015-08-23T22:48:31Z</updated>
-    <link href="http://preaction.github.io/ETL-Yertl/blog/tag/release.atom" rel="self" />
-    <link href="http://preaction.github.io/ETL-Yertl/blog/tag/release/" rel="alternate" />
-    <generator version="0.055">Statocles</generator>
+    <updated>2015-10-25T19:50:40Z</updated>
+    <link href="http://preaction.me/yertl/blog/tag/release.atom" rel="self" />
+    <link href="http://preaction.me/yertl/blog/tag/release/" rel="alternate" />
+    <generator version="0.056">Statocles</generator>
     <entry>
-        <id>http://preaction.github.io/ETL-Yertl/blog/2015/08/23/release-v0-025/</id>
+        <id>http://preaction.me/yertl/blog/2015/08/23/release-v0-025/</id>
         <title>Release v0.025</title>
-        <link href="http://preaction.github.io/ETL-Yertl/blog/2015/08/23/release-v0-025/" rel="alternate" />
+        <link href="http://preaction.me/yertl/blog/2015/08/23/release-v0-025/" rel="alternate" />
         <content type="html"><![CDATA[
             <p>Some minor bugfixes in this release. One that would make Yertl
 fail its tests (and therefore fail to install). Two that caused some
 very confusing error messages to be printed when using
-<a href="http://preaction.github.io/ETL-Yertl/pod/ysql.html">ysql</a>. And a final one that made it hard to use the
-HTTP log pattern with <a href="http://preaction.github.io/ETL-Yertl/pod/ygrok.html">ygrok</a>.</p>
+<a href="http://preaction.me/yertl/pod/ysql.html">ysql</a>. And a final one that made it hard to use the
+HTTP log pattern with <a href="http://preaction.me/yertl/pod/ygrok.html">ygrok</a>.</p>
 
 <p>Full changelog below...</p>
 
-                <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/08/23/release-v0-025/#section-2">Continue reading...</a></p>
+                <p><a href="http://preaction.me/yertl/blog/2015/08/23/release-v0-025/#section-2">Continue reading...</a></p>
             <p>Tags:
                 <a href="/blog/tag/release/">release</a>
             </p>
@@ -28,9 +28,9 @@ HTTP log pattern with <a href="http://preaction.github.io/ETL-Yertl/pod/ygrok.ht
         <category term="release" />
     </entry>
     <entry>
-        <id>http://preaction.github.io/ETL-Yertl/blog/2015/05/31/release-v0-024/</id>
+        <id>http://preaction.me/yertl/blog/2015/05/31/release-v0-024/</id>
         <title>Release v0.024</title>
-        <link href="http://preaction.github.io/ETL-Yertl/blog/2015/05/31/release-v0-024/" rel="alternate" />
+        <link href="http://preaction.me/yertl/blog/2015/05/31/release-v0-024/" rel="alternate" />
         <content type="html"><![CDATA[
             <p>A small release to fix the <code>ps</code> grok patterns for GNU procutils and to add
 the <code>yq -x</code> option to make it a lot easier to pipe the output of yq into
@@ -38,7 +38,7 @@ another program.</p>
 
 <p>Full changelog below</p>
 
-                <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/05/31/release-v0-024/#section-2">Continue reading...</a></p>
+                <p><a href="http://preaction.me/yertl/blog/2015/05/31/release-v0-024/#section-2">Continue reading...</a></p>
             <p>Tags:
                 <a href="/blog/tag/release/">release</a>
             </p>
@@ -47,9 +47,9 @@ another program.</p>
         <category term="release" />
     </entry>
     <entry>
-        <id>http://preaction.github.io/ETL-Yertl/blog/2015/02/26/release-v0.023/</id>
+        <id>http://preaction.me/yertl/blog/2015/02/26/release-v0.023/</id>
         <title>Release v0.023</title>
-        <link href="http://preaction.github.io/ETL-Yertl/blog/2015/02/26/release-v0.023/" rel="alternate" />
+        <link href="http://preaction.me/yertl/blog/2015/02/26/release-v0.023/" rel="alternate" />
         <content type="html"><![CDATA[
             <p>A quick release to fix a bug in <code>yq</code> that would cause a confusing error. Since <code>yq</code>
 was using YAML exclusively, but other commands were using other YAML modules, there
@@ -60,7 +60,7 @@ parse.</p>
 
 <p>Full changelog below:</p>
 
-                <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/02/26/release-v0.023/#section-2">Continue reading...</a></p>
+                <p><a href="http://preaction.me/yertl/blog/2015/02/26/release-v0.023/#section-2">Continue reading...</a></p>
             <p>Tags:
                 <a href="/blog/tag/release/">release</a>
             </p>
@@ -69,15 +69,15 @@ parse.</p>
         <category term="release" />
     </entry>
     <entry>
-        <id>http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.022.html</id>
+        <id>http://preaction.me/yertl/blog/2015/02/01/release-v0.022.html</id>
         <title>Release v0.022</title>
-        <link href="http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.022.html" rel="alternate" />
+        <link href="http://preaction.me/yertl/blog/2015/02/01/release-v0.022.html" rel="alternate" />
         <content type="html"><![CDATA[
             <p>A quick release to fix up some incorrect documentation.</p>
 
 <p>Full changelog below:</p>
 
-                <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.022.html#section-2">Continue reading...</a></p>
+                <p><a href="http://preaction.me/yertl/blog/2015/02/01/release-v0.022.html#section-2">Continue reading...</a></p>
             <p>Tags:
                 <a href="/blog/tag/release/">release</a>
             </p>
@@ -86,9 +86,9 @@ parse.</p>
         <category term="release" />
     </entry>
     <entry>
-        <id>http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.021.html</id>
+        <id>http://preaction.me/yertl/blog/2015/02/01/release-v0.021.html</id>
         <title>Release v0.021</title>
-        <link href="http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.021.html" rel="alternate" />
+        <link href="http://preaction.me/yertl/blog/2015/02/01/release-v0.021.html" rel="alternate" />
         <content type="html"><![CDATA[
             <p>A breaking change in this release: <code>ysql</code> no longer needs the word <code>query</code> to
 run a query.  With the earlier removal of the <code>write</code> command, the <code>query</code>
@@ -101,7 +101,7 @@ There&#39;s also a new <code>-l</code> flag to allow loose matching of input lin
 
 <p>This release also allows you to add your own <code>ygrok</code> patterns. In addition to
 adding your own custom patterns, you can list all the existing patterns by
-doing <code>ygrok --pattern</code>. See <a href="http://preaction.github.io/ETL-Yertl/pod/ygrok">the ygrok documentation</a> for more
+doing <code>ygrok --pattern</code>. See <a href="http://preaction.me/yertl/pod/ygrok">the ygrok documentation</a> for more
 details.</p>
 
 <p>With all the possibilities, <code>ygrok</code> patterns can now be organized into
@@ -110,7 +110,7 @@ patterns to the Yertl core.</p>
 
 <p>Full changelog below:</p>
 
-                <p><a href="http://preaction.github.io/ETL-Yertl/blog/2015/02/01/release-v0.021.html#section-2">Continue reading...</a></p>
+                <p><a href="http://preaction.me/yertl/blog/2015/02/01/release-v0.021.html#section-2">Continue reading...</a></p>
             <p>Tags:
                 <a href="/blog/tag/release/">release</a>
             </p>

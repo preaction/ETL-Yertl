@@ -7,10 +7,10 @@
         <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
         <title>Yertl</title>
         <meta content="Statocles 0.056" name="generator">
-        <link href="http://preaction.me/yertl/pod/" rel="canonical">
+        <link href="http://preaction.me/yertl/pod/ETL/Yertl/source.html" rel="canonical">
 <script>
     if ( location.href.indexOf( "http://preaction.me/yertl/" ) == -1 ) {
-        location.href = "http://preaction.me/yertl/pod/";
+        location.href = "http://preaction.me/yertl/pod/ETL/Yertl/source.html";
     }
 </script>
 
@@ -46,24 +46,60 @@
             
         </header>
         <div class="main container">
-            <div class="crumbtrail">
-<ul>
-    <li>
-        ETL
-    </li>
-    <li>
-        <a href="/yertl/pod/">Yertl</a>
-    </li>
-</ul>
-(<a href="/yertl/pod/ETL/Yertl/source.html">source</a>)
-</div>
-<h1 id="NAME">NAME</h1>
+            <a class="button" href="/yertl/pod/">
+    Back to documentation
+</a>
+<pre>package ETL::Yertl;
+# ABSTRACT: ETL with a Shell
 
-<p>ETL::Yertl - ETL with a Shell</p>
+use strict;
+use warnings;
+use base &#39;Import::Base&#39;;
 
-<h1 id="SYNOPSIS">SYNOPSIS</h1>
+our @IMPORT_MODULES = (
+    strict =&gt; [],
+    warnings =&gt; [],
+    feature =&gt; [qw( :5.10 )],
+    &#39;Path::Tiny&#39; =&gt; [qw( path )],
+);
 
-<pre><code>    ### On a shell...
+my @class_modules = (
+    &#39;Types::Standard&#39; =&gt; [qw( :all )],
+);
+
+our %IMPORT_BUNDLES = (
+    Test =&gt; [
+        qw( Test::More Test::Deep Test::Exception Test::Differences ),
+        FindBin =&gt; [ &#39;$Bin&#39; ],
+        boolean =&gt; [&#39;:all&#39;],
+        &#39;Path::Tiny&#39; =&gt; [qw( cwd tempfile tempdir )],
+        &#39;Dir::Self&#39; =&gt; [qw( __DIR__ )],
+    ],
+
+    Class =&gt; [
+        &#39;&lt;Moo::Lax&#39;,
+        @class_modules,
+    ],
+
+    Role =&gt; [
+        &#39;&lt;Moo::Role::Lax&#39;,
+        @class_modules,
+    ],
+
+);
+
+$ETL::Yertl::VERBOSE = $ENV{YERTL_VERBOSE} || 0;
+sub yertl::diag {
+    my ( $level, $text ) = @_;
+    print STDERR &quot;$text\n&quot; if $ETL::Yertl::VERBOSE &gt;= $level;
+}
+
+1;
+__END__
+
+=head1 SYNOPSIS
+
+    ### On a shell...
     # Convert file to Yertl&#39;s format
     $ yfrom csv file.csv &gt;work.yml
     $ yfrom json file.json &gt;work.yml
@@ -87,107 +123,84 @@
     ### In Perl...
     use ETL::Yertl;
 
-    # XXX: To do: Perl API</code></pre>
+    # XXX: To do: Perl API
 
-<h1 id="DESCRIPTION">DESCRIPTION</h1>
+=head1 DESCRIPTION
 
-<p>ETL::Yertl is an ETL for shells. It is designed to accept data from multiple formats (CSV, JSON), manipulate them using simple tools, and then convert them to an output format.</p>
+ETL::Yertl is an ETL for shells. It is designed to accept data from multiple formats
+(CSV, JSON), manipulate them using simple tools, and then convert them to an output
+format.
 
-<p>Yertl will have tools for:</p>
+Yertl will have tools for:
 
-<dl>
+=over 4
 
-<dt>Extracting data from databases (MySQL, Postgres, MongoDB)</dt>
-<dd>
+=item Extracting data from databases (MySQL, Postgres, MongoDB)
 
-</dd>
-<dt>Loading data into databases</dt>
-<dd>
+=item Loading data into databases
 
-</dd>
-<dt>Extracting data from web services</dt>
-<dd>
+=item Extracting data from web services
 
-</dd>
-<dt>Writing data to web services</dt>
-<dd>
+=item Writing data to web services
 
-</dd>
-<dt>Distributing data through messaging APIs (ZeroMQ)</dt>
-<dd>
+=item Distributing data through messaging APIs (ZeroMQ)
 
-</dd>
-</dl>
+=back
 
-<h1 id="SEE-ALSO">SEE ALSO</h1>
+=head1 SEE ALSO
 
-<dl>
+=over 4
 
-<dt><a href="http://preaction.me/yertl" rel="external">http://preaction.me/yertl</a></dt>
-<dd>
+=item L&lt;http://preaction.me/yertl&gt;
 
-<p>The Yertl home page.</p>
+The Yertl home page.
 
-</dd>
-</dl>
+=back
 
-<h2 id="Yertl-Tools">Yertl Tools</h2>
+=head2 Yertl Tools
 
-<dl>
+=over 4
 
-<dt><a href="/yertl/pod/yfrom/">yfrom</a></dt>
-<dd>
+=item L&lt;yfrom&gt;
 
-<p>Convert incoming data (CSV, JSON) to Yertl documents.</p>
+Convert incoming data (CSV, JSON) to Yertl documents.
 
-</dd>
-<dt><a href="/yertl/pod/yto/">yto</a></dt>
-<dd>
+=item L&lt;yto&gt;
 
-<p>Convert Yertl documents into another format (CSV, JSON).</p>
+Convert Yertl documents into another format (CSV, JSON).
 
-</dd>
-<dt><a href="/yertl/pod/ygrok/">ygrok</a></dt>
-<dd>
+=item L&lt;ygrok&gt;
 
-<p>Parse lines of text into Yertl documents.</p>
+Parse lines of text into Yertl documents.
 
-</dd>
-<dt><a href="/yertl/pod/ysql/">ysql</a></dt>
-<dd>
+=item L&lt;ysql&gt;
 
-<p>Read/write documents from SQL databases.</p>
+Read/write documents from SQL databases.
 
-</dd>
-<dt><a href="/yertl/pod/ymask/">ymask</a></dt>
-<dd>
+=item L&lt;ymask&gt;
 
-<p>Filter documents with a mask, letting only matching fields through.</p>
+Filter documents with a mask, letting only matching fields through.
 
-</dd>
-<dt><a href="/yertl/pod/yq/">yq</a></dt>
-<dd>
+=item L&lt;yq&gt;
 
-<p>A powerful mini-language for munging and filtering.</p>
+A powerful mini-language for munging and filtering.
 
-</dd>
-</dl>
+=back
 
-<h2 id="Other-Tools">Other Tools</h2>
+=head2 Other Tools
 
-<p>Here are some other tools that can be used with Yertl</p>
+Here are some other tools that can be used with Yertl
 
-<dl>
+=over 4
 
-<dt>jq</dt>
-<dd>
+=item jq
 
-<p><a href="http://stedolan.github.io/jq/" rel="external">http://stedolan.github.io/jq/</a> A filter for JSON documents. The inspiration for <a href="/yertl/pod/yq/">yq</a>.</p>
+L&lt;http://stedolan.github.io/jq/&gt; A filter for JSON documents. The inspiration
+for L&lt;yq&gt;.
 
-</dd>
-</dl>
+=back
 
-
+</pre>
 
         </div>
         <footer>

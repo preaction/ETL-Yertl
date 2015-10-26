@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="/yertl/theme/css/normalize.css" rel="stylesheet">
+        <link href="/yertl/theme/css/skeleton.css" rel="stylesheet">
+        <link href="/yertl/theme/css/statocles-default.css" rel="stylesheet">
+        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+        <title>Yertl</title>
+        <meta content="Statocles 0.056" name="generator">
+        <link href="http://preaction.me/yertl/pod/ETL/Yertl/Format/csv/source.html" rel="canonical">
+<script>
+    if ( location.href.indexOf( "http://preaction.me/yertl/" ) == -1 ) {
+        location.href = "http://preaction.me/yertl/pod/ETL/Yertl/Format/csv/source.html";
+    }
+</script>
+
+    </head>
+    <body>
+        <header>
+            <nav class="navbar">
+                <div class="container">
+                    <a class="brand" href="/yertl/">Yertl</a>
+                    <ul>
+                        <li>
+                            <a href="/yertl/blog">Blog</a>
+                        </li>
+                        <li>
+                            <a href="/yertl/pod">Docs</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl">Code</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl/issues">Bugs</a>
+                        </li>
+                        <li>
+                            <a href="http://metacpan.org/pod/ETL::Yertl">CPAN</a>
+                        </li>
+                        <li>
+                            <a href="https://chat.mibbit.com/?channel=%23yertl&amp;server=irc.perl.org">IRC</a>
+                        </li>
+                    </ul>
+                    
+                </div>
+            </nav>
+            
+        </header>
+        <div class="main container">
+            <a class="button" href="/yertl/pod/ETL/Yertl/Format/csv/">
+    Back to documentation
+</a>
+<pre>package ETL::Yertl::Format::csv;
+# ABSTRACT: CSV read/write support for Yertl
+
+use ETL::Yertl &#39;Class&#39;;
+use Module::Runtime qw( use_module );
+use List::Util qw( pairs pairkeys pairfirst );
+
+=attr input
+
+The filehandle to read from for input.
+
+=cut
+
+has input =&gt; (
+    is =&gt; &#39;ro&#39;,
+    isa =&gt; FileHandle,
+);
+
+=attr format_module
+
+The module being used for this format. Possible modules, in order of importance:
+
+=over 4
+
+=item L&lt;Text::CSV_XS&gt; (any version)
+
+=item L&lt;Text::CSV&gt; (any version)
+
+=back
+
+=cut
+
+# Pairs of module =&gt; supported version
+our @FORMAT_MODULES = (
+    &#39;Text::CSV_XS&#39; =&gt; 0,
+    &#39;Text::CSV&#39; =&gt; 0,
+);
+
+has format_module =&gt; (
+    is =&gt; &#39;rw&#39;,
+    isa =&gt; sub {
+        my ( $format_module ) = @_;
+        die &quot;format_module must be one of: &quot; . join &quot; &quot;, pairkeys @FORMAT_MODULES
+            unless pairfirst { $a eq $format_module } @FORMAT_MODULES;
+        eval {
+            use_module( $format_module );
+        };
+        if ( $@ ) {
+            die &quot;Could not load format module &#39;$format_module&#39;&quot;;
+        }
+    },
+    lazy =&gt; 1,
+    default =&gt; sub {
+        for my $format_module ( pairs @FORMAT_MODULES ) {
+            eval {
+                # Prototypes on use_module() make @$format_module not work correctly
+                use_module( $format_module-&gt;[0], $format_module-&gt;[1] );
+            };
+            if ( !$@ ) {
+                return $format_module-&gt;[0];
+            }
+        }
+        die &quot;Could not load a formatter for CSV. Please install one of the following modules:\n&quot;
+            . join &quot;&quot;,
+                map { sprintf &quot;\t%s (%s)&quot;, $_-&gt;[0], $_-&gt;[1] ? &quot;version $_-&gt;[1]&quot; : &quot;Any version&quot; }
+                pairs @FORMAT_MODULES;
+    },
+);
+
+has _field_names =&gt; (
+    is =&gt; &#39;rw&#39;,
+    isa =&gt; ArrayRef[Str],
+    default =&gt; sub { [] },
+);
+
+has _csv =&gt; (
+    is =&gt; &#39;ro&#39;,
+    lazy =&gt; 1,
+    default =&gt; sub {
+        my ( $self ) = @_;
+        $self-&gt;format_module-&gt;new({ binary =&gt; 1, eol =&gt; $\ });
+    },
+);
+
+=method write( DOCUMENTS )
+
+Convert the given C&lt;DOCUMENTS&gt; to CSV. Returns a CSV string.
+
+=cut
+
+sub write {
+    my ( $self, @docs ) = @_;
+    my $csv = $self-&gt;_csv;
+    my $str = &#39;&#39;;
+    my @names = @{ $self-&gt;_field_names };
+
+    if ( !@names ) {
+        @names = sort keys %{ $docs[0] };
+        $csv-&gt;combine( @names );
+        $str .= $csv-&gt;string . $/;
+        $self-&gt;_field_names( \@names );
+    }
+
+    for my $doc ( @docs ) {
+        $csv-&gt;combine( map { $doc-&gt;{ $_ } } @names );
+        $str .= $csv-&gt;string . $/;
+    }
+
+    return $str;
+}
+
+=method read()
+
+Read a CSV string from L&lt;input&gt; and return all the documents.
+
+=cut
+
+sub read {
+    my ( $self ) = @_;
+    my $fh = $self-&gt;input || die &quot;No input filehandle&quot;;
+    my $csv = $self-&gt;_csv;
+    my @names = @{ $self-&gt;_field_names };
+
+    if ( !@names ) {
+        @names = @{ $csv-&gt;getline( $fh ) };
+        $self-&gt;_field_names( \@names );
+    }
+
+    my @docs;
+    while ( my $row = $csv-&gt;getline( $fh ) ) {
+        push @docs, { map {; $names[ $_ ] =&gt; $row-&gt;[ $_ ] } 0..$#{ $row } };
+    }
+
+    return @docs;
+}
+
+1;
+__END__
+
+</pre>
+
+        </div>
+        <footer>
+            <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-61295159-4', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+            <div class="container tagline">
+                <a href="http://preaction.github.io/Statocles">Made with Statocles</a><br>
+                <a href="http://www.perl.org">Powered by Perl</a>
+            </div>
+        </footer>
+    </body>
+</html>

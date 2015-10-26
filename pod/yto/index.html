@@ -5,12 +5,12 @@
         <link href="/yertl/theme/css/skeleton.css" rel="stylesheet">
         <link href="/yertl/theme/css/statocles-default.css" rel="stylesheet">
         <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-        <title>Release v0.022 - Yertl</title>
+        <title>Yertl</title>
         <meta content="Statocles 0.056" name="generator">
-        <link href="http://preaction.me/yertl/blog/2015/02/01/release-v0.022.html" rel="canonical">
+        <link href="http://preaction.me/yertl/pod/yto/" rel="canonical">
 <script>
     if ( location.href.indexOf( "http://preaction.me/yertl/" ) == -1 ) {
-        location.href = "http://preaction.me/yertl/blog/2015/02/01/release-v0.022.html";
+        location.href = "http://preaction.me/yertl/pod/yto/";
     }
 </script>
 
@@ -46,55 +46,49 @@
             
         </header>
         <div class="main container">
-            <div class="row">
-
-    <div class="nine columns">
-        <main>
-            <header>
-                <h1>Release v0.022</h1>
-                <p class="tags">Tags:
-                    <a href="/yertl/blog/tag/release/" rel="tag">release</a>
-                </p>
-
-                <aside>
-                    <p><time datetime="2015-02-01">
-                        Posted on 2015-02-01
-                    </time>
-                    </p>
-                </aside>
-
-
-            </header>
-            <section id="section-1">
-                <p>A quick release to fix up some incorrect documentation.</p>
-
-<p>Full changelog below:</p>
-
-            </section>
-            <section id="section-2">
-                <ul>
-<li><a href="https://github.com/preaction/Statocles/commit/79e70dc98c5a71d8b9daa8c4d55c44e0b88fe38a">add guides to the site main page</a></li>
-<li><a href="https://github.com/preaction/Statocles/commit/e031c6b4a59f9bb545ffae10fc91c2ff78bdb21e">fix ysql synopsis missing -- before config option</a></li>
-<li><a href="https://github.com/preaction/Statocles/commit/f4389b5fc87aee971b81f08b99b82d75927789d0">add site intro and fix links to internal docs</a></li>
-<li><a href="https://github.com/preaction/Statocles/commit/e0472dc184c687ac9f2b2487208d2ac3edb8ef21">fix link to Yertl on metacpan.org</a></li>
-<li><a href="https://github.com/preaction/Statocles/commit/0d3f794188deae46a406a1ec3bf00f5ffddc2b82">update statocles default theme</a></li>
+            <div class="crumbtrail">
+<ul>
+    <li>
+        <a href="/yertl/pod/yto/">yto</a>
+    </li>
 </ul>
-
-            </section>
-        </main>
-    </div>
-
-    <div class="three columns sidebar">
-        
-        <nav id="tags">
-            <h1>Tags</h1>
-            <ul class="list-inline">
-                <li><a href="/yertl/blog/tag/release/">release</a></li>
-            </ul>
-        </nav>
-    </div>
-
+(<a href="/yertl/pod/yto/source.html">source</a>)
 </div>
+<h1 id="NAME">NAME</h1>
+
+<p>yto - Change YAML to another format (like JSON)</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    yto &lt;format&gt; [&lt;file&gt;...]
+
+    yto -h|--help|--version</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This program takes a stream of YAML documents (on STDIN or file arguments), and prints them in the desired format.</p>
+
+<h1 id="ARGUMENTS">ARGUMENTS</h1>
+
+<h2 id="format">format</h2>
+
+<p>The format to output. Currently supported formats: JSON</p>
+
+<h2 id="file">&lt;file&gt;</h2>
+
+<p>A YAML file to read. The special file &quot;-&quot; refers to STDIN. If no files are specified, read STDIN.</p>
+
+<h1 id="OPTIONS">OPTIONS</h1>
+
+<h2 id="h---help">-h | --help</h2>
+
+<p>Show this help document.</p>
+
+<h2 id="version">--version</h2>
+
+<p>Print the current yto and Perl versions.</p>
+
+
 
         </div>
         <footer>

@@ -1,4 +1,4 @@
-Sitemap: http://preaction.github.io/ETL-Yertl/sitemap.xml
+Sitemap: http://preaction.me/yertl/sitemap.xml
 User-Agent: *
 Disallow:
 

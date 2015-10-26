@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="/yertl/theme/css/normalize.css" rel="stylesheet">
+        <link href="/yertl/theme/css/skeleton.css" rel="stylesheet">
+        <link href="/yertl/theme/css/statocles-default.css" rel="stylesheet">
+        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+        <title>Yertl</title>
+        <meta content="Statocles 0.056" name="generator">
+        <link href="http://preaction.me/yertl/pod/yq/source.html" rel="canonical">
+<script>
+    if ( location.href.indexOf( "http://preaction.me/yertl/" ) == -1 ) {
+        location.href = "http://preaction.me/yertl/pod/yq/source.html";
+    }
+</script>
+
+    </head>
+    <body>
+        <header>
+            <nav class="navbar">
+                <div class="container">
+                    <a class="brand" href="/yertl/">Yertl</a>
+                    <ul>
+                        <li>
+                            <a href="/yertl/blog">Blog</a>
+                        </li>
+                        <li>
+                            <a href="/yertl/pod">Docs</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl">Code</a>
+                        </li>
+                        <li>
+                            <a href="http://github.com/preaction/ETL-Yertl/issues">Bugs</a>
+                        </li>
+                        <li>
+                            <a href="http://metacpan.org/pod/ETL::Yertl">CPAN</a>
+                        </li>
+                        <li>
+                            <a href="https://chat.mibbit.com/?channel=%23yertl&amp;server=irc.perl.org">IRC</a>
+                        </li>
+                    </ul>
+                    
+                </div>
+            </nav>
+            
+        </header>
+        <div class="main container">
+            <a class="button" href="/yertl/pod/yq/">
+    Back to documentation
+</a>
+<pre>#!/usr/bin/env perl
+package yq;
+# ABSTRACT: Filter YAML through a command-line program
+
+use ETL::Yertl;
+use Pod::Usage::Return qw( pod2usage );
+use Getopt::Long qw( GetOptionsFromArray );
+use ETL::Yertl::Command::yq;
+
+$|++; # no buffering
+
+sub main {
+    my ( $class, @argv ) = @_;
+
+    my %opt = (
+        verbose =&gt; $ENV{YERTL_VERBOSE},
+    );
+
+    GetOptionsFromArray( \@argv, \%opt,
+        &#39;help|h&#39;,
+        &#39;verbose|v+&#39;,
+        &#39;version&#39;,
+        &#39;xargs|x&#39;,
+    );
+    return pod2usage(0) if $opt{help};
+    if ( $opt{version} ) {
+        print &quot;yq version $yq::VERSION (Perl $^V)\n&quot;;
+        return 0;
+    }
+
+    eval {
+        ETL::Yertl::Command::yq-&gt;main( @argv, \%opt );
+    };
+    if ( $@ ) {
+        return pod2usage( &quot;ERROR: $@&quot; );
+    }
+    return 0;
+}
+
+exit __PACKAGE__-&gt;main( @ARGV ) unless caller(0);
+
+=head1 SYNOPSIS
+
+    yq [-vx] &lt;script&gt; [&lt;file&gt;...]
+
+    yq -h|--help|--version
+
+=head1 DESCRIPTION
+
+This program takes a stream of YAML documents (on STDIN or file arguments),
+applies a filter, then writes the results to STDOUT.
+
+=head1 ARGUMENTS
+
+=head2 script
+
+The script to run. For the script syntax, see L&lt;SYNTAX&gt;.
+
+=head2 &lt;file&gt;
+
+A YAML file to filter. The special file &quot;-&quot; refers to STDIN. If no files are
+specified, filter STDIN.
+
+=head1 OPTIONS
+
+=head2 -v | --verbose
+
+Set verbose mode to print out some internal program messages on STDERR to help
+with debugging.
+
+=head2 -x | --xargs
+
+xargs mode. When the filter returns only a single item, simply print it out without
+using the serializer. This allows single values to be piped into other programs that
+may not know how to deal with serialized data, like xargs.
+
+=head2 -h | --help
+
+Show this help document.
+
+=head2 --version
+
+Print the current yq and Perl versions.
+
+=head1 SYNTAX
+
+=head2 EXPRESSIONS
+
+An C&lt;EXPRESSION&gt; is allowed to be either a L&lt;FILTER&gt;, L&lt;VALUE&gt;, or a L&lt;COMPARISON&gt;.
+
+=head2 FILTERS
+
+Filters select a portion of the incoming documents. Filters can be combined
+to reach deep inside the documents you&#39;re working with.
+
+=over
+
+=item .
+
+Returns the entire document, unfiltered. Useful in if/then statements.
+
+    # INPUT
+    foo: bar
+    baz: fuzz
+
+    $ yq .
+    foo: bar
+    baz: fuzz
+
+=item .key
+
+Extract a single item out of a hash.
+
+    # INPUT
+    foo:
+        bar: baz
+        fizz: fuzz
+
+    $ yq .foo
+    bar: baz
+    fizz: fuzz
+
+    $ yq .foo.fizz
+    fuzz
+
+=item .[#]
+
+Extract a single item out of an array.
+
+    # INPUT
+    - foo: fuzz
+    - bar: buzz
+    - baz:
+        good: bad
+        new: old
+
+    $ yq .[1]
+    bar: buzz
+
+    $ yq .[2]
+    baz:
+        good: bad
+        new: old
+
+    $ yq .[2].baz
+    good: bad
+    new: old
+
+    $ yq .[2].baz.new
+    old
+
+=item []
+
+Use [] with no index to flatten an array.
+
+    # INPUT
+    - foo: fuzz
+    - bar: buzz
+
+    $ yq &#39;.[]&#39;
+    foo: fuzz
+    ---
+    bar: buzz
+
+=back
+
+=head2 VALUES
+
+=over
+
+=item &#39;STRING&#39; &quot;STRING&quot;
+
+Both single- and double-quoted strings are allowed. Using \ will escape
+the string delimiter.
+
+=item { KEY: EXPRESSION, ... }
+
+The hash constructor. C&lt;KEY&gt; may be any C&lt;FILTER&gt; or a bare value.
+
+    # INPUT
+    foo: bar
+    baz: fuzz
+    ---
+    foo: 1
+    baz: 2
+
+    $ yq &#39;{ bar: .foo, .baz: foo }&#39;
+    bar: bar
+    fuzz: foo
+    ---
+    2: foo
+    bar: 1
+
+=item [ EXPRESSION, ... ]
+
+The array constructor.
+
+    # INPUT
+    foo: bar
+    baz: fuzz
+    ---
+    foo: 1
+    baz: 2
+
+    $ yq &#39;[ .foo, .baz ]&#39;
+    - bar
+    - fuzz
+    ---
+    - 1
+    - 2
+
+=item empty
+
+The special value empty suppresses printing of a document. Normally,
+an undefined document will show up in the output as &quot;--- ~&quot;. If your
+filter instead yields empty, the document will not be printed at all.
+
+This is especially useful in conditionals:
+
+    # INPUT
+    foo: bar
+    baz: fuzz
+
+    $ yq &#39;if .foo eq bar then . else empty&#39;
+    foo: bar
+    baz: fuzz
+
+    $ yq &#39;if .foo eq buzz then . else empty&#39;
+    $
+
+... though see the C&lt;grep()&gt; function for a shorter way of writing this.
+
+=item Values
+
+Any bareword that is not recognized as a syntax element is treated as a value.
+These barewords may only contain letters, numbers, and underscore.
+
+B&lt;NOTE&gt;: This may be subject to change to only allow quoted strings and bare
+numbers in a future version.
+
+=back
+
+=head2 COMPARISONS
+
+=over
+
+=item eq
+
+String equals comparison. Returns true if both sides are equal to each other
+when treated as a string.
+
+The two sides may be L&lt;FILTERS&gt; or L&lt;VALUES&gt;.
+
+    # INPUT
+    foo: bar
+    baz: fuzz
+    buzz: fuzz
+
+    $ yq &#39;.foo eq bar&#39;
+    true
+
+    $ yq &#39;.baz eq .buzz&#39;
+    true
+
+    $ yq &#39;.baz eq bar&#39;
+    false
+
+YAML treats the string &quot;true&quot; as a true value, and the string &quot;false&quot; as a
+false value.
+
+=item ne
+
+String not equals comparison. Returns true if one side is not equal to the
+other side when compared as a string.
+
+The two sides may be L&lt;FILTERS&gt; or L&lt;VALUES&gt;.
+
+    # INPUT
+    foo: bar
+    baz: fuzz
+    buzz: fuzz
+
+    $ yq &#39;.foo eq bar&#39;
+    true
+
+    $ yq &#39;.baz eq .buzz&#39;
+    true
+
+    $ yq &#39;.baz eq bar&#39;
+    false
+
+YAML treats the string &quot;true&quot; as a true value, and the string &quot;false&quot; as a
+false value.
+
+=item ==
+
+Numeric equals comparison. Returns true if both sides are equal to each other
+when treated as numbers. If one of the items is not a number, will print a
+warning to STDERR but try to compare anyway.
+
+The two sides may be L&lt;FILTERS&gt; or L&lt;VALUES&gt;.
+
+    # INPUT
+    one: 1
+    two: 2
+    uno: 1
+
+    $ yq &#39;.one == 1&#39;
+    true
+
+    $ yq &#39;.one == 2&#39;
+    false
+
+    $ yq &#39;.one == .uno&#39;
+    true
+
+=item !=
+
+Numeric not equals comparison. Returns true if both sides are equal to each
+other when treated as numbers. If one of the items is not a number, will print
+a warning to STDERR but try to compare anyway.
+
+The two sides may be L&lt;FILTERS&gt; or L&lt;VALUES&gt;.
+
+    # INPUT
+    one: 1
+    two: 2
+    uno: 1
+
+    $ yq &#39;.two != 1&#39;
+    true
+
+    $ yq &#39;.two != 2&#39;
+    false
+
+    $ yq &#39;.one != .uno&#39;
+    false
+
+=item &gt; / &gt;=
+
+Numeric greater-than (or equal-to) comparison. Returns true if the left side is
+greater than (or equal-to) the right side. If one of the items is not a number,
+will print a warning to STDERR but try to compare anyway.
+
+The two sides may be L&lt;FILTERS&gt; or L&lt;VALUES&gt;.
+
+    # INPUT
+    one: 1
+    two: 2
+    uno: 1
+
+    $ yq &#39;.two &gt;= 1&#39;
+    true
+
+    $ yq &#39;.two &gt; 2&#39;
+    false
+
+    $ yq &#39;.one &gt;= .uno&#39;
+    true
+
+=item &lt; / &lt;=
+
+Numeric less-than (or equal-to) comparison. Returns true if the left side is
+less than (or equal-to) the right side. If one of the items is not a number,
+will print a warning to STDERR but try to compare anyway.
+
+The two sides may be L&lt;FILTERS&gt; or L&lt;VALUES&gt;.
+
+    # INPUT
+    one: 1
+    two: 2
+    uno: 1
+
+    $ yq &#39;.two &lt;= 1&#39;
+    false
+
+    $ yq &#39;.two &lt; 2&#39;
+    false
+
+    $ yq &#39;.one &lt;= .uno&#39;
+    true
+
+=back
+
+=head2 FUNCTIONS
+
+=over
+
+=item length( EXPRESSION )
+
+Returns the length of the thing returned by EXPRESSION. Depending on what type
+of thing that is:
+
+    string/number   - Returns the number of characters
+    array           - Returns the number of items
+    hash            - Returns the number of pairs
+
+If EXPRESSION is missing, gives the length of the entire document (C&lt;length(.)&gt;).
+Returns a number suitable for assignment.
+
+Although length() takes an expression, certain constructs are redundant:
+
+    length( keys( EXPRESSION ) ) -&gt; length( EXPRESSION )
+    # length() works on hashes
+
+A future version may optimize these away, or warn you of their redundancy.
+
+    # INPUT
+    foo:
+        one: 1
+        two: onetwothreefourfive
+        three: 3
+    baz: [ 3, 2, 1 ],
+
+    $ yq &#39;length(.)&#39;
+    2
+
+    $ yq &#39;length&#39;
+    2
+
+    $ yq &#39;length( .foo )&#39;
+    3
+
+    $ yq &#39;length( .baz )&#39;
+    3
+
+    $ yq &#39;length( .foo.two )&#39;
+    19
+
+    $ yq &#39;{ l: length( .foo.two ) }&#39;
+    l: 19
+
+=item keys( EXPRESSION )
+
+Return the keys of the hash or the indicies of the array returned by EXPRESSION.
+If EXPRESSION is missing, gives the keys of the entire document (C&lt;keys(.)&gt;).
+
+Returns an array suitable for assignment.
+
+    # INPUT
+    foo:
+        one: 1
+        two: 2
+        three: 3
+    baz: [ 3, 2, 1 ]
+
+    $ yq &#39;keys( .foo )&#39;
+    - one
+    - two
+    - three
+
+    $ yq &#39;keys( .baz )&#39;
+    - 0
+    - 1
+    - 2
+
+    $ yq &#39;keys( . )&#39;
+    - foo
+    - baz
+
+    $ yq &#39;keys&#39;
+    - foo
+    - baz
+
+    $ yq &#39;{ k: keys( .foo ) }&#39;
+    k:
+        - one
+        - two
+        - three
+
+=item grep( EXPRESSION )
+
+If C&lt;EXPRESSION&gt; is true, return the current document. Otherwise, return C&lt;empty&gt;.
+
+This is exactly the same as:
+
+    if EXPRESSION then . else empty
+
+=item select( EXPRESSION )
+
+Another name for C&lt;grep()&gt; to match C&lt;jq&gt;&#39;s syntax.
+
+=item group_by( EXPRESSION )
+
+Group incoming documents based on the result of C&lt;EXPRESSION&gt;, yielding a single
+document containing a hash of arrays.
+
+    # INPUT
+    ---
+    foo: &#39;bar&#39;
+    baz: 1
+    ---
+    foo: &#39;bar&#39;
+    baz: 2
+    ---
+    foo: &#39;baz&#39;
+    baz: 3
+
+    $ yq &#39;group_by( .foo )&#39;
+    bar:
+        - foo: bar
+          baz: 1
+        - foo: bar
+          baz: 2
+    baz:
+        - foo: baz
+          baz: 3
+
+NOTE: If you are filtering a lot of documents, this will consume a lot of memory.
+
+=back
+
+=head2 CONDITIONALS
+
+=over
+
+=item if EXPRESSION then TRUE_FILTER else FALSE_FILTER
+
+If the C&lt;EXPRESSION&gt; is true, return the result of C&lt;TRUE_FILTER&gt;, otherwise
+return the result of C&lt;FALSE_FILTER&gt;.
+
+
+    # INPUT
+    foo: bar
+    baz: fuzz
+
+    $ yq &#39;if .foo eq bar then .baz else .foo&#39;
+    fuzz
+
+    $ yq &#39;if .foo eq buzz then .baz else .foo&#39;
+    bar
+
+    $ yq &#39;if .foo then .baz&#39;
+    fuzz
+
+    $ yq &#39;if .herp then .derp else .&#39;
+    foo: bar
+    baz: fuzz
+
+The C&lt;else FALSE_FILTER&gt; is optional and defaults to returning undefined.
+
+=back
+
+=head2 COMBINATORS
+
+Combinators combine multiple expressions to yield one or more documents in the
+output stream.
+
+=over
+
+=item ,
+
+Multiple EXPRESSIONS may be separated by commas to yield multiple documents in the
+output.
+
+    # INPUT
+    foo: bar
+    baz: fuzz
+
+    $ yq &#39;.foo, .baz&#39;
+    bar
+    ---
+    fuzz
+
+=item |
+
+Multiple EXPRESSIONS may be separated by pipes to give the output of the left
+expression as the input of the right expression (much like how shell pipes
+work).
+
+    # INPUT
+    foo: bar
+    baz: fuzz
+    pop: more
+    ---
+    foo: buzz
+    baz: fizz
+    pop: jump
+
+    $ yq &#39;{ foo: .foo, val: .pop } | group_by( .foo )&#39;
+    bar:
+        - foo: bar
+          val: more
+    buzz:
+        - foo: buzz
+          val: jump
+
+The above example can be useful to avoid C&lt;group_by&gt; memory issues when dealing
+with very large streams: Reduce the size of the working document by keeping
+only the keys you want, then group those documents.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over
+
+=item YQ_VERBOSE
+
+Set the verbosity level. Useful when running the tests.
+
+=back
+</pre>
+
+        </div>
+        <footer>
+            <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-61295159-4', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+            <div class="container tagline">
+                <a href="http://preaction.github.io/Statocles">Made with Statocles</a><br>
+                <a href="http://www.perl.org">Powered by Perl</a>
+            </div>
+        </footer>
+    </body>
+</html>
