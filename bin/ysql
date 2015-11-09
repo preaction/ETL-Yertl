@@ -47,6 +47,7 @@ __END__
     ysql [<db_name> | --dsn <dsn>] [<query> | <query_name>] [<value>...]
 
     ysql <db_name> --save <query_name> <query>
+    ysql <db_name> --edit <query_name>
 
     ysql --config <db_name> [--driver <driver>] [--database <database] [--host <host>]
         [--port <port>] [--user <user>] [--password <password>]
@@ -120,6 +121,11 @@ View, add, and edit database configuration.
 =head2 --save <query_name>
 
 Save a query to run later.
+
+=head2 --edit <query_name>
+
+Edit the named query in your text editor (taken from the C<EDITOR> environment
+variable).
 
 =head2 --driver <driver>
 

@@ -5,6 +5,7 @@ use ETL::Yertl;
 use Getopt::Long qw( GetOptionsFromArray :config pass_through );
 use ETL::Yertl::Format::yaml;
 use File::HomeDir;
+use Path::Tiny qw( tempfile );
 
 sub main {
     my $class = shift;
@@ -30,6 +31,7 @@ sub main {
         'user|u=s',
         'password|pass=s',
         'save=s',
+        'edit|e=s',
     );
     #; use Data::Dumper;
     #; say Dumper \@args;
@@ -112,6 +114,18 @@ sub main {
 
     }
     else {
+        if ( $opt{ edit } ) {
+            my $db_key = shift @args;
+            my $db_conf = db_config( $db_key );
+            my $query = $db_conf->{query}{ $opt{edit} };
+            my $tmp = tempfile;
+            $tmp->spew( $query );
+            system $ENV{EDITOR}, "$tmp";
+            $db_conf->{query}{ $opt{edit} } = $tmp->slurp;
+            db_config( $db_key => $db_conf );
+            return 0;
+        }
+
         if ( $opt{ save } ) {
             my $db_key = shift @args;
             my $db_conf = db_config( $db_key );
