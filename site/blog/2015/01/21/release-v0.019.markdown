@@ -16,8 +16,8 @@ Full changelog below:
 
 ---
 
-* [add missing ABSTRACTs to Command modules](https://github.com/preaction/Statocles/commit/f8c9a102a691037659ad5a89fe615f076d7984fc)
-* [add error checking when preparing or executing SQL](https://github.com/preaction/Statocles/commit/5a2783d5fafa6473bf422308cec6763c7375902d) ([#92](https://github.com/preaction/Statocles/issues/92))
-* [allow using "--dsn" to edit config](https://github.com/preaction/Statocles/commit/749060f26b576947ad290a8b9ec8683637f16165) ([#91](https://github.com/preaction/Statocles/issues/91))
-* [combine write and query in ysql](https://github.com/preaction/Statocles/commit/9ff860bb6a96d963a11e1126fe364fd8bf158900)
-* [fix test failure on DBD::SQLite 1.33](https://github.com/preaction/Statocles/commit/42845367e54f3402fcb61de91c8b6d681e6fb7ec) ([#86](https://github.com/preaction/Statocles/issues/86))
+* [add missing ABSTRACTs to Command modules](https://github.com/preaction/ETL-Yertl/commit/f8c9a102a691037659ad5a89fe615f076d7984fc)
+* [add error checking when preparing or executing SQL](https://github.com/preaction/ETL-Yertl/commit/5a2783d5fafa6473bf422308cec6763c7375902d) ([#92](https://github.com/preaction/ETL-Yertl/issues/92))
+* [allow using "--dsn" to edit config](https://github.com/preaction/ETL-Yertl/commit/749060f26b576947ad290a8b9ec8683637f16165) ([#91](https://github.com/preaction/ETL-Yertl/issues/91))
+* [combine write and query in ysql](https://github.com/preaction/ETL-Yertl/commit/9ff860bb6a96d963a11e1126fe364fd8bf158900)
+* [fix test failure on DBD::SQLite 1.33](https://github.com/preaction/ETL-Yertl/commit/42845367e54f3402fcb61de91c8b6d681e6fb7ec) ([#86](https://github.com/preaction/ETL-Yertl/issues/86))

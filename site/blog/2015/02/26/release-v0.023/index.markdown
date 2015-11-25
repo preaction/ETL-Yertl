@@ -15,4 +15,4 @@ Full changelog below:
 
 ---
 
-* [make yq use formatter modules](https://github.com/preaction/Statocles/commit/966c355fa059af8b3b23fcfaf7ec6034b19534c1)
+* [make yq use formatter modules](https://github.com/preaction/ETL-Yertl/commit/966c355fa059af8b3b23fcfaf7ec6034b19534c1)
