@@ -453,13 +453,13 @@ subtest 'query' => sub {
         $conf_file->touchpath->spew( $yaml->write( $conf ) );
 
         my $dbi = DBI->connect( 'dbi:SQLite:dbname=' . $home->child( 'test.db' ) );
-        $dbi->do( 'CREATE TABLE person ( id INT, name VARCHAR, email VARCHAR )' );
+        $dbi->do( 'CREATE TABLE person ( id INT, name VARCHAR, email VARCHAR, paygrade VARCHAR )' );
         my @people = (
-            [ 1, 'Hazel Murphy', 'hank@example.com' ],
-            [ 2, 'Quentin Quinn', 'quinn@example.com' ],
+            [ 1, 'Hazel Murphy', 'hank@example.com', 'E5' ],
+            [ 2, 'Quentin Quinn', 'quinn@example.com', 'D1' ],
         );
         for my $person ( @people ) {
-            $dbi->do( 'INSERT INTO person ( id, name, email ) VALUES ( ?, ?, ? )', {}, @$person );
+            $dbi->do( 'INSERT INTO person ( id, name, email, paygrade ) VALUES ( ?, ?, ?, ? )', {}, @$person );
         }
 
         return ( $home );
@@ -482,11 +482,13 @@ subtest 'query' => sub {
                 id => 1,
                 name => 'Hazel Murphy',
                 email => 'hank@example.com',
+                paygrade => 'E5',
             },
             {
                 id => 2,
                 name => 'Quentin Quinn',
                 email => 'quinn@example.com',
+                paygrade => 'D1',
             },
         );
 
@@ -510,11 +512,13 @@ subtest 'query' => sub {
                     id => 1,
                     name => 'Hazel Murphy',
                     email => 'hank@example.com',
+                    paygrade => 'E5',
                 },
                 {
                     id => 2,
                     name => 'Quentin Quinn',
                     email => 'quinn@example.com',
+                    paygrade => 'D1',
                 },
             );
 
@@ -532,6 +536,7 @@ subtest 'query' => sub {
                         id => 2,
                         name => 'Quentin Quinn',
                         email => 'quinn@example.com',
+                        paygrade => 'D1',
                     },
                 );
             };
@@ -615,11 +620,13 @@ subtest 'query' => sub {
                         id => 1,
                         name => 'Hazel Murphy',
                         email => 'hank@example.com',
+                        paygrade => 'E5',
                     },
                     {
                         id => 2,
                         name => 'Quentin Quinn',
                         email => 'quinn@example.com',
+                        paygrade => 'D1',
                     },
                 );
 
@@ -668,6 +675,7 @@ subtest 'query' => sub {
                         id => 1,
                         name => 'Hazel Murphy',
                         email => 'hank@example.com',
+                        paygrade => 'E5',
                     },
                 );
 
