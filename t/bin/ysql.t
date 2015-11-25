@@ -492,6 +492,68 @@ subtest 'query' => sub {
 
     };
 
+    subtest 'sql helper options' => sub {
+        subtest '--select' => sub {
+            my ( $home ) = $setup->();
+            local $ENV{HOME} = "$home";
+
+            my ( $stdout, $stderr, $exit ) = capture {
+                ysql->main( 'testdb', '--select', 'person' );
+            };
+            is $exit, 0;
+            ok !$stderr, 'nothing on stderr' or diag $stderr;
+
+            open my $fh, '<', \$stdout;
+            my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
+            cmp_deeply [ $yaml_fmt->read ], bag(
+                {
+                    id => 1,
+                    name => 'Hazel Murphy',
+                    email => 'hank@example.com',
+                },
+                {
+                    id => 2,
+                    name => 'Quentin Quinn',
+                    email => 'quinn@example.com',
+                },
+            );
+        };
+
+        subtest '--insert' => sub {
+            my $home = tempdir;
+            local $ENV{HOME} = "$home";
+
+            my $conf = {
+                testdb => {
+                    driver => 'SQLite',
+                    database => $home->child( 'test.db' )->stringify,
+                },
+            };
+            my $conf_file = $home->child( '.yertl', 'ysql.yml' );
+            my $yaml = ETL::Yertl::Format::yaml->new;
+            $conf_file->touchpath->spew( $yaml->write( $conf ) );
+
+            my $dbi = DBI->connect( 'dbi:SQLite:dbname=' . $home->child( 'test.db' ) );
+            $dbi->do( 'CREATE TABLE person ( id INT, name VARCHAR, email VARCHAR )' );
+            local *STDIN = $SHARE_DIR->child( 'command', 'ysql', 'write.yml' )->openr;
+
+            my ( $stdout, $stderr, $exit ) = capture {
+                ysql->main( 'testdb', '--insert', 'person' );
+            };
+            is $exit, 0;
+            ok !$stderr, 'nothing on stderr' or diag $stderr;
+            ok !$stdout, 'nothing on stdout' or diag $stdout;
+
+            cmp_deeply
+                $dbi->selectall_arrayref( 'SELECT id,name,email FROM person' ),
+                bag(
+                    [ 1, 'Hazel Murphy', 'hank@example.com' ],
+                    [ 2, 'Quentin Quinn', 'quinn@example.com' ],
+                );
+        };
+
+    };
+
     subtest 'saved queries' => sub {
         subtest 'without placeholders' => sub {
             my ( $home ) = $setup->();

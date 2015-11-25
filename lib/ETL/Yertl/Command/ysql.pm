@@ -6,6 +6,7 @@ use Getopt::Long qw( GetOptionsFromArray :config pass_through );
 use ETL::Yertl::Format::yaml;
 use File::HomeDir;
 use Path::Tiny qw( tempfile );
+use SQL::Abstract;
 
 sub main {
     my $class = shift;
@@ -32,6 +33,8 @@ sub main {
         'password|pass=s',
         'save=s',
         'edit|e=s',
+        'select=s',
+        'insert=s',
     );
     #; use Data::Dumper;
     #; say Dumper \@args;
@@ -153,11 +156,60 @@ sub main {
                 $DBI::errstr;
         }
 
-        my $query = shift @args;
-        if ( $db_key ) {
-            my $db_conf = db_config( $db_key );
-            if ( $db_conf->{query}{ $query } ) {
-                $query = $db_conf->{query}{ $query };
+        my $sql = SQL::Abstract->new;
+
+        # Insert helper requires special handling, as the query may change
+        # with every document inserted.
+        if ( $opt{insert} ) {
+            if ( !-t *STDIN ) {
+                my $in_fmt = ETL::Yertl::Format::yaml->new( input => \*STDIN );
+
+                my $query;
+                my @bind_args;
+                my $sth;
+                for my $doc ( $in_fmt->read ) {
+                    my ( $new_query, @bind_args ) = $sql->insert( $opt{insert}, $doc );
+                    if ( !$query || $new_query ne $query ) {
+                        $query = $new_query;
+                        $sth = $dbh->prepare( $query );
+                    }
+
+                    $sth->execute( @bind_args )
+                        or die "SQL error in execute: " . $dbh->errstr . "\n";
+                    while ( my $doc = $sth->fetchrow_hashref ) {
+                        print $out_fmt->write( $doc );
+                    }
+                }
+
+            }
+            else {
+                my ( $query, @bind_args ) = $sql->insert( $opt{insert}, \@args );
+                my $sth = $dbh->prepare( $query )
+                    or die "SQL error in prepare: " . $dbh->errstr . "\n";
+
+                $sth->execute( @bind_args )
+                    or die "SQL error in execute: " . $dbh->errstr . "\n";
+                while ( my $doc = $sth->fetchrow_hashref ) {
+                    print $out_fmt->write( $doc );
+                }
+            }
+            return 0;
+        }
+
+        # Other queries that do not require special handling
+        my $query;
+        if ( $opt{select} ) {
+            $query = $sql->select( $opt{select} );
+        }
+        else {
+            $query = shift @args;
+
+            # Check for saved query
+            if ( $db_key ) {
+                my $db_conf = db_config( $db_key );
+                if ( $db_conf->{query}{ $query } ) {
+                    $query = $db_conf->{query}{ $query };
+                }
             }
         }
 

@@ -46,6 +46,9 @@ __END__
 
     ysql [<db_name> | --dsn <dsn>] [<query> | <query_name>] [<value>...]
 
+    ysql <db_name> --select <table>
+    ysql <db_name> --insert <table>
+
     ysql <db_name> --save <query_name> <query>
     ysql <db_name> --edit <query_name>
 
@@ -98,6 +101,29 @@ example:
                     VALUES ( $.name, $.email, $.profile.dept )' \
                     < input.yml
 
+=head2 Query Helpers
+
+For common, simple SQL queries, there are some helper options that will
+help generate the SQL for you.
+
+Instead of C<SELECT * FROM person>, we can use the C<--select> helper:
+
+    $ ysql db_name --select person
+
+And for simple inserts, we can use the C<--insert> helper:
+
+    # input.yml
+    ---
+    name: Hesh Hipplewhite
+    email: hesh@example.com
+    dept: Engineering
+    ---
+    name: Jodene Sparks
+    email: overlord@example.com
+    dept: Communication
+
+    $ ysql db_name --insert person < input.yml
+
 =head1 ARGUMENTS
 
 =head2 db_name
@@ -113,6 +139,16 @@ The SQL query to run against the database.
 The name of a saved query. Add and edit saved queries using the C<--save> option.
 
 =head1 OPTIONS
+
+=head2 --select <table>
+
+Generate a C<SELECT * FROM table> query for the given C<table>.
+
+=head2 --insert <table>
+
+Generate an C<INSERT INTO table ( fields ) VALUES ( values )> query for the
+given C<table>. For each document read on STDIN, the correct fields and values
+will be used.
 
 =head2 --config
 
