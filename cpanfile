@@ -11,6 +11,7 @@ requires "Parse::RecDescent" => "0";
 requires "Path::Tiny" => "0.055";
 requires "Pod::Usage::Return" => "0";
 requires "Regexp::Common" => "2013031301";
+requires "SQL::Abstract" => "0";
 requires "Text::Trim" => "0";
 requires "Type::Tiny" => "0";
 requires "Types::Standard" => "0";

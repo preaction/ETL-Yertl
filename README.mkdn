@@ -4,7 +4,7 @@ ETL::Yertl - ETL with a Shell
 
 # VERSION
 
-version 0.025
+version 0.026
 
 # STATUS
 
@@ -54,7 +54,7 @@ Yertl will have tools for:
 
 # SEE ALSO
 
-- [http://preaction.github.io/ETL-Yertl](http://preaction.github.io/ETL-Yertl)
+- [http://preaction.me/yertl](http://preaction.me/yertl)
 
     The Yertl home page.
 

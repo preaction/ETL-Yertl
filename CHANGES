@@ -1,6 +1,20 @@
 Changelog for ETL-Yertl
 
-0.025 2015-08-24T03:12:13
+0.026 2015-11-25T03:41:56
+ - add --order-by helper for ysql
+ - add sortable field to ysql test
+ - add --where helper for select queries
+ - add --select and --insert query helpers to ysql
+ - add flag to edit SQL query in text editor
+ - deploy to personal site
+ - redirect from github pages to personal site
+ - update docs to new website at preaction.me
+ - ignore the statocles directory
+ - remove obsolete site config attributes
+ - add release v0.025 announcement
+ - update theme from statocles default
+
+0.025 2015-08-24T03:12:13Z
  - fix SQL error using --dsn printing error twice
  - handle error in connect with useful error message
  - update Regexp::Common to 2013031301
