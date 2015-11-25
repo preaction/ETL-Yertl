@@ -517,6 +517,24 @@ subtest 'query' => sub {
                     email => 'quinn@example.com',
                 },
             );
+
+            subtest '--where' => sub {
+                my ( $stdout, $stderr, $exit ) = capture {
+                    ysql->main( 'testdb', '--select', 'person', '--where', 'id >= 2' );
+                };
+                is $exit, 0;
+                ok !$stderr, 'nothing on stderr' or diag $stderr;
+
+                open my $fh, '<', \$stdout;
+                my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
+                cmp_deeply [ $yaml_fmt->read ], bag(
+                    {
+                        id => 2,
+                        name => 'Quentin Quinn',
+                        email => 'quinn@example.com',
+                    },
+                );
+            };
         };
 
         subtest '--insert' => sub {

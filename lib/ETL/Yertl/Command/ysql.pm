@@ -35,6 +35,7 @@ sub main {
         'edit|e=s',
         'select=s',
         'insert=s',
+        'where=s',
     );
     #; use Data::Dumper;
     #; say Dumper \@args;
@@ -199,7 +200,7 @@ sub main {
         # Other queries that do not require special handling
         my $query;
         if ( $opt{select} ) {
-            $query = $sql->select( $opt{select} );
+            $query = $sql->select( $opt{select}, '*', $opt{where} );
         }
         else {
             $query = shift @args;
