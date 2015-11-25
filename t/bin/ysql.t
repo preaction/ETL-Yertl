@@ -540,6 +540,60 @@ subtest 'query' => sub {
                     },
                 );
             };
+
+            subtest '--sort/--order' => sub {
+
+                subtest '--sort with DESC' => sub {
+                    my ( $stdout, $stderr, $exit ) = capture {
+                        ysql->main( 'testdb', '--select', 'person', '--sort', 'id DESC' );
+                    };
+                    is $exit, 0;
+                    ok !$stderr, 'nothing on stderr' or diag $stderr;
+
+                    open my $fh, '<', \$stdout;
+                    my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
+                    cmp_deeply [ $yaml_fmt->read ], [
+                        {
+                            id => 2,
+                            name => 'Quentin Quinn',
+                            email => 'quinn@example.com',
+                            paygrade => 'D1',
+                        },
+                        {
+                            id => 1,
+                            name => 'Hazel Murphy',
+                            email => 'hank@example.com',
+                            paygrade => 'E5',
+                        },
+                    ];
+                };
+
+                subtest '--order ASC by default' => sub {
+                    my ( $stdout, $stderr, $exit ) = capture {
+                        ysql->main( 'testdb', '--select', 'person', '--order', 'paygrade' );
+                    };
+                    is $exit, 0;
+                    ok !$stderr, 'nothing on stderr' or diag $stderr;
+
+                    open my $fh, '<', \$stdout;
+                    my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
+                    cmp_deeply [ $yaml_fmt->read ], [
+                        {
+                            id => 2,
+                            name => 'Quentin Quinn',
+                            email => 'quinn@example.com',
+                            paygrade => 'D1',
+                        },
+                        {
+                            id => 1,
+                            name => 'Hazel Murphy',
+                            email => 'hank@example.com',
+                            paygrade => 'E5',
+                        },
+                    ];
+                };
+
+            };
         };
 
         subtest '--insert' => sub {

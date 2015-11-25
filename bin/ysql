@@ -110,9 +110,9 @@ Instead of C<SELECT * FROM person>, we can use the C<--select> helper:
 
     $ ysql db_name --select person
 
-And we can combine it with the C<--where> helper:
+And we can combine it with the C<--where> and C<--order-by> helpers:
 
-    $ ysql db_name --select person --where 'dept = "Science"'
+    $ ysql db_name --select person --where 'dept = "Science"' --order-by name
 
 And for simple inserts, we can use the C<--insert> helper:
 
@@ -157,6 +157,10 @@ will be used.
 =head2 --where <clause>
 
 Add a C<WHERE> clause to a C<--select> query.
+
+=head2 --order-by <clause> | --sort <clause>
+
+Add an C<ORDER BY> clause to a C<--select> query.
 
 =head2 --config
 

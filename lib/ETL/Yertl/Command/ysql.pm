@@ -36,6 +36,7 @@ sub main {
         'select=s',
         'insert=s',
         'where=s',
+        'order|order-by|sort=s',
     );
     #; use Data::Dumper;
     #; say Dumper \@args;
@@ -200,7 +201,7 @@ sub main {
         # Other queries that do not require special handling
         my $query;
         if ( $opt{select} ) {
-            $query = $sql->select( $opt{select}, '*', $opt{where} );
+            $query = $sql->select( $opt{select}, '*', $opt{where}, $opt{order} );
         }
         else {
             $query = shift @args;
