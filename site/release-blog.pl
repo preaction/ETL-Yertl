@@ -6,7 +6,7 @@ use Getopt::Long qw( GetOptionsFromArray );
 use Pod::Usage::Return;
 use List::MoreUtils qw( firstidx );
 
-my $GITHUB_ROOT = 'https://github.com/preaction/Statocles';
+my $GITHUB_ROOT = 'https://github.com/preaction/ETL-Yertl';
 
 sub main {
     my ( $class, @args ) = @_;
