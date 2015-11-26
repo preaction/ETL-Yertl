@@ -452,14 +452,14 @@ subtest 'query' => sub {
         my $yaml = ETL::Yertl::Format::yaml->new;
         $conf_file->touchpath->spew( $yaml->write( $conf ) );
 
-        my $dbi = DBI->connect( 'dbi:SQLite:dbname=' . $home->child( 'test.db' ) );
-        $dbi->do( 'CREATE TABLE person ( id INT, name VARCHAR, email VARCHAR, paygrade VARCHAR )' );
+        my $dbh = DBI->connect( 'dbi:SQLite:dbname=' . $home->child( 'test.db' ) );
+        $dbh->do( 'CREATE TABLE person ( id INT, name VARCHAR, email VARCHAR, paygrade VARCHAR )' );
         my @people = (
             [ 1, 'Hazel Murphy', 'hank@example.com', 'E5' ],
             [ 2, 'Quentin Quinn', 'quinn@example.com', 'D1' ],
         );
         for my $person ( @people ) {
-            $dbi->do( 'INSERT INTO person ( id, name, email, paygrade ) VALUES ( ?, ?, ?, ? )', {}, @$person );
+            $dbh->do( 'INSERT INTO person ( id, name, email, paygrade ) VALUES ( ?, ?, ?, ? )', {}, @$person );
         }
 
         return ( $home );
@@ -610,8 +610,8 @@ subtest 'query' => sub {
             my $yaml = ETL::Yertl::Format::yaml->new;
             $conf_file->touchpath->spew( $yaml->write( $conf ) );
 
-            my $dbi = DBI->connect( 'dbi:SQLite:dbname=' . $home->child( 'test.db' ) );
-            $dbi->do( 'CREATE TABLE person ( id INT, name VARCHAR, email VARCHAR )' );
+            my $dbh = DBI->connect( 'dbi:SQLite:dbname=' . $home->child( 'test.db' ) );
+            $dbh->do( 'CREATE TABLE person ( id INT, name VARCHAR, email VARCHAR )' );
             local *STDIN = $SHARE_DIR->child( 'command', 'ysql', 'write.yml' )->openr;
 
             my ( $stdout, $stderr, $exit ) = capture {
@@ -622,7 +622,7 @@ subtest 'query' => sub {
             ok !$stdout, 'nothing on stdout' or diag $stdout;
 
             cmp_deeply
-                $dbi->selectall_arrayref( 'SELECT id,name,email FROM person' ),
+                $dbh->selectall_arrayref( 'SELECT id,name,email FROM person' ),
                 bag(
                     [ 1, 'Hazel Murphy', 'hank@example.com' ],
                     [ 2, 'Quentin Quinn', 'quinn@example.com' ],
@@ -751,8 +751,8 @@ subtest 'query' => sub {
         my $yaml = ETL::Yertl::Format::yaml->new;
         $conf_file->touchpath->spew( $yaml->write( $conf ) );
 
-        my $dbi = DBI->connect( 'dbi:SQLite:dbname=' . $home->child( 'test.db' ) );
-        $dbi->do( 'CREATE TABLE person ( id INT, name VARCHAR, email VARCHAR )' );
+        my $dbh = DBI->connect( 'dbi:SQLite:dbname=' . $home->child( 'test.db' ) );
+        $dbh->do( 'CREATE TABLE person ( id INT, name VARCHAR, email VARCHAR )' );
         local *STDIN = $SHARE_DIR->child( 'command', 'ysql', 'write.yml' )->openr;
 
         my ( $stdout, $stderr, $exit ) = capture {
@@ -765,7 +765,7 @@ subtest 'query' => sub {
         ok !$stdout, 'nothing on stdout' or diag $stdout;
 
         cmp_deeply
-            $dbi->selectall_arrayref( 'SELECT id,name,email FROM person' ),
+            $dbh->selectall_arrayref( 'SELECT id,name,email FROM person' ),
             bag(
                 [ 1, 'Hazel Murphy', 'hank@example.com' ],
                 [ 2, 'Quentin Quinn', 'quinn@example.com' ],
@@ -788,8 +788,8 @@ subtest 'query' => sub {
             my $yaml = ETL::Yertl::Format::yaml->new;
             $conf_file->touchpath->spew( $yaml->write( $conf ) );
 
-            my $dbi = DBI->connect( 'dbi:SQLite:dbname=' . $home->child( 'test.db' ) );
-            $dbi->do( 'CREATE TABLE person ( id INT, name VARCHAR, email VARCHAR )' );
+            my $dbh = DBI->connect( 'dbi:SQLite:dbname=' . $home->child( 'test.db' ) );
+            $dbh->do( 'CREATE TABLE person ( id INT, name VARCHAR, email VARCHAR )' );
             local *STDIN = $SHARE_DIR->child( 'command', 'ysql', 'deep.yml' )->openr;
 
             my ( $stdout, $stderr, $exit ) = capture {
@@ -802,7 +802,7 @@ subtest 'query' => sub {
             ok !$stdout, 'nothing on stdout' or diag $stdout;
 
             cmp_deeply
-                $dbi->selectall_arrayref( 'SELECT id,name,email FROM person' ),
+                $dbh->selectall_arrayref( 'SELECT id,name,email FROM person' ),
                 bag(
                     [ 1, 'Hazel Murphy', 'hank@example.com' ],
                     [ 2, 'Quentin Quinn', 'quinn@example.com' ],
