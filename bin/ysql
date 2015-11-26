@@ -46,9 +46,9 @@ __END__
 
     ysql [<db_name> | --dsn <dsn>] [<query> | <query_name>] [<value>...]
 
-    ysql <db_name> --select <table>
+    ysql <db_name> --select <table> [--where <clause>] [--order-by <clause>]
     ysql <db_name> --insert <table>
-    ysql <db_name> --delete <table>
+    ysql <db_name> --delete <table> [--where <clause>]
 
     ysql <db_name> --save <query_name> <query>
     ysql <db_name> --edit <query_name>
@@ -151,7 +151,8 @@ The name of a saved query. Add and edit saved queries using the C<--save> option
 
 =head2 --select <table>
 
-Generate a C<SELECT * FROM table> query for the given C<table>.
+Generate a C<SELECT * FROM table> query for the given C<table>. Also accepts
+the C<--where> and C<--order-by> options.
 
 =head2 --insert <table>
 
