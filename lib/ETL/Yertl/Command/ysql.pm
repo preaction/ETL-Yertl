@@ -35,6 +35,7 @@ sub main {
         'edit|e=s',
         'select=s',
         'insert=s',
+        'delete=s',
         'where=s',
         'order|order-by|sort=s',
     );
@@ -202,6 +203,9 @@ sub main {
         my $query;
         if ( $opt{select} ) {
             $query = $sql->select( $opt{select}, '*', $opt{where}, $opt{order} );
+        }
+        elsif ( $opt{delete} ) {
+            $query = $sql->delete( $opt{delete}, $opt{where} );
         }
         else {
             $query = shift @args;

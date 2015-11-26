@@ -48,6 +48,7 @@ __END__
 
     ysql <db_name> --select <table>
     ysql <db_name> --insert <table>
+    ysql <db_name> --delete <table>
 
     ysql <db_name> --save <query_name> <query>
     ysql <db_name> --edit <query_name>
@@ -128,6 +129,10 @@ And for simple inserts, we can use the C<--insert> helper:
 
     $ ysql db_name --insert person < input.yml
 
+There is a C<--delete> helper as well, which accepts the C<--where> option:
+
+    $ ysql db_name --delete person --where 'dept = "Wildlife"'
+
 =head1 ARGUMENTS
 
 =head2 db_name
@@ -153,6 +158,11 @@ Generate a C<SELECT * FROM table> query for the given C<table>.
 Generate an C<INSERT INTO table ( fields ) VALUES ( values )> query for the
 given C<table>. For each document read on STDIN, the correct fields and values
 will be used.
+
+=head2 --delete <table>
+
+Generate a C<DELETE FROM table> query for the given C<table>. Also accepts
+the C<--where> option.
 
 =head2 --where <clause>
 

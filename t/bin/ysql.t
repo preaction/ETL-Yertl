@@ -629,6 +629,40 @@ subtest 'query' => sub {
                 );
         };
 
+        subtest '--delete' => sub {
+            my ( $home, $dbh ) = $setup->();
+            local $ENV{HOME} = "$home";
+
+            my ( $stdout, $stderr, $exit ) = capture {
+                ysql->main( 'testdb', '--delete', 'person' );
+            };
+            is $exit, 0;
+            ok !$stderr, 'nothing on stderr' or diag $stderr;
+            ok !$stdout, 'nothing on stdout' or diag $stdout;
+
+            cmp_deeply
+                $dbh->selectall_arrayref( 'SELECT id,name,email FROM person' ),
+                [];
+
+            subtest '--where' => sub {
+                my ( $home, $dbh ) = $setup->();
+                local $ENV{HOME} = "$home";
+
+                my ( $stdout, $stderr, $exit ) = capture {
+                    ysql->main( 'testdb', '--delete', 'person', '--where', 'id >= 2' );
+                };
+                is $exit, 0;
+                ok !$stderr, 'nothing on stderr' or diag $stderr;
+                ok !$stdout, 'nothing on stdout' or diag $stdout;
+
+                cmp_deeply
+                    $dbh->selectall_arrayref( 'SELECT id,name,email FROM person' ),
+                    bag(
+                        [ 1, 'Hazel Murphy', 'hank@example.com' ],
+                    );
+            };
+
+        };
     };
 
     subtest 'saved queries' => sub {
