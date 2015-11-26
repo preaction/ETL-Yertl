@@ -462,7 +462,7 @@ subtest 'query' => sub {
             $dbh->do( 'INSERT INTO person ( id, name, email, paygrade ) VALUES ( ?, ?, ?, ? )', {}, @$person );
         }
 
-        return ( $home );
+        return ( $home, $dbh );
     };
 
     subtest 'basic query' => sub {
