@@ -178,7 +178,11 @@ A process name
 
 =item NET.IPV4
 
-An IPV4 address.
+An IPv4 address.
+
+=item NET.IPV6
+
+An IPv6 address.
 
 =item NET.HOSTNAME
 

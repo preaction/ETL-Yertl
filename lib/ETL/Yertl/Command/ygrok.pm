@@ -29,7 +29,8 @@ our %PATTERNS = (
 
     NET => {
         HOSTNAME => join( "|", $RE{net}{IPv4}, $RE{net}{IPv6}, $RE{net}{domain}{-rfc1101} ),
-        IPV4 => '\d{1,3}[.]\d{1,3}[.]\d{1,3}[.]\d{1,3}',
+        IPV6 => $RE{net}{IPv6}."",
+        IPV4 => $RE{net}{IPv4}."",
     },
 
     URL => {
