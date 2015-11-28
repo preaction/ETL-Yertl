@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "Module::Runtime" => 0,
     "Moo::Lax" => 0,
     "Parse::RecDescent" => 0,
-    "Path::Tiny" => "0.055",
+    "Path::Tiny" => "0.072",
     "Pod::Usage::Return" => 0,
     "Regexp::Common" => "2013031301",
     "SQL::Abstract" => 0,
@@ -59,7 +59,7 @@ my %WriteMakefileArgs = (
     "Test::Lib" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "0.026",
+  "VERSION" => "0.027",
   "test" => {
     "TESTS" => "t/*.t t/bin/*.t t/command/yq/*.t t/format/*.t"
   }
@@ -83,7 +83,7 @@ my %FallbackPrereqs = (
   "Module::Runtime" => 0,
   "Moo::Lax" => 0,
   "Parse::RecDescent" => 0,
-  "Path::Tiny" => "0.055",
+  "Path::Tiny" => "0.072",
   "Pod::Usage::Return" => 0,
   "Regexp::Common" => "2013031301",
   "SQL::Abstract" => 0,
