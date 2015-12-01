@@ -76,9 +76,10 @@ __END__
 
 =head1 DESCRIPTION
 
-ETL::Yertl is an ETL for shells. It is designed to accept data from multiple formats
-(CSV, JSON), manipulate them using simple tools, and then convert them to an output
-format.
+ETL::Yertl is an ETL (L<Extract, Transform,
+Load|https://en.wikipedia.org/wiki/Extract,_transform,_load>) for shells. It is
+designed to accept data from multiple formats (CSV, JSON), manipulate them
+using simple tools, and then convert them to an output format.
 
 Yertl will have tools for:
 

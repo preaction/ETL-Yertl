@@ -5,8 +5,9 @@ title: Yertl -- ETL with a Shell
 
 # Yertl - ETL with a Shell
 
-Yertl is an ETL (Extract, Transform, Load) system for working with structured data
-with a command-line.
+Yertl is an ETL ([Extract, Transform,
+Load](https://en.wikipedia.org/wiki/Extract,_transform,_load)) system
+for working with structured data with a command-line.
 
 ## Getting Started
 
