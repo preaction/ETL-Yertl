@@ -26,12 +26,12 @@ our %IMPORT_BUNDLES = (
     ],
 
     Class => [
-        '<Moo::Lax',
+        '<Moo',
         @class_modules,
     ],
 
     Role => [
-        '<Moo::Role::Lax',
+        '<Moo::Role',
         @class_modules,
     ],
 
