@@ -1,6 +1,18 @@
 # PODNAME: ETL::Yertl::Help::ysql
 # ABSTRACT: A guide to using ysql to work with SQL databases
 
+=head1 DESCRIPTION
+
+C<ysql> is a simple utility for working with SQL databases. Any database
+that Perl's L<DBI|http://dbi.perl.org> library has a L<DBD driver
+for|https://metacpan.org/search?q=DBD%3A%3A> will work with this
+utility.
+
+C<ysql> allows for selecting, inserting, updating, and running arbitrary
+SQL on a database. It also stores database configurations and even
+queries for later use (so you don't have to re-type that long query over
+and over).
+
 =head1 Configure Databases
 
 To use ysql, first we have to configure a database. This saves us from having
