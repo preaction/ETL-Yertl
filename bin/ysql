@@ -79,6 +79,12 @@ query, or SQL (usually a C<SELECT>). C<value> is used to fill in C<?> placeholde
     email: dr.quinn@example.com
     dept: Science
 
+    $ ysql db_name 'SELECT * FROM person WHERE dept = ?' Science
+    ---
+    name: Quinn Quinlan
+    email: dr.quinn@example.com
+    dept: Science
+
 =head2 Writing
 
 If there are documents to read on STDIN, the C<query> will be executed once for

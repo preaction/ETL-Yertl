@@ -58,7 +58,7 @@ to make some tables:
     $ ysql dev 'CREATE TABLE users ( id INTEGER PRIMARY KEY \
         AUTOINCREMENT, name VARCHAR, email VARCHAR )'
 
-Next let's insert some data:
+Next let's insert some data using plain SQL:
 
     $ ysql prod 'INSERT INTO users ( name, email ) \
         VALUES ( "preaction", "preaction@example.com" )'
@@ -76,6 +76,79 @@ Now, let's query for our data:
     email: postaction.example.com
     id: 2
     name: postaction
+
+=head1 SQL Helpers
+
+Since SQL is a standard language, and can be verbose at times, ysql
+provides some helpers for generating queries quickly.
+
+=head2 Selecting Data
+
+To quickly select all the data in a table, we can use the C<--select>
+helper:
+
+    $ ysql prod --select users
+
+To filter our results, we can add a C<--where> helper:
+
+    $ ysql prod --select users --where 'name = "preaction"'
+
+The C<--order-by> helper can sort our results for us:
+
+    $ ysql prod --select users --order-by id
+
+=head2 Inserting Data
+
+Now, lets say we want to copy our production database to dev for testing. To do
+that, Yertl allows us to read YAML from C<STDIN> and execute a query for each YAML
+document. The C<--insert> helper makes this easy:
+
+    $ ysql prod --select users | ysql dev --insert users
+
+The insert helper does all the work of determining what fields the input
+has and executing the correct C<INSERT INTO> SQL query for each document
+to insert.
+
+=head2 Deleting Data
+
+Much like selecting data, we can delete data using the C<--delete>
+helper.
+
+    $ ysql prod --delete users
+
+The C<--where> helper can limit which rows get deleted:
+
+    $ ysql prod --delete users --where 'name = "postaction"'
+
+=head1 Placeholders
+
+Additional arguments on the command-line are treated as placeholder
+values, which fill in any C<?> in the query.
+
+    $ ysql prod 'SELECT * FROM users WHERE name=?' postaction
+
+This is especially helpful when using saved queries, below, or when
+using C<xargs(1)>.
+
+=head1 Interpolation
+
+When piping in data and running custom SQL, Yertl allows a special
+interpolation syntax (starting with a C<$>) to pick parts of the
+document to fill in the query. So, to copy our users from prod to dev
+again, we could do:
+
+    $ ysql prod 'SELECT * FROM users' |
+        ysql dev 'INSERT INTO users ( id, name, email ) \
+            VALUES ( $.id, $.name, $.email )'
+
+C<$.id> picks the "id" field, C<$.name> the "name" field, etc...
+
+We can also pipe in data and run a select query, useful when we need to
+find related information, or see if our two databases have the same
+user names:
+
+    $ ysql prod --select users |
+        ysql dev 'SELECT * FROM users WHERE name=$.name'
 
 =head1 Converting Formats
 
@@ -99,25 +172,11 @@ using the L<yto utility|yto>.
        "name" : "postaction"
     }
 
-=head1 Writing Data
-
-Now, lets say we want to copy our production database to dev for testing. To do
-that, Yertl allows us to read YAML from C<STDIN> and execute a query for each YAML
-document. Yertl uses a special interpolation syntax (starting with a C<$>) to
-pick parts of the document to fill in the query:
-
-    $ ysql prod 'SELECT * FROM users' |
-        ysql dev 'INSERT INTO users ( id, name, email ) \
-            VALUES ( $.id, $.name, $.email )'
-
-So this will take our users table from prod and write it to dev. C<$.id> picks
-the "id" field, C<$.name> the "name" field, etc...
-
 =head1 Saved Queries
 
-But all this would be a bear to type over and over again (imagine if we had a
-bunch of joins to do). So, ysql allows you to save queries for later use using
-the C<--save E<lt>nameE<gt>> option:
+All these long queries would be a bear to type over and over again
+(imagine if we had a bunch of joins to do). So, ysql allows you to save
+queries for later use using the C<--save> option:
 
     $ ysql prod --save users 'SELECT * FROM users'
     $ ysql dev --save update_users 'UPDATE users SET \
@@ -126,6 +185,12 @@ the C<--save E<lt>nameE<gt>> option:
 Then we can recall our query by the name we gave to the C<--save> option:
 
     $ ysql prod users | ysql dev update_users
+
+If our saved query has a placeholder, we can give it a value as the next
+argument:
+
+    $ ysql prod --save find_user 'SELECT * FROM users WHERE name=?'
+    $ ysql prod find_user preaction
 
 =head1 SEE ALSO
 
