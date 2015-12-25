@@ -9,6 +9,10 @@ sub empty() {
     bless {}, 'empty';
 }
 
+sub is_empty($) {
+    return ref $_[0] eq 'empty';
+}
+
 *diag = *yertl::diag;
 
 my $QUOTE_STRING = $RE{delimited}{-delim=>q{'"}};
@@ -160,6 +164,11 @@ sub filter {
             # XXX: This is a very poor decision...
             return $filter;
         }
+
+        if ( is_empty $doc ) {
+            return empty;
+        }
+
         my @keys = split /[.]/, $filter;
         my $subdoc = $doc;
         for my $key ( @keys[1..$#keys] ) {

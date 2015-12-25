@@ -18,6 +18,7 @@ sub is_list { return ref $_[0] eq 'list' }
 sub flatten { map { is_list( $_ ) ? @$_ : $_ } @_ }
 sub list { return bless [ flatten( @_ ) ], 'list' }
 sub empty { return bless {}, 'empty' }
+sub is_empty { return ref $_[0] eq 'empty' }
 
 my $grammar = q{
     <autotree>
@@ -162,10 +163,17 @@ sub run_expr {
 
 sub run_filter {
     my ( $filter, $document, $scope ) = @_;
+
+    # Empty things cannot contain anything to filter
+    if ( is_empty( $document ) ) {
+        return $document;
+    }
+
     yertl::diag( 1, "Filter: " . Dumper $filter );
     if ( !$filter->{'filter_part(s?)'} ) {
         return $document;
     }
+
     for my $part ( @{ $filter->{'filter_part(s?)'} } ) {
         if ( $part->{word} ) {
             $document = $document->{ $part->{word}{__VALUE__} };

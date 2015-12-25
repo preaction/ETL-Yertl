@@ -8,7 +8,7 @@ use Module::Runtime qw( use_module );
 our $VERBOSE = $ENV{YERTL_VERBOSE} // 0;
 
 sub is_empty {
-    return ref $_[0] eq 'empty';
+    return !$_[0] || ref $_[0] eq 'empty';
 }
 
 sub main {

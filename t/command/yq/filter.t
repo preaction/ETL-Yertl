@@ -73,4 +73,11 @@ subtest '[] with no index flattens an array' => sub {
     cmp_deeply \@out, [ 1, 2, 3 ];
 };
 
+subtest 'filter on empty results in empty' => sub {
+    my $doc = bless {}, 'empty';
+    my $filter = '.foo';
+    my $out = $class->filter( $filter, $doc );
+    isa_ok $out, 'empty';
+};
+
 done_testing;

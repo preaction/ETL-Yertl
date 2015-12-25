@@ -50,19 +50,21 @@ my $grammar = q{
             yertl::diag( 1, "Filter: " . Dumper( \@item ) );
             my @keys = @{$item[3]};
             $return = list( $::document );
-            for my $key ( @keys ) {
-                yertl::diag( 1, "Key: " . Dumper( $key ) );
-                if ( $key =~ /^\[\]$/ ) {
-                    $return = list( @{ $return->[0] } );
-                }
-                elsif ( $key =~ /^\[(\d+)\]$/ ) {
-                    $return = list( $return->[0][ $1 ] );
-                }
-                elsif ( $key =~ /^\w+$/ ) {
-                    $return = list( $return->[0]{ $key } );
-                }
-                else {
-                    die "Invalid filter key '$key'";
+            if ( ref $::document ne 'empty' ) {
+                for my $key ( @keys ) {
+                    yertl::diag( 1, "Key: " . Dumper( $key ) );
+                    if ( $key =~ /^\[\]$/ ) {
+                        $return = list( @{ $return->[0] } );
+                    }
+                    elsif ( $key =~ /^\[(\d+)\]$/ ) {
+                        $return = list( $return->[0][ $1 ] );
+                    }
+                    elsif ( $key =~ /^\w+$/ ) {
+                        $return = list( $return->[0]{ $key } );
+                    }
+                    else {
+                        die "Invalid filter key '$key'";
+                    }
                 }
             }
             # Make RD commit to this if the filter is just '.'
