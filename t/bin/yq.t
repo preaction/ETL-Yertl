@@ -51,6 +51,15 @@ subtest 'file in ARGV' => sub {
     ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
     my @got = YAML::Load( $output );
     cmp_deeply \@got, [ 'bar' ];
+
+    subtest 'multiple files with no seperators' => sub {
+        my $file = $SHARE_DIR->child( yaml => 'noseperator.yaml' );
+        my $filter = '.foo';
+        my ( $output, $stderr ) = capture { yq->main( $filter, "$file", "$file" ) };
+        ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
+        my @got = YAML::Load( $output );
+        cmp_deeply \@got, [ 'bar', 'bar' ];
+    };
 };
 
 subtest 'multiple documents print properly' => sub {
