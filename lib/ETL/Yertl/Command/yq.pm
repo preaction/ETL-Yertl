@@ -54,7 +54,7 @@ sub write {
     my ( $class, $docs, $opt ) = @_;
 
     if ( $opt->{xargs} ) {
-        print "$_\n" for @$docs;
+        print "$_\n" for grep { defined } @$docs;
         return;
     }
 

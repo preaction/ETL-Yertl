@@ -98,6 +98,14 @@ subtest 'xargs (-x) output' => sub {
     my ( $output, $stderr ) = capture { yq->main( $filter, "-x" ) };
     ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
     eq_or_diff $output, "bar\nbuzz\n";
+
+    subtest 'missing fields' => sub {
+        local *STDIN = $SHARE_DIR->child( yaml => 'group_by.yaml' )->openr;
+        my $filter = '.foo, .bar, .baz';
+        my ( $output, $stderr ) = capture { yq->main( $filter, "-x" ) };
+        ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
+        eq_or_diff $output, "bar\n1\nbar\n2\nbaz\n3\n";
+    };
 };
 
 subtest 'version check' => sub {
