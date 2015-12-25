@@ -31,6 +31,7 @@ subtest 'constructor' => sub {
         throws_ok {
             $CLASS->new( format_module => 'Not::Supported' );
         } qr{format_module must be one of: YAML::XS YAML::Syck YAML};
+        unlike $@, qr{yaml[.]pm line \d+}, 'does not contain module/line';
     };
 };
 
@@ -94,6 +95,7 @@ subtest 'no formatter available' => sub {
     like $@, qr{Not::YAML::Module \(Any version\)};
     like $@, qr{Not::Other::Module \(Any version\)};
     like $@, qr{LowVersion \(version 1\)};
+    unlike $@, qr{yaml[.]pm line \d+}, 'does not contain module/line';
 };
 
 done_testing;

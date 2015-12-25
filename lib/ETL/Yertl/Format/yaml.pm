@@ -43,13 +43,13 @@ has format_module => (
     is => 'rw',
     isa => sub {
         my ( $format_module ) = @_;
-        die "format_module must be one of: " . join " ", pairkeys @FORMAT_MODULES
+        die "format_module must be one of: " . join( " ", pairkeys @FORMAT_MODULES ) . "\n"
             unless pairfirst { $a eq $format_module } @FORMAT_MODULES;
         eval {
             use_module( $format_module );
         };
         if ( $@ ) {
-            die "Could not load format module '$format_module'";
+            die "Could not load format module '$format_module': $@";
         }
     },
     lazy => 1,
@@ -64,9 +64,11 @@ has format_module => (
             }
         }
         die "Could not load a formatter for YAML. Please install one of the following modules:\n"
-            . join "",
+            . join( "",
                 map { sprintf "\t%s (%s)", $_->[0], $_->[1] ? "version $_->[1]" : "Any version" }
-                pairs @FORMAT_MODULES;
+                pairs @FORMAT_MODULES
+            )
+            . "\n";
     },
 );
 

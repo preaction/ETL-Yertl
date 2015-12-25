@@ -31,6 +31,7 @@ subtest 'constructor' => sub {
         throws_ok {
             $CLASS->new( format_module => 'Not::Supported' );
         } qr{format_module must be one of: JSON::XS JSON::PP};
+        unlike $@, qr{json[.]pm line \d+}, 'does not contain module/line';
     };
 };
 
@@ -81,6 +82,7 @@ subtest 'no formatter available' => sub {
     like $@, qr{Not::JSON::Module \(Any version\)};
     like $@, qr{Not::Other::Module \(Any version\)};
     like $@, qr{LowVersion \(version 1\)};
+    unlike $@, qr{json[.]pm line \d+}, 'does not contain module/line';
 };
 
 done_testing;
