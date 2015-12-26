@@ -14,6 +14,7 @@ BEGIN {
 my $SHARE_DIR = path( __DIR__, '..', 'share' );
 my $CLASS = 'ETL::Yertl::Format::csv';
 my $EXPECT_TO = $SHARE_DIR->child( csv => 'test.csv' );
+my $EXPECT_COLON = $SHARE_DIR->child( csv => 'test-colon.csv' );
 
 my @EXPECT_FROM = (
     {
@@ -66,6 +67,27 @@ subtest 'formatter modules' => sub {
                 my $formatter = $CLASS->new( format_module => $formatter_module );
                 eq_or_diff $formatter->write( @EXPECT_FROM ), $EXPECT_TO->slurp;
             };
+
+            subtest 'delimiter ":"' => sub {
+                subtest 'input' => sub {
+                    my $formatter = $CLASS->new(
+                        input => $EXPECT_COLON->openr,
+                        format_module => $formatter_module,
+                        delimiter => ":",
+                    );
+                    my $got = [ $formatter->read ];
+                    cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
+                };
+
+                subtest 'output' => sub {
+                    my $formatter = $CLASS->new(
+                        format_module => $formatter_module,
+                        delimiter => ":",
+                    );
+                    eq_or_diff $formatter->write( @EXPECT_FROM ), $EXPECT_COLON->slurp;
+                };
+            };
+
         };
     }
 };

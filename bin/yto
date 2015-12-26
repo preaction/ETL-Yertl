@@ -15,6 +15,7 @@ sub main {
     GetOptionsFromArray( \@argv, \%opt,
         'help|h',
         'version',
+        'delimiter|d=s',
     );
     return pod2usage(0) if $opt{help};
     if ( $opt{version} ) {
@@ -39,6 +40,8 @@ __END__
 
     yto <format> [<file>...]
 
+    yto csv [-d <delimiter>] [<file>...]
+
     yto -h|--help|--version
 
 =head1 DESCRIPTION
@@ -58,6 +61,10 @@ A YAML file to read. The special file "-" refers to STDIN. If no files are
 specified, read STDIN.
 
 =head1 OPTIONS
+
+=head2 -d | --delimiter
+
+The delimiter to use for the C<csv> format. Defaults to C<,>.
 
 =head2 -h | --help
 

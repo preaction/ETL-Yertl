@@ -16,6 +16,18 @@ has input => (
     isa => FileHandle,
 );
 
+=attr delimiter
+
+The delimited to use. Defaults to C<,>. Other common values include C<:>.
+
+=cut
+
+has delimiter => (
+    is => 'ro',
+    isa => Str,
+    default => ',',
+);
+
 =attr format_module
 
 The module being used for this format. Possible modules, in order of importance:
@@ -80,7 +92,10 @@ has _csv => (
     lazy => 1,
     default => sub {
         my ( $self ) = @_;
-        $self->format_module->new({ binary => 1, eol => $\ });
+        $self->format_module->new({
+            binary => 1, eol => $\,
+            sep_char => $self->delimiter,
+        });
     },
 );
 
