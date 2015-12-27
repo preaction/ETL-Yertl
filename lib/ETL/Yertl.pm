@@ -155,5 +155,11 @@ A filter for JSON documents. The inspiration for L<yq>. For
 interoperability, set the C<YERTL_FORMAT> environment variable to
 C<"json">.
 
+=item L<jt|App::jt>
+
+JSON Transformer. Allows multiple ways of manipulating JSON, including
+L<JSONPath|http://goessner.net/articles/JsonPath/>. For interoperability,
+set the C<YERTL_FORMAT> environment variable to C<"json">.
+
 =back
 
