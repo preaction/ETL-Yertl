@@ -2,7 +2,7 @@ package ETL::Yertl::Command::yfrom;
 # ABSTRACT: Read documents from a format like JSON or CSV
 
 use ETL::Yertl;
-use ETL::Yertl::Format::yaml;
+use ETL::Yertl::Format::default;
 use Module::Runtime qw( use_module compose_module_name );
 
 sub main {
@@ -27,7 +27,7 @@ sub main {
         die "Could not load format '$format': $@";
     }
 
-    my $out_formatter = ETL::Yertl::Format::yaml->new;
+    my $out_formatter = ETL::Yertl::Format::default->new;
     push @files, "-" unless @files;
     for my $file ( @files ) {
 

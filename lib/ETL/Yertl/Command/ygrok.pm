@@ -3,6 +3,7 @@ package ETL::Yertl::Command::ygrok;
 
 use ETL::Yertl;
 use Getopt::Long qw( GetOptionsFromArray );
+use ETL::Yertl::Format::default;
 use ETL::Yertl::Format::yaml;
 use Regexp::Common;
 use File::HomeDir;
@@ -150,13 +151,13 @@ sub main {
                     say $pattern;
                 }
                 else {
-                    my $out_fmt = ETL::Yertl::Format::yaml->new;
+                    my $out_fmt = ETL::Yertl::Format::default->new;
                     say $out_fmt->write( $pattern );
                 }
             }
             else {
                 # Show all patterns we know about
-                my $out_fmt = ETL::Yertl::Format::yaml->new;
+                my $out_fmt = ETL::Yertl::Format::default->new;
                 say $out_fmt->write( $patterns );
             }
         }
@@ -173,7 +174,7 @@ sub main {
         $re = qr{^$re$};
     }
 
-    my $out_formatter = ETL::Yertl::Format::yaml->new;
+    my $out_formatter = ETL::Yertl::Format::default->new;
     push @files, "-" unless @files;
     for my $file ( @files ) {
 

@@ -2,7 +2,7 @@ package ETL::Yertl::Command::ymask;
 # ABSTRACT: Filter documents through applying a mask
 
 use ETL::Yertl;
-use ETL::Yertl::Format::yaml;
+use ETL::Yertl::Format::default;
 use Data::Partial::Google;
 
 sub main {
@@ -18,7 +18,7 @@ sub main {
     die "Must give a mask\n" unless $mask;
 
     my $filter = Data::Partial::Google->new( $mask );
-    my $out_fmt = ETL::Yertl::Format::yaml->new;
+    my $out_fmt = ETL::Yertl::Format::default->new;
 
     push @files, "-" unless @files;
     for my $file ( @files ) {
@@ -35,7 +35,7 @@ sub main {
             }
         }
 
-        my $in_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
+        my $in_fmt = ETL::Yertl::Format::default->new( input => $fh );
         for my $doc ( $in_fmt->read ) {
             print $out_fmt->write( $filter->mask( $doc ) );
         }

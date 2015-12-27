@@ -591,9 +591,14 @@ only the keys you want, then group those documents.
 
 =back
 
-=head1 ENVIRONMENT
+=head1 ENVIRONMENT VARIABLES
 
-=over
+=over 4
+
+=item YERTL_FORMAT
+
+Specify the default format Yertl uses between commands. Defaults to C<yaml>. Can be
+set to C<json> for interoperability with other programs.
 
 =item YQ_VERBOSE
 

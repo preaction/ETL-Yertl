@@ -3,7 +3,7 @@ package ETL::Yertl::Command::yto;
 
 use ETL::Yertl;
 use Module::Runtime qw( use_module compose_module_name is_module_spec );
-use ETL::Yertl::Format::yaml;
+use ETL::Yertl::Format::default;
 
 sub main {
     my $class = shift;
@@ -48,7 +48,7 @@ sub main {
             }
         }
 
-        my $in_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
+        my $in_fmt = ETL::Yertl::Format::default->new( input => $fh );
         print $out_fmt->write( $in_fmt->read );
     }
 }

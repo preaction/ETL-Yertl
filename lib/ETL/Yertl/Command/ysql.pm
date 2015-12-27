@@ -4,6 +4,7 @@ package ETL::Yertl::Command::ysql;
 use ETL::Yertl;
 use Getopt::Long qw( GetOptionsFromArray :config pass_through );
 use ETL::Yertl::Format::yaml;
+use ETL::Yertl::Format::default;
 use File::HomeDir;
 use Path::Tiny qw( tempfile );
 use SQL::Abstract;
@@ -43,7 +44,7 @@ sub main {
     #; say Dumper \@args;
     #; say Dumper \%opt;
 
-    my $out_fmt = ETL::Yertl::Format::yaml->new;
+    my $out_fmt = ETL::Yertl::Format::default->new;
 
     if ( $opt{config} ) {
         my $db_key = shift @args;
@@ -165,7 +166,7 @@ sub main {
         # with every document inserted.
         if ( $opt{insert} ) {
             if ( !-t *STDIN ) {
-                my $in_fmt = ETL::Yertl::Format::yaml->new( input => \*STDIN );
+                my $in_fmt = ETL::Yertl::Format::default->new( input => \*STDIN );
 
                 my $query;
                 my @bind_args;
@@ -227,7 +228,7 @@ sub main {
             or die "SQL error in prepare: " . $dbh->errstr . "\n";
 
         if ( !-t *STDIN ) {
-            my $in_fmt = ETL::Yertl::Format::yaml->new( input => \*STDIN );
+            my $in_fmt = ETL::Yertl::Format::default->new( input => \*STDIN );
 
             for my $doc ( $in_fmt->read ) {
                 $sth->execute( map { select_doc( $_, $doc ) } @fields )

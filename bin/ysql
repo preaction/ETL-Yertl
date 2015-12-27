@@ -244,6 +244,17 @@ Show this help document.
 
 Print the current ysql and Perl versions.
 
+=head1 ENVIRONMENT VARIABLES
+
+=over 4
+
+=item YERTL_FORMAT
+
+Specify the default format Yertl uses between commands. Defaults to C<yaml>. Can be
+set to C<json> for interoperability with other programs.
+
+=back
+
 =head1 SEE ALSO
 
 =over 4

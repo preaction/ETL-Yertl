@@ -2,7 +2,7 @@ package ETL::Yertl::Command::yq;
 # ABSTRACT: Filter and construct documents using a mini-language
 
 use ETL::Yertl;
-use ETL::Yertl::Format::yaml;
+use ETL::Yertl::Format::default;
 use boolean qw( :all );
 use Module::Runtime qw( use_module );
 our $VERBOSE = $ENV{YERTL_VERBOSE} // 0;
@@ -38,7 +38,7 @@ sub main {
             }
         }
 
-        my $in_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
+        my $in_fmt = ETL::Yertl::Format::default->new( input => $fh );
         my $scope = {};
         for my $doc ( $in_fmt->read ) {
             my @output = $class->filter( $filter, $doc, $scope );
@@ -58,7 +58,7 @@ sub write {
         return;
     }
 
-    my $out_fmt = ETL::Yertl::Format::yaml->new;
+    my $out_fmt = ETL::Yertl::Format::default->new;
     for my $doc ( @$docs ) {
         next if is_empty( $doc );
         if ( isTrue( $doc ) ) {
