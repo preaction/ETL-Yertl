@@ -143,10 +143,17 @@ Here are some other tools that can be used with Yertl
 
 =over 4
 
-=item jq
+=item L<recs (App::RecordStream)|App::RecordStream>
 
-L<http://stedolan.github.io/jq/> A filter for JSON documents. The inspiration
-for L<yq>.
+A set of tools for manipulating JSON (constrast with Yertl's YAML). For
+interoperability, set the C<YERTL_FORMAT> environment variable to
+C<"json">.
+
+=item L<jq|http://stedolan.github.io/jq/>
+
+A filter for JSON documents. The inspiration for L<yq>. For
+interoperability, set the C<YERTL_FORMAT> environment variable to
+C<"json">.
 
 =back
 
