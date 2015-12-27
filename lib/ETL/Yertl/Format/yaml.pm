@@ -28,6 +28,8 @@ The module being used for this format. Possible modules, in order of importance:
 
 =item L<YAML> (any version)
 
+=item L<YAML::Tiny> (any version)
+
 =back
 
 =cut
@@ -37,6 +39,7 @@ our @FORMAT_MODULES = (
     'YAML::XS' => 0,
     'YAML::Syck' => 0,
     'YAML' => 0,
+    'YAML::Tiny' => 0,
 );
 
 has format_module => (
@@ -117,6 +120,21 @@ my %FORMAT_SUB = (
         },
 
     },
+
+    'YAML::Tiny' => {
+        write => sub {
+            my $self = shift;
+            return YAML::Tiny::Dump( @_ );
+        },
+
+        read => sub {
+            my $self = shift;
+            my $yaml = do { local $/; readline $self->input };
+            return $yaml ? YAML::Tiny::Load( $yaml ) : ();
+        },
+
+    },
+
 );
 
 =method write( DOCUMENTS )
