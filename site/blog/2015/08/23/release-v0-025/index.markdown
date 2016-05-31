@@ -7,8 +7,8 @@ title: Release v0.025
 Some minor bugfixes in this release. One that would make Yertl
 fail its tests (and therefore fail to install). Two that caused some
 very confusing error messages to be printed when using
-[ysql](/pod/ysql.html). And a final one that made it hard to use the
-HTTP log pattern with [ygrok](/pod/ygrok.html).
+[ysql](/pod/ysql). And a final one that made it hard to use the
+HTTP log pattern with [ygrok](/pod/ygrok).
 
 Full changelog below...
 

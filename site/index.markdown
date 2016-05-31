@@ -23,19 +23,19 @@ Check out the documentation for Yertl:
 
 Completely new to Yertl? Start here with the guides:
 
-* [ysql - Work with SQL databases](/pod/ETL/Yertl/Help/ysql.html)
+* [ysql - Work with SQL databases](/pod/ETL/Yertl/Help/ysql)
 
 ### Input/Output
 
-* [yfrom - Convert formatted data (JSON, CSV) to a Yertl feed (YAML)](/pod/yfrom.html)
-* [yto - Convert Yertl feed (YAML) to an output format (JSON, CSV)](/pod/yto.html)
-* [ygrok - Parse lines of plain text into documents](/pod/ygrok.html)
-* [ysql - Read/write to/from a SQL database](/pod/ysql.html)
+* [yfrom - Convert formatted data (JSON, CSV) to a Yertl feed (YAML)](/pod/yfrom)
+* [yto - Convert Yertl feed (YAML) to an output format (JSON, CSV)](/pod/yto)
+* [ygrok - Parse lines of plain text into documents](/pod/ygrok)
+* [ysql - Read/write to/from a SQL database](/pod/ysql)
 
 ### Filter/Transform
 
-* [ymask - Filter by properties using a simple mask](/pod/ymask.html)
-* [yq - A transform mini-language](/pod/yq.html)
+* [ymask - Filter by properties using a simple mask](/pod/ymask)
+* [yq - A transform mini-language](/pod/yq)
 
 ## Other Resources
 

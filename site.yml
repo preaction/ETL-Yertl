@@ -21,6 +21,9 @@ site:
     args:
         title: Yertl
         base_url: http://preaction.me/yertl/
+        plugins:
+            link_check:
+                $class: Statocles::Plugin::LinkCheck
         nav:
             main:
                 - title: Blog
