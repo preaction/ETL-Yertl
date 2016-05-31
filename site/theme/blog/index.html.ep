@@ -1,84 +1,95 @@
 
-<div class="row">
+% if ( my $tag_text = $self->data->{ tag_text } ) {
+<%= markdown $tag_text %>
+% }
 
-    <div class="nine columns">
-        <main>
+% for my $page ( @$pages ) {
+<article>
+    <header>
+        <h1><a href="<%= $app->page_url( $page ) %>"><%== $page->title %></a></h1>
 
-            % if ( my $tag_text = $self->data->{ tag_text } ) {
-            <p><%= $tag_text %></p>
+        <p class="tags">Tags:
+        % for my $tag ( $page->tags ) {
+            <a href="<%= $tag->href %>" rel="tag"><%= $tag->text %></a>
+        % }
+        </p>
+
+        <aside>
+            <p><time datetime="<%= $page->date->strftime('%Y-%m-%d') %>">
+                Posted on <%= $page->date->strftime('%Y-%m-%d') %>
+            </time>
+            % if ( $page->author ) {
+                by <%= $page->author %>
             % }
-
-            % for my $page ( @$pages ) {
-            <article>
-                <header>
-                    <h1><a href="<%= $app->page_url( $page ) %>"><%= $page->title %></a></h1>
-
-                    <p class="tags">Tags:
-                    % for my $tag ( $page->tags ) {
-                        <a href="<%= $tag->href %>" rel="tag"><%= $tag->text %></a>
-                    % }
-                    </p>
-
-                    <aside>
-                        <p><time datetime="<%= $page->date->strftime('%Y-%m-%d') %>">
-                            Posted on <%= $page->date->strftime('%Y-%m-%d') %>
-                        </time>
-                        % if ( $page->author ) {
-                            by <%= $page->author %>
-                        % }
-                        </p>
-                    </aside>
-
-                    % if ( $page->links( 'crosspost' ) ) {
-                    <p>Originally posted as:
-                        % for my $link ( $page->links( 'crosspost' ) ) {
-                            <a href="<%= $link->href %>">
-                                <em><%= $page->title %></em> on <%= $link->title %>.
-                            </a>
-                        % }
-                    </p>
-                    % }
-                </header>
-
-                % my @sections = $page->sections;
-                <%= $sections[0] %>
-
-                % if ( @sections > 1 ) {
-                    <p><a href="<%= $app->page_url( $page ) %>#section-2">Continue reading <%= $page->title %>...</a></p>
-                % }
-
-            </article>
+            % if ( $site->data->{disqus}{shortname} ) {
+            <a data-disqus-identifier="<%= $page->document->path %>" href="<%= $app->page_url( $page ) %>#disqus_thread">0 comments</a>
             % }
-        </main>
+            </p>
+        </aside>
 
-        <ul class="pager">
-            <li class="prev">
-                <a class="button <%= $self->next ? 'button-primary' : 'disabled' %>"
-                    rel="next" href="<%= $self->next // '' %>"
-                >
-                    &larr; Older
+        % if ( $page->links( 'crosspost' ) ) {
+        <p>Originally posted as:
+            % for my $link ( $page->links( 'crosspost' ) ) {
+                <a href="<%= $link->href %>">
+                    <em><%= $page->title %></em> on <%= $link->title %>.
                 </a>
-            </li>
-            <li class="next">
-                <a class="button <%= $self->prev ? 'button-primary' : 'disabled' %>"
-                    rel="prev" href="<%= $self->prev // '' %>"
-                >
-                    Newer &rarr;
-                </a>
-            </li>
-        </ul>
+            % }
+        </p>
+        % }
+    </header>
 
-    </div>
+    % my @sections = $page->sections;
+    <%= $sections[0] %>
 
-    <div class="three columns sidebar">
-        %= include 'site/sidebar_before.html.ep'
+    % if ( @sections > 1 ) {
+        <p><a href="<%= $app->page_url( $page ) %>#section-2">Continue reading <%= $page->title %>...</a></p>
+    % }
+
+</article>
+% }
+
+<ul class="pager">
+    <li class="prev">
+        <a class="button <%= $self->next ? 'button-primary' : 'disabled' %>"
+            rel="next" href="<%= $self->next // '' %>"
+        >
+            &larr; Older
+        </a>
+    </li>
+    <li class="next">
+        <a class="button <%= $self->prev ? 'button-primary' : 'disabled' %>"
+            rel="prev" href="<%= $self->prev // '' %>"
+        >
+            Newer &rarr;
+        </a>
+    </li>
+</ul>
+
+% if ( $site->data->{disqus}{shortname} ) {
+<script type="text/javascript">
+    var disqus_shortname = '<%= $site->data->{disqus}{shortname} %>';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+% }
+
+% content tags => begin
+    <nav id="tags">
         <h1>Tags</h1>
         <ul class="list-inline">
         % for my $tag ( $app->tags ) {
             <li><a href="<%= $tag->href %>"><%= $tag->text %></a></li>
         % }
         </ul>
-        % if ( my @links = $self->links( 'feed' ) ) {
+    </nav>
+% end
+
+% if ( my @links = $self->links( 'feed' ) ) {
+    % content feeds => begin
         <h1>Feeds</h1>
         <ul class="list-inline">
             % for my $link ( @links ) {
@@ -89,7 +100,6 @@
             </li>
             % }
         </ul>
-        % }
-    </div>
+    % end
+% }
 
-</div>
