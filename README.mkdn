@@ -4,7 +4,7 @@ ETL::Yertl - ETL with a Shell
 
 # VERSION
 
-version 0.027
+version 0.028
 
 # STATUS
 
@@ -41,8 +41,8 @@ version 0.027
 # DESCRIPTION
 
 ETL::Yertl is an ETL ([Extract, Transform,
-Load](https://en.wikipedia.org/wiki/Extract,_transform,_load)) for shells. It
-is designed to accept data from multiple formats (CSV, JSON), manipulate them
+Load](https://en.wikipedia.org/wiki/Extract,_transform,_load)) for shells. It is
+designed to accept data from multiple formats (CSV, JSON), manipulate them
 using simple tools, and then convert them to an output format.
 
 Yertl will have tools for:
@@ -89,18 +89,35 @@ Yertl will have tools for:
 
 Here are some other tools that can be used with Yertl
 
-- jq
+- [recs (App::RecordStream)](https://metacpan.org/pod/App::RecordStream)
 
-    [http://stedolan.github.io/jq/](http://stedolan.github.io/jq/) A filter for JSON documents. The inspiration
-    for [yq](https://metacpan.org/pod/yq).
+    A set of tools for manipulating JSON (constrast with Yertl's YAML). For
+    interoperability, set the `YERTL_FORMAT` environment variable to
+    `"json"`.
+
+- [jq](http://stedolan.github.io/jq/)
+
+    A filter for JSON documents. The inspiration for [yq](https://metacpan.org/pod/yq). For
+    interoperability, set the `YERTL_FORMAT` environment variable to
+    `"json"`.
+
+- [jt](https://metacpan.org/pod/App::jt)
+
+    JSON Transformer. Allows multiple ways of manipulating JSON, including
+    [JSONPath](http://goessner.net/articles/JsonPath/). For interoperability,
+    set the `YERTL_FORMAT` environment variable to `"json"`.
 
 # AUTHOR
 
 Doug Bell <preaction@cpan.org>
 
+# CONTRIBUTOR
+
+Doug Bell <doug@preaction.me>
+
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Doug Bell.
+This software is copyright (c) 2016 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
