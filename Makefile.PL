@@ -59,7 +59,7 @@ my %WriteMakefileArgs = (
     "Test::Lib" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "0.028",
+  "VERSION" => "0.029",
   "test" => {
     "TESTS" => "t/*.t t/bin/*.t t/command/ygrok/*.t t/command/ygrok/pattern/*.t t/command/yq/*.t t/format/*.t"
   }

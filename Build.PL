@@ -19,7 +19,7 @@ my %module_build_args = (
     "Doug Bell <preaction\@cpan.org>"
   ],
   "dist_name" => "ETL-Yertl",
-  "dist_version" => "0.023",
+  "dist_version" => "0.029",
   "license" => "perl",
   "module_name" => "ETL::Yertl",
   "recommends" => {
