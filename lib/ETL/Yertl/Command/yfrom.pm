@@ -1,4 +1,5 @@
 package ETL::Yertl::Command::yfrom;
+our $VERSION = "0.028";
 # ABSTRACT: Read documents from a format like JSON or CSV
 
 use ETL::Yertl;
