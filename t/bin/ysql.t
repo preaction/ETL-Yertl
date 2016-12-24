@@ -889,6 +889,34 @@ subtest 'query' => sub {
             unlike $stderr, qr{DBD::SQLite::db prepare failed:}, 'does not contain second error from DBI';
             unlike $stderr, qr{Usage:}, "we don't need usage info";
         };
+
+        subtest 'placeholder bind failure in --insert helper' => sub {
+            my $home = tempdir;
+            local $ENV{HOME} = "$home";
+
+            my $conf = {
+                testdb => {
+                    driver => 'SQLite',
+                    database => $home->child( 'test.db' )->stringify,
+                },
+            };
+            my $conf_file = $home->child( '.yertl', 'ysql.yml' );
+            my $yaml = ETL::Yertl::Format::yaml->new;
+            $conf_file->touchpath->spew( $yaml->write( $conf ) );
+
+            my $dbh = DBI->connect( 'dbi:SQLite:dbname=' . $home->child( 'test.db' ) );
+            $dbh->do( 'CREATE TABLE person ( id INT, name VARCHAR, email VARCHAR )' );
+            local *STDIN = $SHARE_DIR->child( 'command', 'ysql', 'deep.yml' )->openr;
+
+            my ( $stdout, $stderr, $exit ) = capture {
+                ysql->main( 'testdb',
+                    '--insert', 'person'
+                );
+            };
+            ok $exit, 'nonzero exit on error';
+            like $stderr, qr{\QERROR: Can't insert complex data structures using '--insert'}, 'stderr has error message';
+            ok !$stdout, 'nothing on stdout' or diag $stdout;
+        };
     };
 };
 

@@ -1,5 +1,15 @@
 Changelog for ETL-Yertl
 
+{{$NEXT}}
+
+    [Fixed]
+
+    - We now give better error messages when accidentally trying to
+      insert hashrefs or arrayrefs into a column using the `ysql`
+      `--insert` helper. SQL::Abstract does not allow this and instead
+      gives an untrappable warning (instead of throwing an exception,
+      which is potentially earmarked for SQL::Abstract v2)
+
 0.028     2016-10-09 23:08:36-05:00 America/Chicago
 
     [Added]

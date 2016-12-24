@@ -173,10 +173,15 @@ sub main {
                 my @bind_args;
                 my $sth;
                 for my $doc ( $in_fmt->read ) {
+                    if ( grep { ref } values %$doc ) {
+                        die q{Can't insert complex data structures using '--insert'. Please use SQL with '$' placeholders instead}."\n";
+                    }
+
                     my ( $new_query, @bind_args ) = $sql->insert( $opt{insert}, $doc );
                     if ( !$query || $new_query ne $query ) {
                         $query = $new_query;
-                        $sth = $dbh->prepare( $query );
+                        $sth = $dbh->prepare( $query )
+                            or die "SQL error in prepare: " . $dbh->errstr . "\n";
                     }
 
                     $sth->execute( @bind_args )
