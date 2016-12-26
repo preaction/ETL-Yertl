@@ -3,8 +3,8 @@ our $VERSION = '0.029';
 # ABSTRACT: Write documents to a format like JSON or CSV
 
 use ETL::Yertl;
+use ETL::Yertl::Util qw( load_module );
 use Module::Runtime qw( use_module compose_module_name is_module_spec );
-use ETL::Yertl::Format::default;
 
 sub main {
     my $class = shift;
@@ -17,22 +17,7 @@ sub main {
     my ( $format, @files ) = @_;
 
     die "Must give a format\n" unless $format;
-    my $formatter_class = eval { compose_module_name( 'ETL::Yertl::Format', $format ) };
-    if ( $@ ) {
-        die "Unknown format '$format'\n";
-    }
-
-    eval {
-        use_module( $formatter_class );
-    };
-    if ( $@ ) {
-        if ( $@ =~ /^Can't locate \S+ in \@INC/ ) {
-            die "Unknown format '$format'\n";
-        }
-        die "Could not load format '$format': $@";
-    }
-
-    my $out_fmt = $formatter_class->new( %opt );
+    my $out_fmt = load_module( format => $format )->new( %opt );
 
     push @files, "-" unless @files;
     for my $file ( @files ) {
@@ -49,7 +34,7 @@ sub main {
             }
         }
 
-        my $in_fmt = ETL::Yertl::Format::default->new( input => $fh );
+        my $in_fmt = load_module( format => 'default' )->new( input => $fh );
         print $out_fmt->write( $in_fmt->read );
     }
 }

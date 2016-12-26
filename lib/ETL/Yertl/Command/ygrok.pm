@@ -3,9 +3,8 @@ our $VERSION = '0.029';
 # ABSTRACT: Parse lines of text into documents
 
 use ETL::Yertl;
+use ETL::Yertl::Util qw( load_module );
 use Getopt::Long qw( GetOptionsFromArray );
-use ETL::Yertl::Format::default;
-use ETL::Yertl::Format::yaml;
 use Regexp::Common;
 use File::HomeDir;
 use Hash::Merge::Simple qw( merge );
@@ -152,13 +151,13 @@ sub main {
                     say $pattern;
                 }
                 else {
-                    my $out_fmt = ETL::Yertl::Format::default->new;
+                    my $out_fmt = load_module( format => 'default' )->new;
                     say $out_fmt->write( $pattern );
                 }
             }
             else {
                 # Show all patterns we know about
-                my $out_fmt = ETL::Yertl::Format::default->new;
+                my $out_fmt = load_module( format => 'default' )->new;
                 say $out_fmt->write( $patterns );
             }
         }
@@ -175,7 +174,7 @@ sub main {
         $re = qr{^$re$};
     }
 
-    my $out_formatter = ETL::Yertl::Format::default->new;
+    my $out_formatter = load_module( format => 'default' )->new;
     push @files, "-" unless @files;
     for my $file ( @files ) {
 
@@ -248,7 +247,7 @@ sub config {
     my $conf_file = path( File::HomeDir->my_home, '.yertl', 'ygrok.yml' );
     my $config = {};
     if ( $conf_file->exists ) {
-        my $yaml = ETL::Yertl::Format::yaml->new( input => $conf_file->openr );
+        my $yaml = load_module( format => 'yaml' )->new( input => $conf_file->openr );
         ( $config ) = $yaml->read;
     }
     return $config;
@@ -269,7 +268,7 @@ sub config_pattern {
             $conf_file->touchpath;
         }
         $pattern_category->{ $parts[-1] } = $pattern;
-        my $yaml = ETL::Yertl::Format::yaml->new;
+        my $yaml = load_module( format => 'yaml' )->new;
         $conf_file->spew( $yaml->write( $all_config ) );
         return;
     }

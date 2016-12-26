@@ -3,9 +3,8 @@ our $VERSION = '0.029';
 # ABSTRACT: Read and write documents with a SQL database
 
 use ETL::Yertl;
+use ETL::Yertl::Util qw( load_module );
 use Getopt::Long qw( GetOptionsFromArray :config pass_through );
-use ETL::Yertl::Format::yaml;
-use ETL::Yertl::Format::default;
 use File::HomeDir;
 use Path::Tiny qw( tempfile );
 use SQL::Abstract;
@@ -45,13 +44,13 @@ sub main {
     #; say Dumper \@args;
     #; say Dumper \%opt;
 
-    my $out_fmt = ETL::Yertl::Format::default->new;
+    my $out_fmt = load_module( format => 'default' )->new;
 
     if ( $opt{config} ) {
         my $db_key = shift @args;
 
         if ( !$db_key ) {
-            my $out_fmt = ETL::Yertl::Format::yaml->new;
+            my $out_fmt = load_module( format => 'yaml' )->new;
             print $out_fmt->write( config() );
             return 0;
         }
@@ -61,7 +60,7 @@ sub main {
 
         if ( !@args && !grep { defined } @opt{qw( dsn driver database host port user password )} ) {
             die "Database key '$db_key' does not exist" unless keys %$db_conf;
-            my $out_fmt = ETL::Yertl::Format::yaml->new;
+            my $out_fmt = load_module( format => 'yaml' )->new;
             print $out_fmt->write( $db_conf );
             return 0;
         }
@@ -167,7 +166,7 @@ sub main {
         # with every document inserted.
         if ( $opt{insert} ) {
             if ( !-t *STDIN ) {
-                my $in_fmt = ETL::Yertl::Format::default->new( input => \*STDIN );
+                my $in_fmt = load_module( format => 'default' )->new( input => \*STDIN );
 
                 my $query;
                 my @bind_args;
@@ -234,7 +233,7 @@ sub main {
             or die "SQL error in prepare: " . $dbh->errstr . "\n";
 
         if ( !-t *STDIN ) {
-            my $in_fmt = ETL::Yertl::Format::default->new( input => \*STDIN );
+            my $in_fmt = load_module( format => 'default' )->new( input => \*STDIN );
 
             for my $doc ( $in_fmt->read ) {
                 $sth->execute( map { select_doc( $_, $doc ) } @fields )
@@ -261,7 +260,7 @@ sub config {
     my $conf_file = path( File::HomeDir->my_home, '.yertl', 'ysql.yml' );
     my $config = {};
     if ( $conf_file->exists ) {
-        my $yaml = ETL::Yertl::Format::yaml->new( input => $conf_file->openr );
+        my $yaml = load_module( format => 'yaml' )->new( input => $conf_file->openr );
         ( $config ) = $yaml->read;
     }
     return $config;
@@ -276,7 +275,7 @@ sub db_config {
         }
         my $all_config = config();
         $all_config->{ $db_key } = $config;
-        my $yaml = ETL::Yertl::Format::yaml->new;
+        my $yaml = load_module( format => 'yaml' )->new;
         $conf_file->spew( $yaml->write( $all_config ) );
         return;
     }
@@ -297,7 +296,7 @@ sub dbi_args {
     my ( $db_name ) = @_;
     my $conf_file = path( File::HomeDir->my_home, '.yertl', 'ysql.yml' );
     if ( $conf_file->exists ) {
-        my $yaml = ETL::Yertl::Format::yaml->new( input => $conf_file->openr );
+        my $yaml = load_module( format => 'yaml' )->new( input => $conf_file->openr );
         my ( $config ) = $yaml->read;
         my $db_config = $config->{ $db_name };
 
