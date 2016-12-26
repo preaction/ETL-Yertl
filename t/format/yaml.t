@@ -71,6 +71,12 @@ subtest 'formatter modules' => sub {
                 cmp_deeply [ "${format_module}::Load"->( $got_yaml ) ], \@EXPECT_FROM or diag $got_yaml;
             };
 
+            subtest 'decode' => sub {
+                my $formatter = $CLASS->new( format_module => $format_module );
+                my $given = $formatter->write( $EXPECT_FROM[0] );
+                cmp_deeply $formatter->decode( $given ), $EXPECT_FROM[0];
+            };
+
             subtest 'empty file' => sub {
                 my $tmp = tempfile;
                 my $formatter = $CLASS->new( input => $tmp->openr );

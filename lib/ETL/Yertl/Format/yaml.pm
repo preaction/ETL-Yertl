@@ -81,6 +81,11 @@ has format_module => (
 my %FORMAT_SUB = (
 
     'YAML::XS' => {
+        decode => sub {
+            my ( $self, $msg ) = @_;
+            return YAML::XS::Load( $msg );
+        },
+
         write => sub {
             my $self = shift;
             return YAML::XS::Dump( @_ );
@@ -95,6 +100,11 @@ my %FORMAT_SUB = (
     },
 
     'YAML::Syck' => {
+        decode => sub {
+            my ( $self, $msg ) = @_;
+            return YAML::Syck::Load( $msg );
+        },
+
         write => sub {
             my $self = shift;
             return YAML::Syck::Dump( @_ );
@@ -109,6 +119,11 @@ my %FORMAT_SUB = (
     },
 
     'YAML' => {
+        decode => sub {
+            my ( $self, $msg ) = @_;
+            return YAML::Load( $msg );
+        },
+
         write => sub {
             my $self = shift;
             return YAML::Dump( @_ );
@@ -123,6 +138,11 @@ my %FORMAT_SUB = (
     },
 
     'YAML::Tiny' => {
+        decode => sub {
+            my ( $self, $msg ) = @_;
+            return YAML::Tiny::Load( $msg );
+        },
+
         write => sub {
             my $self = shift;
             return YAML::Tiny::Dump( @_ );
@@ -158,6 +178,20 @@ Read a YAML string from L<input> and return all the documents.
 sub read {
     my $self = shift;
     return $FORMAT_SUB{ $self->format_module }{read}->( $self );
+}
+
+=method decode
+
+    my $msg = $yaml->decode( $bytes );
+
+Decode the given bytes into a single data structure. C<$bytes> must be
+a single YAML document.
+
+=cut
+
+sub decode {
+    my ( $self, $msg ) = @_;
+    return $FORMAT_SUB{ $self->format_module }{decode}->( $self, $msg );
 }
 
 1;

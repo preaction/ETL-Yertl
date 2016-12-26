@@ -66,6 +66,12 @@ subtest 'formatter modules' => sub {
                 my $formatter = $CLASS->new( format_module => $formatter_module );
                 eq_or_diff $formatter->write( @EXPECT_FROM ), $EXPECT_TO->slurp;
             };
+
+            subtest 'decode' => sub {
+                my $formatter = $CLASS->new( format_module => $formatter_module );
+                my $given = $formatter->write( $EXPECT_FROM[0] );
+                cmp_deeply $formatter->decode( $given ), $EXPECT_FROM[0];
+            };
         };
     }
 };

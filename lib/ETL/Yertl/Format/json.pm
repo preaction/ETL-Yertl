@@ -75,6 +75,11 @@ has format_module => (
 my %FORMAT_SUB = (
 
     'JSON::XS' => {
+        decode => sub {
+            my ( $self, $msg ) = @_;
+            state $json = JSON::XS->new->relaxed;
+            return $json->decode( $msg );
+        },
         write => sub {
             my $self = shift;
             state $json = JSON::XS->new->canonical->pretty->allow_nonref;
@@ -88,6 +93,11 @@ my %FORMAT_SUB = (
     },
 
     'JSON::PP' => {
+        decode => sub {
+            my ( $self, $msg ) = @_;
+            state $json = JSON::PP->new->relaxed;
+            return $json->decode( $msg );
+        },
         write => sub {
             my $self = shift;
             state $json = JSON::PP->new->canonical->pretty->indent_length(3)->allow_nonref;
@@ -138,6 +148,20 @@ Read a JSON string from L<input> and return all the documents
 sub read {
     my $self = shift;
     return $FORMAT_SUB{ $self->format_module }{read}->( $self );
+}
+
+=method decode
+
+    my $msg = $fmt->decode( $bytes );
+
+Decode the given bytes into the given message. The bytes must contain
+exactly one message to be decoded.
+
+=cut
+
+sub decode {
+    my ( $self, $bytes ) = @_;
+    return $FORMAT_SUB{ $self->format_module }{decode}->( $self, $bytes );
 }
 
 1;
