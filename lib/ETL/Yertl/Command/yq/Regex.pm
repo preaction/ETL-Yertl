@@ -31,7 +31,7 @@ my $FILTER = qr{
         |
         \w+ # Constant/bareword
     }x;
-my $OP = qr{eq|ne|==|!=|>=?|<=?};
+my $OP = qr{eq|ne|==?|!=|>=?|<=?};
 my $FUNC_NAME = qr{empty|select|grep|group_by|keys|length|sort};
 my $EXPR = qr{
     \{(\s*$FILTER\s*:\s*(?0)\s*(?:,(?-1))*)\} # Hash constructor
@@ -189,43 +189,67 @@ sub filter {
         }
         return $subdoc;
     }
+
     # Binary operators
     elsif ( $filter =~ /^($FILTER)\s+($OP)\s+($FILTER)$/ ) {
         my ( $lhs_filter, $cond, $rhs_filter ) = ( $1, $2, $3 );
-        my $lhs_value = $class->filter( $lhs_filter, $doc, $scope, $orig_doc );
-        my $rhs_value = $class->filter( $rhs_filter, $doc, $scope, $orig_doc );
-        diag( 1, join " ", "BINOP:", $lhs_value // '<undef>', $cond, $rhs_value // '<undef>' );
-        # These operators suppress undef warnings, treating undef as just
-        # another value. Undef will never be treated as '' or 0 here.
-        if ( $cond eq 'eq' ) {
-            return defined $lhs_value == defined $rhs_value 
-                && $lhs_value eq $rhs_value ? true : false;
+        if ( $cond eq '=' ) {
+            # Get the referent from the left-hand side
+            my @keys = split /[.]/, $lhs_filter;
+            my $subdoc = $keys[0] && $keys[0] eq '$' ? \$orig_doc : \$doc;
+            for my $key ( @keys[1..$#keys] ) {
+                if ( $key =~ /^\[(\d+)\]$/ ) {
+                    $subdoc = \( $$subdoc->[ $1 ] );
+                }
+                elsif ( $key =~ /^\w+$/ ) {
+                    $subdoc = \( $$subdoc->{ $key } );
+                }
+                else {
+                    die "Invalid filter key '$key'";
+                }
+            }
+
+            my $rhs_value = $class->filter( $rhs_filter, $doc, $scope, $orig_doc );
+            diag( 1, join " ", "BINOP:", $lhs_filter, $cond, $rhs_value // '<undef>' );
+            $$subdoc = $rhs_value;
+            return $doc; # Assignment does not change current document
         }
-        elsif ( $cond eq 'ne' ) {
-            return defined $lhs_value != defined $rhs_value
-                || $lhs_value ne $rhs_value ? true : false;
-        }
-        elsif ( $cond eq '==' ) {
-            return defined $lhs_value == defined $rhs_value
-                && $lhs_value == $rhs_value ? true : false;
-        }
-        elsif ( $cond eq '!=' ) {
-            return defined $lhs_value != defined $rhs_value
-                || $lhs_value != $rhs_value ? true : false;
-        }
-        # These operators allow undef warnings, since equating undef to 0 or ''
-        # can be a cause of problems.
-        elsif ( $cond eq '>' ) {
-            return $lhs_value > $rhs_value ? true : false;
-        }
-        elsif ( $cond eq '>=' ) {
-            return $lhs_value >= $rhs_value ? true : false;
-        }
-        elsif ( $cond eq '<' ) {
-            return $lhs_value < $rhs_value ? true : false;
-        }
-        elsif ( $cond eq '<=' ) {
-            return $lhs_value <= $rhs_value ? true : false;
+        else {
+            my $lhs_value = $class->filter( $lhs_filter, $doc, $scope, $orig_doc );
+            my $rhs_value = $class->filter( $rhs_filter, $doc, $scope, $orig_doc );
+            diag( 1, join " ", "BINOP:", $lhs_value // '<undef>', $cond, $rhs_value // '<undef>' );
+            # These operators suppress undef warnings, treating undef as just
+            # another value. Undef will never be treated as '' or 0 here.
+            if ( $cond eq 'eq' ) {
+                return defined $lhs_value == defined $rhs_value 
+                    && $lhs_value eq $rhs_value ? true : false;
+            }
+            elsif ( $cond eq 'ne' ) {
+                return defined $lhs_value != defined $rhs_value
+                    || $lhs_value ne $rhs_value ? true : false;
+            }
+            elsif ( $cond eq '==' ) {
+                return defined $lhs_value == defined $rhs_value
+                    && $lhs_value == $rhs_value ? true : false;
+            }
+            elsif ( $cond eq '!=' ) {
+                return defined $lhs_value != defined $rhs_value
+                    || $lhs_value != $rhs_value ? true : false;
+            }
+            # These operators allow undef warnings, since equating undef to 0 or ''
+            # can be a cause of problems.
+            elsif ( $cond eq '>' ) {
+                return $lhs_value > $rhs_value ? true : false;
+            }
+            elsif ( $cond eq '>=' ) {
+                return $lhs_value >= $rhs_value ? true : false;
+            }
+            elsif ( $cond eq '<' ) {
+                return $lhs_value < $rhs_value ? true : false;
+            }
+            elsif ( $cond eq '<=' ) {
+                return $lhs_value <= $rhs_value ? true : false;
+            }
         }
     }
     # Conditional (if/then/else)

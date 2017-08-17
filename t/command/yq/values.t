@@ -77,4 +77,35 @@ subtest 'array constructor' => sub {
     ] or diag explain \@out;
 };
 
+subtest 'assignment operator' => sub {
+    my $doc = {
+        foo => 'bar',
+        baz => 'fuzz',
+    };
+
+    subtest '<filter> = <filter>' => sub {
+        my @out = $class->filter( '.foo = .baz', $doc );
+        cmp_deeply \@out, [ { foo => 'fuzz', baz => 'fuzz' } ]
+            or diag explain \@out;
+    };
+
+    subtest '<filter> = <number>' => sub {
+        my @out = $class->filter( '.foo = 2', $doc );
+        cmp_deeply \@out, [ { foo => '2', baz => 'fuzz' } ]
+            or diag explain \@out;
+    };
+
+    subtest '<filter> = <string>' => sub {
+        my @out = $class->filter( '.foo = "baz"', $doc );
+        cmp_deeply \@out, [ { foo => 'baz', baz => 'fuzz' } ]
+            or diag explain \@out;
+    };
+
+    subtest 'combine assignments with |' => sub {
+        my @out = $class->filter( '.foo = "baz" | .baz = 2', $doc );
+        cmp_deeply \@out, [ { foo => 'baz', baz => 2 } ]
+            or diag explain \@out;
+    };
+};
+
 done_testing;

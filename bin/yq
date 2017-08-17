@@ -168,6 +168,34 @@ Use [] with no index to flatten an array.
 C<$.> is the whole original document before any pipe operators changed
 what part of the document we're working with.
 
+=item Assignment
+
+Filters can be assigned new values. The new value can be another filter
+or any L</VALUES>.
+
+    # INPUT
+    foo: fuzz
+    bar: baz
+    ---
+    foo: buzz
+    bar: taz
+
+    $ yq '.foo = 2'
+    foo: 2
+    bar: baz
+    ---
+    foo: 2
+    bar: taz
+
+Multiple assignments can be combined with C<|>:
+
+    $ yq '.foo = .bar | .bar = "foo"'
+    foo: baz
+    bar: foo
+    ---
+    foo: taz
+    bar: foo
+
 =back
 
 =head2 VALUES
