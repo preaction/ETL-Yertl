@@ -1,6 +1,6 @@
 Changelog for ETL-Yertl
 
-{{$NEXT}}
+0.029     2017-08-16 23:11:30-05:00 America/Chicago
 
     [Fixed]
 
@@ -9,6 +9,26 @@ Changelog for ETL-Yertl
       `--insert` helper. SQL::Abstract does not allow this and instead
       gives an untrappable warning (instead of throwing an exception,
       which is potentially earmarked for SQL::Abstract v2)
+
+    [Added]
+
+    - yq's filter language now allows `$.` to refer to the initial
+      document even if the current document (`.`) is something else.
+      This way one can traverse the document using `|` filters and still
+      get to the original.
+
+    - yq's filter language now allows assigning values to filters, so
+      you can modify documents in-place.
+
+    - yq's filter language now has an `each()` function to iterate over
+      hashes/arrays
+
+    - yq's filter language now allows function calls on either side of
+      binary operators (assignment operator and comparison operators).
+      This means we can filter based on the output of a function (like
+      find all arrays with more than 5 elements) or assign the output of
+      a function to a place in the document (like replace an array with
+      its length).
 
 0.028     2016-10-09 23:08:36-05:00 America/Chicago
 

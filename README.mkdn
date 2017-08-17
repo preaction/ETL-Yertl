@@ -4,7 +4,7 @@ ETL::Yertl - ETL with a Shell
 
 # VERSION
 
-version 0.028
+version 0.029
 
 # STATUS
 
@@ -110,10 +110,6 @@ Here are some other tools that can be used with Yertl
 # AUTHOR
 
 Doug Bell <preaction@cpan.org>
-
-# CONTRIBUTOR
-
-Doug Bell <doug@preaction.me>
 
 # COPYRIGHT AND LICENSE
 
