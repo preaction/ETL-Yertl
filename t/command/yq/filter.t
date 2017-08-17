@@ -80,4 +80,26 @@ subtest 'filter on empty results in empty' => sub {
     isa_ok $out, 'empty';
 };
 
+subtest 'original document starts with $.' => sub {
+    my $doc = {
+        foo => 'bar',
+        fizz => 'buzz',
+    };
+    my $filter = '$.foo';
+    my $out = $class->filter( $filter, $doc );
+    cmp_deeply $out, 'bar';
+
+    subtest 'original document is always constant even through pipes' => sub {
+        my $doc = {
+            foo => {
+                foo => 'baz',
+            },
+            fizz => 'buzz',
+        };
+        my $filter = '.foo | $.foo';
+        my @out = $class->filter( $filter, $doc );
+        cmp_deeply \@out, [ { foo => 'baz' } ];
+    };
+};
+
 done_testing;

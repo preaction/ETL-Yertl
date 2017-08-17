@@ -21,9 +21,9 @@ my $EVAL_NUMS = qr{(?:0b$RE{num}{bin}|0$RE{num}{oct}|0x$RE{num}{hex})};
 
 # Match a document path
 my $FILTER = qr{
-        [.] # entire document
+        \$?[.] # entire document
         |
-        (?:[.](?:\w+|\[\d*\]))+ # hash/array lookup
+        (?:\$?[.](?:\w+|\[\d*\]))+ # hash/array lookup
         |
         $QUOTE_STRING
         |
@@ -48,7 +48,8 @@ my $PIPE = qr{[|]};
 
 # Filter MUST NOT mutate $doc!
 sub filter {
-    my ( $class, $filter, $doc, $scope ) = @_;
+    my ( $class, $filter, $doc, $scope, $orig_doc ) = @_;
+    $orig_doc ||= $doc;
 
     # Pipes: LEFT | RIGHT pipes the output of LEFT to the input of RIGHT
     if ( $filter =~ $PIPE ) {
@@ -57,7 +58,7 @@ sub filter {
         for my $expr ( @exprs ) {
             my @out = ();
             for my $doc ( @in ) {
-                push @out, $class->filter( $expr, $doc, $scope );
+                push @out, $class->filter( $expr, $doc, $scope, $orig_doc );
             }
             @in = @out;
         }
@@ -69,8 +70,8 @@ sub filter {
         my ( $inner ) = $filter =~ /^\{\s*([^\}]+?)\s*\}$/;
         for my $pair ( split /\s*,\s*/, $inner ) {
             my ( $key_filter, $value_expr ) = split /\s*:\s*/, $pair;
-            my $key = $class->filter( $key_filter, $doc );
-            $out{ $key } = $class->filter( $value_expr, $doc );
+            my $key = $class->filter( $key_filter, $doc, $scope, $orig_doc );
+            $out{ $key } = $class->filter( $value_expr, $doc, $scope, $orig_doc );
         }
         return \%out;
     }
@@ -79,14 +80,14 @@ sub filter {
         my @out;
         my ( $inner ) = $filter =~ /^\[\s*([^\]]+?)\s*\]$/;
         for my $value_expr ( split /\s*,\s*/, $inner ) {
-            push @out, $class->filter( $value_expr, $doc );
+            push @out, $class->filter( $value_expr, $doc, $scope, $orig_doc );
         }
         return \@out;
     }
     # , does multiple filters, yielding multiple documents
     elsif ( $filter =~ /,/ ) {
         my @filters = split /\s*,\s*/, $filter;
-        return map { $class->filter( $_, $doc ) } @filters;
+        return map { $class->filter( $_, $doc, $scope, $orig_doc ) } @filters;
     }
     # Function calls
     elsif ( $filter =~ /^($FUNC_NAME)(?:\(\s*($EXPR)\s*\))?$/ ) {
@@ -103,22 +104,22 @@ sub filter {
                 warn "'$func' takes an expression argument";
                 return empty;
             }
-            return $class->filter( $expr, $doc ) ? $doc : empty;
+            return $class->filter( $expr, $doc, $scope, $orig_doc ) ? $doc : empty;
         }
         elsif ( $func eq 'group_by' ) {
-            my $grouping = $class->filter( $expr, $doc );
+            my $grouping = $class->filter( $expr, $doc, $scope, $orig_doc );
             push @{ $scope->{ group_by }{ $grouping } }, $doc;
             return;
         }
         elsif ( $func eq 'sort' ) {
             $expr ||= '.';
-            my $value = $class->filter( $expr, $doc );
+            my $value = $class->filter( $expr, $doc, $scope, $orig_doc );
             push @{ $scope->{sort} }, [ "$value", $doc ];
             return;
         }
         elsif ( $func eq 'keys' ) {
             $expr ||= '.';
-            my $value = $class->filter( $expr, $doc );
+            my $value = $class->filter( $expr, $doc, $scope, $orig_doc );
             if ( ref $value eq 'HASH' ) {
                 return [ keys %$value ];
             }
@@ -132,7 +133,7 @@ sub filter {
         }
         elsif ( $func eq 'length' ) {
             $expr ||= '.';
-            my $value = $class->filter( $expr, $doc );
+            my $value = $class->filter( $expr, $doc, $scope, $orig_doc );
             if ( ref $value eq 'HASH' ) {
                 return scalar keys %$value;
             }
@@ -160,7 +161,7 @@ sub filter {
             return eval $filter;
         }
         # Constants/barewords do not begin with .
-        elsif ( $filter !~ /^[.]/ ) {
+        elsif ( $filter !~ /^[\$.]/ ) {
             # If it's not a reserved word, it's a string
             # XXX: This is a very poor decision...
             return $filter;
@@ -171,7 +172,7 @@ sub filter {
         }
 
         my @keys = split /[.]/, $filter;
-        my $subdoc = $doc;
+        my $subdoc = $keys[0] && $keys[0] eq '$' ? $orig_doc : $doc;
         for my $key ( @keys[1..$#keys] ) {
             if ( $key =~ /^\[\]$/ ) {
                 return @{ $subdoc };
@@ -191,8 +192,8 @@ sub filter {
     # Binary operators
     elsif ( $filter =~ /^($FILTER)\s+($OP)\s+($FILTER)$/ ) {
         my ( $lhs_filter, $cond, $rhs_filter ) = ( $1, $2, $3 );
-        my $lhs_value = $class->filter( $lhs_filter, $doc );
-        my $rhs_value = $class->filter( $rhs_filter, $doc );
+        my $lhs_value = $class->filter( $lhs_filter, $doc, $scope, $orig_doc );
+        my $rhs_value = $class->filter( $rhs_filter, $doc, $scope, $orig_doc );
         diag( 1, join " ", "BINOP:", $lhs_value // '<undef>', $cond, $rhs_value // '<undef>' );
         # These operators suppress undef warnings, treating undef as just
         # another value. Undef will never be treated as '' or 0 here.
@@ -232,12 +233,12 @@ sub filter {
     # because $EXPR has captures in itself
     elsif ( $filter =~ /^if\s+(?<expr>$EXPR)\s+then\s+(?<true>$FILTER)(?:\s+else\s+(?<false>$FILTER))?$/ ) {
         my ( $expr, $true_filter, $false_filter ) = @+{qw( expr true false )};
-        my $expr_value = $class->filter( $expr, $doc );
+        my $expr_value = $class->filter( $expr, $doc, $scope, $orig_doc );
         if ( $expr_value ) {
-            return $class->filter( $true_filter, $doc );
+            return $class->filter( $true_filter, $doc, $scope, $orig_doc );
         }
         else {
-            return $false_filter ? $class->filter( $false_filter, $doc ) : ();
+            return $false_filter ? $class->filter( $false_filter, $doc, $scope, $orig_doc ) : ();
         }
     }
     else {

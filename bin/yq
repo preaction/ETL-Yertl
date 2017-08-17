@@ -163,6 +163,11 @@ Use [] with no index to flatten an array.
     ---
     bar: buzz
 
+=item $.
+
+C<$.> is the whole original document before any pipe operators changed
+what part of the document we're working with.
+
 =back
 
 =head2 VALUES
