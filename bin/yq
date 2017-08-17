@@ -502,6 +502,54 @@ Returns an array suitable for assignment.
         - two
         - three
 
+=item each( EXPRESSION )
+
+Return a list of key/value pairs for the hash or array given by
+EXPRESSION. If EXPRESSION is missing, gives the key/value pairs of the
+entire document (C<each(.)>).
+
+    # INPUT
+    foo:
+        one: 1
+        two: 2
+        three: 3
+    baz: [ 3, 2, 1 ]
+
+    $ yq 'each'
+    ---
+    key: foo
+    value:
+      one: 1
+      two: 2
+      three: 3
+    ---
+    key: baz
+    value: [ 3, 2, 1 ]
+
+    $ yq 'each( .foo )'
+    ---
+    key: one
+    value: 1
+    ---
+    key: two
+    value: 2
+    ---
+    key: three
+    value: 3
+
+    $ yq 'each( .baz )'
+    ---
+    key: 0
+    value: 3
+    ---
+    key: 1
+    value: 2
+    ---
+    key: 2
+    value: 1
+
+The documents created by each can be piped to further filters.
+
 =item grep( EXPRESSION )
 
 If C<EXPRESSION> is true, return the current document. Otherwise, return C<empty>.

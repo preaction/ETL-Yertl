@@ -32,7 +32,7 @@ my $FILTER = qr{
         \w+ # Constant/bareword
     }x;
 my $OP = qr{eq|ne|==?|!=|>=?|<=?};
-my $FUNC_NAME = qr{empty|select|grep|group_by|keys|length|sort};
+my $FUNC_NAME = qr{empty|select|grep|group_by|keys|length|sort|each};
 my $EXPR = qr{
     \{(\s*$FILTER\s*:\s*(?0)\s*(?:,(?-1))*)\} # Hash constructor
     |
@@ -128,6 +128,20 @@ sub filter {
             }
             else {
                 warn "keys() requires a hash or array";
+                return empty;
+            }
+        }
+        elsif ( $func eq 'each' ) {
+            $expr ||= '.';
+            my $value = $class->filter( $expr, $doc, $scope, $orig_doc );
+            if ( ref $value eq 'HASH' ) {
+                return map +{ key => $_, value => $value->{ $_ } }, keys %$value;
+            }
+            elsif ( ref $value eq 'ARRAY' ) {
+                return map +{ key => $_, value => $value->[ $_ ] }, 0..$#$value;
+            }
+            else {
+                warn "each() requires a hash or array";
                 return empty;
             }
         }
