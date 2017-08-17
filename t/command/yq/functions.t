@@ -210,6 +210,42 @@ subtest 'length( EXPR )' => sub {
         my $out = $class->filter( '{ l: length( .foo.two ) }', $doc );
         cmp_deeply $out, { l => 19 };
     };
+
+    subtest 'length of all arrays in a hash' => sub {
+        my $doc = {
+            foo => [ 1..5 ],
+            bar => [ 1..4 ],
+            baz => [ 1..10 ],
+        };
+        my @out;
+        eval {
+            @out = $class->filter( 'each | .value = length( .value )', $doc );
+        };
+        ok !$@, 'filter ran successfully' or diag $@;
+        cmp_deeply \@out, bag(
+            { key => 'foo', value => 5 },
+            { key => 'bar', value => 4 },
+            { key => 'baz', value => 10 },
+        ) or diag explain \@out;
+    };
+
+    subtest 'get arrays of certain length' => sub {
+        my $doc = {
+            foo => [ 1..5 ],
+            bar => [ 1..4 ],
+            baz => [ 1..10 ],
+        };
+        my @out;
+        eval {
+            @out = $class->filter( 'each | select( length( .value ) >= 5 )', $doc );
+        };
+        ok !$@, 'filter ran successfully' or diag $@;
+        cmp_deeply \@out, bag(
+            bless( {}, 'empty' ),
+            { key => 'foo', value => [ 1..5 ] },
+            { key => 'baz', value => [ 1..10 ] },
+        ) or diag explain \@out;
+    };
 };
 
 done_testing;

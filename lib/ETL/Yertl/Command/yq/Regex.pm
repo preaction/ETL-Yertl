@@ -20,30 +20,39 @@ my $QUOTE_STRING = $RE{delimited}{-delim=>q{'"}};
 my $EVAL_NUMS = qr{(?:0b$RE{num}{bin}|0$RE{num}{oct}|0x$RE{num}{hex})};
 
 # Match a document path
-my $FILTER = qr{
-        \$?[.] # entire document
-        |
-        (?:\$?[.](?:\w+|\[\d*\]))+ # hash/array lookup
-        |
-        $QUOTE_STRING
-        |
-        $RE{num}{real}|$EVAL_NUMS
-        |
-        \w+ # Constant/bareword
-    }x;
-my $OP = qr{eq|ne|==?|!=|>=?|<=?};
-my $FUNC_NAME = qr{empty|select|grep|group_by|keys|length|sort|each};
-my $EXPR = qr{
-    \{(\s*$FILTER\s*:\s*(?0)\s*(?:,(?-1))*)\} # Hash constructor
-    |
-    \[(\s*(?0)\s*(?:,(?-1))*)\] # Array constructor
-    |
-    $FUNC_NAME(?:\(\s*(?0)\s*\))? # Function with optional argument
-    |
-    $FILTER\s+$OP\s+$FILTER # Binary operator
-    |
-    $FILTER
+our $GRAMMAR = qr{
+    (?(DEFINE)
+        (?<FILTER>
+            (?:\$?[.](?:\w+|\[\d*\]))+ # hash/array lookup
+            |
+            \$?[.] # entire document
+            |
+            $QUOTE_STRING
+            |
+            $RE{num}{real}|$EVAL_NUMS
+            |
+            \w+ # Constant/bareword
+        )
+        (?<OP>eq|ne|==?|!=|>=?|<=?)
+        (?<FUNC_NAME>empty|select|grep|group_by|keys|length|sort|each)
+        (?<EXPR>
+            \{(\s*(?&FILTER)\s*:\s*(?0)\s*(?:,(?-1))*)\} # Hash constructor
+            |
+            \[(\s*(?0)\s*(?:,(?-1))*)\] # Array constructor
+            |
+            (?&FUNC_NAME)(?:\(\s*((?&EXPR))\s*\))? # Function with optional argument
+            |
+            (?:(?&FILTER)|(?&FUNC_NAME)(?:\(\s*((?&EXPR))\s*\))?)\s+(?&OP)\s+(?&EXPR) # Binop with filter
+            |
+            (?&FILTER)
+        )
+    )
 }x;
+
+my $FILTER = qr{(?&FILTER)$GRAMMAR};
+my $OP = qr{(?&OP)$GRAMMAR};
+my $FUNC_NAME = qr{(?&FUNC_NAME)$GRAMMAR};
+my $EXPR = qr{(?&EXPR)$GRAMMAR};
 my $PIPE = qr{[|]};
 
 # Filter MUST NOT mutate $doc!
@@ -90,7 +99,7 @@ sub filter {
         return map { $class->filter( $_, $doc, $scope, $orig_doc ) } @filters;
     }
     # Function calls
-    elsif ( $filter =~ /^($FUNC_NAME)(?:\(\s*($EXPR)\s*\))?$/ ) {
+    elsif ( $filter =~ /^((?&FUNC_NAME))(?:\(\s*((?&EXPR))\s*\))?$GRAMMAR$/ ) {
         my ( $func, $expr ) = ( $1, $2 );
         diag( 1, "F: $func, ARG: " . ( $expr || '' ) );
         if ( $func eq 'empty' ) {
@@ -164,7 +173,7 @@ sub filter {
         }
     }
     # Hash and array keys to traverse the data structure
-    elsif ( $filter =~ /^($FILTER)$/ ) {
+    elsif ( $filter =~ /^((?&FILTER))$GRAMMAR$/ ) {
         # Extract quoted strings
         if ( $filter =~ /^(['"])(.+)(\1)$/ ) {
             return $2;
@@ -204,8 +213,8 @@ sub filter {
         return $subdoc;
     }
 
-    # Binary operators
-    elsif ( $filter =~ /^($FILTER)\s+($OP)\s+($FILTER)$/ ) {
+    # Binary operators (binops)
+    elsif ( $filter =~ /^((?&FILTER)|(?&FUNC_NAME)(?:\(\s*(?&EXPR)\s*\))?)\s+((?&OP))\s+((?&EXPR))$GRAMMAR$/ ) {
         my ( $lhs_filter, $cond, $rhs_filter ) = ( $1, $2, $3 );
         if ( $cond eq '=' ) {
             # Get the referent from the left-hand side
