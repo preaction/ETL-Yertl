@@ -1,0 +1,7 @@
+release v0.030
+
+    [Fixed]
+
+    - Removed out-of-date Build.PL that was no longer being generated.
+      This caused some CPAN clients to fail to install the right
+      prerequisites. Thanks @andk and CPAN Testers!

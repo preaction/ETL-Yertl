@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 package ysql;
-our $VERSION = '0.030';
+our $VERSION = '0.031';
 # ABSTRACT: Query SQL databases in a Yertl workflow
 
 use ETL::Yertl;

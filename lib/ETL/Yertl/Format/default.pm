@@ -1,5 +1,5 @@
 package ETL::Yertl::Format::default;
-our $VERSION = '0.030';
+our $VERSION = '0.031';
 # ABSTRACT: The default format for intra-Yertl communication
 
 =head1 SYNOPSIS
