@@ -1,5 +1,13 @@
 Changelog for ETL-Yertl
 
+0.030     2017-08-24 13:25:23-05:00 America/Chicago
+
+    [Fixed]
+
+    - Removed out-of-date Build.PL that was no longer being generated.
+      This caused some CPAN clients to fail to install the right
+      prerequisites. Thanks @andk and CPAN Testers!
+
 0.029     2017-08-16 23:11:30-05:00 America/Chicago
 
     [Fixed]
