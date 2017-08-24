@@ -50,6 +50,7 @@ __END__
     ysql <db_name> --select <table> [--where <clause>] [--order-by <clause>]
     ysql <db_name> --insert <table>
     ysql <db_name> --delete <table> [--where <clause>]
+    ysql <db_name> --count <table> [--where <clause>]
 
     ysql <db_name> --save <query_name> <query>
     ysql <db_name> --edit <query_name>
@@ -121,6 +122,12 @@ Instead of C<SELECT * FROM person>, we can use the C<--select> helper:
 And we can combine it with the C<--where> and C<--order-by> helpers:
 
     $ ysql db_name --select person --where 'dept = "Science"' --order-by name
+
+Instead of C<SELECT COUNT(*) FROM person>, we can use the C<--count> helper,
+which also works with the C<--where> helper:
+
+    $ ysql db_name --count person
+    $ ysql db_name --count person --where 'dept = "Science"'
 
 And for simple inserts, we can use the C<--insert> helper:
 

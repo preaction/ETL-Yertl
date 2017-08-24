@@ -35,6 +35,7 @@ sub main {
         'save=s',
         'edit|e=s',
         'select=s',
+        'count=s',
         'insert=s',
         'delete=s',
         'where=s',
@@ -209,6 +210,9 @@ sub main {
         my $query;
         if ( $opt{select} ) {
             $query = $sql->select( $opt{select}, '*', $opt{where}, $opt{order} );
+        }
+        elsif ( $opt{count} ) {
+            $query = $sql->select( $opt{count}, 'COUNT(*) AS value', $opt{where} );
         }
         elsif ( $opt{delete} ) {
             $query = $sql->delete( $opt{delete}, $opt{where} );

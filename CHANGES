@@ -2,6 +2,13 @@ Changelog for ETL-Yertl
 
 {{ $NEXT }}
 
+    [Added]
+
+    - ysql now has a `--count` helper to count the number of entries in
+      a table (`SELECT COUNT(*) FROM <table>`). This also works with the
+      `--where` helper to limit the rows counted. This is going to be
+      especially useful with the new `yts` time series command.
+
 0.030     2017-08-24 13:25:23-05:00 America/Chicago
 
     [Fixed]

@@ -596,6 +596,41 @@ subtest 'query' => sub {
             };
         };
 
+        subtest '--count' => sub {
+            my ( $home ) = $setup->();
+            local $ENV{HOME} = "$home";
+
+            my ( $stdout, $stderr, $exit ) = capture {
+                ysql->main( 'testdb', '--count', 'person' );
+            };
+            is $exit, 0;
+            ok !$stderr, 'nothing on stderr' or diag $stderr;
+
+            open my $fh, '<', \$stdout;
+            my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
+            cmp_deeply [ $yaml_fmt->read ], bag(
+                {
+                    value => 2,
+                },
+            );
+
+            subtest '--where' => sub {
+                my ( $stdout, $stderr, $exit ) = capture {
+                    ysql->main( 'testdb', '--count', 'person', '--where', 'id >= 2' );
+                };
+                is $exit, 0;
+                ok !$stderr, 'nothing on stderr' or diag $stderr;
+
+                open my $fh, '<', \$stdout;
+                my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
+                cmp_deeply [ $yaml_fmt->read ], bag(
+                    {
+                        value => 1,
+                    },
+                );
+            };
+        };
+
         subtest '--insert' => sub {
             my $home = tempdir;
             local $ENV{HOME} = "$home";
