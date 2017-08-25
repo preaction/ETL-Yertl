@@ -1,0 +1,164 @@
+#!/usr/bin/env perl
+package yts;
+our $VERSION = '0.031';
+# ABSTRACT: Read/write time series data
+
+use ETL::Yertl;
+use Pod::Usage::Return qw( pod2usage );
+use Getopt::Long qw( GetOptionsFromArray :config pass_through );
+use ETL::Yertl::Command::yts;
+
+$|++; # no buffering
+
+sub main {
+    my ( $class, @argv ) = @_;
+    my %opt;
+    GetOptionsFromArray( \@argv, \%opt,
+        'help|h',
+        'version',
+    );
+    return pod2usage(0) if $opt{help};
+    if ( $opt{version} ) {
+        print "yts version $yts::VERSION (Perl $^V)\n";
+        return 0;
+    }
+
+    eval {
+        ETL::Yertl::Command::yts->main( @argv, \%opt );
+    };
+    if ( $@ ) {
+        return pod2usage( "ERROR: $@" );
+    }
+    return 0;
+}
+
+exit __PACKAGE__->main( @ARGV ) unless caller(0);
+
+__END__
+
+=head1 SYNOPSIS
+
+    # Read a time series
+    yts [-s] <db_spec> <metric> [<field>] [--tag <name>=<value>]
+
+    # Write a time series
+    yts [-s] <db_spec> [<metric> [<field>]] [--tag <name>=<value>]
+
+    yts -h|--help|--version
+
+=head1 DESCRIPTION
+
+This program reads and writes time series data. Time series are lists of
+date/time and value pairs, optionally with additional metadata tags
+attached to them. Time series are stored in databases as metrics.
+
+Since time series databases have a vast array of features, some of these
+arguments/options will not make sense for your database. Any database
+that does not support a feature you've requested will cause C<yts> to
+exit with an error message.
+
+=head2 Reading Time Series
+
+To read a time series, ask for a metric. This will display a set of YAML
+documents describing the values in the series.
+
+    $ yts influx://localhost:8086/mydb cpu_load_1m
+    ---
+    timestamp: 2017-01-01 00:00:00
+    metric: cpu_load_1m
+    value: 1.23
+    tags:
+        server: 10.0.0.1
+    ---
+    timestamp: 2017-01-01 00:00:00
+    metric: cpu_load_1m
+    value: 0.61
+    tags:
+        server: 10.0.0.2
+
+To show only the C<timestamp> and C<value> of a single metric, use the
+C<--short> format:
+
+    $ yts -s influx://localhost:8086/mydb cpu_load_1m
+    ---
+    '2017-01-01 00:00:00': 1.23
+    '2017-01-01 00:00:10': 1.26
+    '2017-01-01 00:00:20': 1.13
+
+If multiple series are being shown with duplicate timestamps, some
+values will be missing.
+
+=head2 Writing Time Series
+
+If C<yts> has input to read, it will write new values to the time series
+database. These values are YAML documents in one of the following
+formats:
+
+=head3 Long format
+
+This format is a series of YAML documents that describe each point
+fully. Use this format if you want to write to many different metrics
+with different tags for each metric. The timestamp can be any ISO8601
+date/time format. The value can be anything the time series database
+accepts.
+
+Any default values can be removed (like C<field> which defaults to
+C<value>).
+
+    ---
+    timestamp: 2017-01-01 00:00:00
+    metric: cpu_load_1m
+    value: 1.23
+    tags:
+        server: 10.0.0.1
+    ---
+    timestamp: 2017-01-01 00:00:10
+    metric: cpu_load_1m
+    value: 1.26
+    tags:
+        server: 10.0.0.1
+
+If your documents have tags, but the database does not support per-value
+tagging, C<yts> will exit with an error message.
+
+=head3 Short format
+
+If you pass in the C<--short> option, you can use the short format.
+This format is a set of date/value pairs. The date can be any ISO8601
+date/time format. The value can be anything the time series database
+accepts.
+
+    ---
+    '2017-01-01 00:00:00': 1.23
+    '2017-01-01 00:00:10': 1.26
+    '2017-01-01 00:00:20': 1.13
+
+This format can only usefully handle one metric. The metric and field
+to write is taken from the command line. Any tags specified on the
+command line will be attached to every point as it is written.
+
+=head1 ARGUMENTS
+
+
+
+=head1 OPTIONS
+
+=head2 -h | --help
+
+Show this help document.
+
+=head2 --version
+
+Print the current ysql and Perl versions.
+
+=head1 ENVIRONMENT VARIABLES
+
+=over 4
+
+=item YERTL_FORMAT
+
+Specify the default format Yertl uses between commands. Defaults to C<yaml>. Can be
+set to C<json> for interoperability with other programs.
+
+=back
+
