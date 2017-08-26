@@ -146,7 +146,6 @@ subtest 'write ts' => sub {
             value => 1.23,
         },
         {
-            timestamp => '2017-01-01T00:00:10.000000000Z',
             metric => 'cpu_load_1m',
             value => 1.26,
         },
@@ -159,7 +158,7 @@ subtest 'write ts' => sub {
     is $args->[0], 'http://localhost:8086/write?db=mydb', 'POST URL correct';
     my @lines = (
         "cpu_load_1m value=1.23 1483228800000000000",
-        "cpu_load_1m value=1.26 1483228810000000000",
+        "cpu_load_1m value=1.26",
     );
     is $args->[1], join( "\n", @lines ), 'influxdb line protocol points correct';
     cmp_deeply { @{ $args }[ 2..$#$args ] },

@@ -105,8 +105,15 @@ sub write_ts {
         if ( $point->{tags} ) {
             $tags = join ",", '', map { join "=", $_, $point->{tags}{$_} } keys %{ $point->{tags} };
         }
-        my $ts = $self->dt_fmt->parse_datetime( $point->{timestamp} )->hires_epoch * 10**9;
-        push @lines, sprintf '%s%s %s=%s %s',
+
+        my $ts = '';
+        if ( $point->{timestamp} ) {
+            $ts = " " . (
+                $self->dt_fmt->parse_datetime( $point->{timestamp} )->hires_epoch * 10**9
+            );
+        }
+
+        push @lines, sprintf '%s%s %s=%s%s',
             $point->{metric}, $tags, $point->{field} || "value",
             $point->{value}, $ts;
     }
