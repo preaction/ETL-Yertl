@@ -19,21 +19,26 @@ my %WriteMakefileArgs = (
     "bin/ymask",
     "bin/yq",
     "bin/ysql",
-    "bin/yto"
+    "bin/yto",
+    "bin/yts"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "ETL::Yertl",
   "PREREQ_PM" => {
     "Data::Partial::Google" => 0,
+    "DateTime" => 0,
+    "DateTime::Format::ISO8601" => 0,
     "File::HomeDir" => 0,
     "File::Spec" => 0,
     "Getopt::Long" => "2.36",
     "Hash::Merge::Simple" => 0,
     "Import::Base" => "0.010",
+    "JSON::MaybeXS" => 0,
     "List::Util" => "1.29",
     "Module::Runtime" => 0,
     "Moo" => 2,
+    "Net::Async::HTTP" => 0,
     "Parse::RecDescent" => 0,
     "Path::Tiny" => "0.072",
     "Pod::Usage::Return" => 0,
@@ -42,6 +47,7 @@ my %WriteMakefileArgs = (
     "Text::Trim" => 0,
     "Type::Tiny" => 0,
     "Types::Standard" => 0,
+    "URI" => 0,
     "YAML" => 0,
     "boolean" => 0
   },
@@ -50,9 +56,11 @@ my %WriteMakefileArgs = (
     "Dir::Self" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "Future" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "JSON::PP" => 0,
+    "Mock::MonkeyPatch" => 0,
     "Test::Deep" => 0,
     "Test::Differences" => 0,
     "Test::Exception" => 0,
@@ -61,7 +69,7 @@ my %WriteMakefileArgs = (
   },
   "VERSION" => "0.031",
   "test" => {
-    "TESTS" => "t/*.t t/bin/*.t t/command/ygrok/*.t t/command/ygrok/pattern/*.t t/command/yq/*.t t/format/*.t"
+    "TESTS" => "t/*.t t/adapter/*.t t/bin/*.t t/command/ygrok/*.t t/command/ygrok/pattern/*.t t/command/yq/*.t t/format/*.t"
   }
 );
 
@@ -69,19 +77,25 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Capture::Tiny" => 0,
   "Data::Partial::Google" => 0,
+  "DateTime" => 0,
+  "DateTime::Format::ISO8601" => 0,
   "Dir::Self" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::HomeDir" => 0,
   "File::Spec" => 0,
+  "Future" => 0,
   "Getopt::Long" => "2.36",
   "Hash::Merge::Simple" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Import::Base" => "0.010",
+  "JSON::MaybeXS" => 0,
   "JSON::PP" => 0,
   "List::Util" => "1.29",
+  "Mock::MonkeyPatch" => 0,
   "Module::Runtime" => 0,
   "Moo" => 2,
+  "Net::Async::HTTP" => 0,
   "Parse::RecDescent" => 0,
   "Path::Tiny" => "0.072",
   "Pod::Usage::Return" => 0,
@@ -95,6 +109,7 @@ my %FallbackPrereqs = (
   "Text::Trim" => 0,
   "Type::Tiny" => 0,
   "Types::Standard" => 0,
+  "URI" => 0,
   "YAML" => 0,
   "boolean" => 0
 );

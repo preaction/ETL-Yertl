@@ -1,6 +1,6 @@
 Changelog for ETL-Yertl
 
-{{ $NEXT }}
+0.031     2017-08-25 18:04:03-05:00 America/Chicago
 
     [Added]
 
@@ -8,6 +8,11 @@ Changelog for ETL-Yertl
       a table (`SELECT COUNT(*) FROM <table>`). This also works with the
       `--where` helper to limit the rows counted. This is going to be
       especially useful with the new `yts` time series command.
+
+    - The `yts` command to work with time series databases like
+      InfluxDB, Graphite (Carbon), RRDTool, Prometheus, and the like.
+      Only InfluxDB is available so far. If you want to contribute an
+      adapter for the others, let me know!
 
 0.030     2017-08-24 13:25:23-05:00 America/Chicago
 
