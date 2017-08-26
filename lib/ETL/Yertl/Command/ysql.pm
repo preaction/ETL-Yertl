@@ -166,7 +166,7 @@ sub main {
         # Insert helper requires special handling, as the query may change
         # with every document inserted.
         if ( $opt{insert} ) {
-            if ( !-t *STDIN ) {
+            if ( !-t *STDIN && !-z *STDIN ) {
                 my $in_fmt = load_module( format => 'default' )->new( input => \*STDIN );
 
                 my $query;
@@ -236,7 +236,7 @@ sub main {
         my $sth = $dbh->prepare( $query )
             or die "SQL error in prepare: " . $dbh->errstr . "\n";
 
-        if ( !-t *STDIN ) {
+        if ( !-t *STDIN && !-z *STDIN ) {
             my $in_fmt = load_module( format => 'default' )->new( input => \*STDIN );
 
             for my $doc ( $in_fmt->read ) {
