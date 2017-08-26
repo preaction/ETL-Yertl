@@ -1,5 +1,14 @@
 Changelog for ETL-Yertl
 
+0.032     2017-08-25 21:42:30-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed a problem where `ysql` would refuse to work as the first
+      part of a cron job, thus making it useless for gathering metrics
+      to be written to `yts`. Now we also check to see if `STDIN` is
+      attached to something with some size...
+
 0.031     2017-08-25 18:04:03-05:00 America/Chicago
 
     [Added]
