@@ -1,5 +1,5 @@
 package ETL::Yertl::Adapter::influxdb;
-our $VERSION = '0.031';
+our $VERSION = '0.032';
 # ABSTRACT: Adapter to read/write from InfluxDB time series database
 
 use ETL::Yertl 'Class';
