@@ -5,7 +5,7 @@ our $VERSION = '0.031';
 use ETL::Yertl 'Class';
 use Net::Async::HTTP;
 use URI;
-use JSON::PP qw( decode_json );
+use JSON::MaybeXS qw( decode_json );
 use List::Util qw( first );
 use DateTime::Format::ISO8601;
 use IO::Async::Loop;
