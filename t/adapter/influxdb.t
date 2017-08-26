@@ -11,7 +11,6 @@ L<yts>
 =cut
 
 use ETL::Yertl 'Test';
-use Net::Async::HTTP::Server;
 use IO::Async::Loop;
 use IO::Async::Test;
 use Mock::MonkeyPatch;
