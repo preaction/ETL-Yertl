@@ -1,5 +1,5 @@
 package ETL::Yertl::Command::ymask;
-our $VERSION = '0.032';
+our $VERSION = '0.033';
 # ABSTRACT: Filter documents through applying a mask
 
 use ETL::Yertl;

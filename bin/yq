@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 package yq;
-our $VERSION = '0.032';
+our $VERSION = '0.033';
 # ABSTRACT: Filter YAML through a command-line program
 
 use ETL::Yertl;
