@@ -24,13 +24,11 @@ subtest 'read' => sub {
         {
             timestamp => '2017-01-01 00:00:00',
             metric => 'cpu_load_1m',
-            field => 'value',
             value => 1.23,
         },
         {
             timestamp => '2017-01-01 00:00:10',
             metric => 'cpu_load_1m',
-            field => 'value',
             value => 1.26,
         },
     );
@@ -72,13 +70,11 @@ subtest 'write' => sub {
         {
             timestamp => '2017-01-01 00:00:00',
             metric => 'cpu_load_1m',
-            field => 'value',
             value => 1.23,
         },
         {
             timestamp => '2017-01-01 00:00:10',
             metric => 'cpu_load_1m',
-            field => 'value',
             value => 1.26,
         },
     );

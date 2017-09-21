@@ -24,25 +24,19 @@ testing_loop( $loop );
 
 subtest 'constructor spec' => sub {
     subtest 'success' => sub {
-        my $db = ETL::Yertl::Adapter::influxdb->new( 'influxdb://localhost:8086/mydb' );
+        my $db = ETL::Yertl::Adapter::influxdb->new( 'influxdb://localhost:8086' );
         is $db->host, 'localhost', 'host is correct';
         is $db->port, 8086, 'port is correct';
-        is $db->db, 'mydb', 'db is correct';
     };
 
     subtest 'port defaults to 8086' => sub {
-        my $db = ETL::Yertl::Adapter::influxdb->new( 'influxdb://localhost/mydb' );
+        my $db = ETL::Yertl::Adapter::influxdb->new( 'influxdb://localhost' );
         is $db->host, 'localhost', 'host is correct';
         is $db->port, 8086, 'port is correct';
-        is $db->db, 'mydb', 'db is correct';
     };
 
     subtest 'host is required' => sub {
-        dies_ok { ETL::Yertl::Adapter::influxdb->new( 'influxdb://:8086/mydb' ) };
-    };
-
-    subtest 'db is required' => sub {
-        dies_ok { ETL::Yertl::Adapter::influxdb->new( 'influxdb://localhost:8086/' ) };
+        dies_ok { ETL::Yertl::Adapter::influxdb->new( 'influxdb://:8086' ) };
     };
 
 };
@@ -51,7 +45,6 @@ subtest 'read ts' => sub {
     my $db = ETL::Yertl::Adapter::influxdb->new(
         _loop => $loop,
         host => 'localhost',
-        db => 'mydb',
     );
 
     my $content = encode_json(
@@ -94,16 +87,16 @@ subtest 'read ts' => sub {
         },
     );
 
-    my @points = $db->read_ts( 'cpu_load_1m', 'value' );
+    my @points = $db->read_ts( { metric => 'mydb.cpu_load_1m.value' } );
     cmp_deeply \@points, [
         {
             timestamp => '2017-01-01T00:00:00.000000000Z',
-            metric => 'cpu_load_1m',
+            metric => 'mydb.cpu_load_1m',
             value => 1.23,
         },
         {
             timestamp => '2017-01-01T00:00:10.000000000Z',
-            metric => 'cpu_load_1m',
+            metric => 'mydb.cpu_load_1m',
             value => 1.26,
         },
     ];
@@ -122,7 +115,6 @@ subtest 'write ts' => sub {
     my $db = ETL::Yertl::Adapter::influxdb->new(
         _loop => $loop,
         host => 'localhost',
-        db => 'mydb',
     );
 
     my $mock = Mock::MonkeyPatch->patch(
@@ -141,11 +133,11 @@ subtest 'write ts' => sub {
     my @points = (
         {
             timestamp => '2017-01-01T00:00:00.000000000Z',
-            metric => 'cpu_load_1m',
+            metric => 'mydb.cpu_load.5m',
             value => 1.23,
         },
         {
-            metric => 'cpu_load_1m',
+            metric => 'mydb.cpu_load.1m',
             value => 1.26,
         },
     );
@@ -156,8 +148,8 @@ subtest 'write ts' => sub {
     my $args = $mock->method_arguments;
     is $args->[0], 'http://localhost:8086/write?db=mydb', 'POST URL correct';
     my @lines = (
-        "cpu_load_1m value=1.23 1483228800000000000",
-        "cpu_load_1m value=1.26",
+        "cpu_load 5m=1.23 1483228800000000000",
+        "cpu_load 1m=1.26",
     );
     is $args->[1], join( "\n", @lines ), 'influxdb line protocol points correct';
     cmp_deeply { @{ $args }[ 2..$#$args ] },
