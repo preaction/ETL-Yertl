@@ -27,7 +27,7 @@ subtest 'read' => sub {
             value => 1.23,
         },
         {
-            timestamp => '2017-01-01 00:00:10',
+            timestamp => '2017-01-01 00:01:00',
             metric => 'cpu_load_1m',
             value => 1.26,
         },
@@ -73,7 +73,7 @@ subtest 'write' => sub {
             value => 1.23,
         },
         {
-            timestamp => '2017-01-01T00:00:10Z',
+            timestamp => '2017-01-01T00:01:00Z',
             metric => 'cpu_load_1m',
             value => 1.26,
         },
