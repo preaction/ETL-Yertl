@@ -2,6 +2,11 @@ Changelog for ETL-Yertl
 
 {{ $NEXT }}
 
+    [Added]
+
+    - Added --start and --end options to yts command to constrain the
+      time series returned to a specific date/time range.
+
     [Fixed]
 
     - Fixed nulls appearing in Graphite time series.

@@ -57,6 +57,29 @@ subtest 'read' => sub {
         cmp_deeply [ $yaml_fmt->read ], [ { map {; $_->{timestamp}, $_->{value} } @ts } ];
     };
 
+    subtest 'read metric -- start/end' => sub {
+        local @ETL::Yertl::Adapter::test::LAST_READ_TS_ARGS;
+        my ( $stdout, $stderr, $exit ) = capture {
+            yts->main( 'test://localhost', 'cpu_load_1m', '--start', '2017-01-01', '--end', '2017-01-02' );
+        };
+        is $exit, 0;
+        ok !$stderr, 'nothing on stderr' or diag $stderr;
+
+        cmp_deeply \@ETL::Yertl::Adapter::test::LAST_READ_TS_ARGS,
+            [ {
+                metric => 'cpu_load_1m',
+                start => '2017-01-01',
+                end => '2017-01-02',
+                tags => undef,
+            } ],
+            'read_ts args correct'
+                or diag explain \@ETL::Yertl::Adapter::test::LAST_READ_TS_ARGS;
+
+        open my $fh, '<', \$stdout;
+        my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
+        cmp_deeply [ $yaml_fmt->read ], \@ts;
+    };
+
     subtest 'error: no metric' => sub {
         my ( $stdout, $stderr, $exit ) = capture { yts->main( 'test://localhost' ) };
         isnt $exit, 0, 'error status';

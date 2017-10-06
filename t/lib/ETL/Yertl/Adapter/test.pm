@@ -2,7 +2,9 @@ package ETL::Yertl::Adapter::test;
 # ABSTRACT: A test adapter for testing
 
 our @READ;
+our @LAST_READ_ARGS;
 our @READ_TS;
+our @LAST_READ_TS_ARGS;
 our @WRITE;
 our @WRITE_TS;
 
@@ -13,11 +15,13 @@ sub new {
 
 sub read {
     my ( $self, @args ) = @_;
+    @LAST_READ_ARGS = @args;
     return @READ;
 }
 
 sub read_ts {
     my ( $self, @args ) = @_;
+    @LAST_READ_TS_ARGS = @args;
     return @READ_TS;
 }
 

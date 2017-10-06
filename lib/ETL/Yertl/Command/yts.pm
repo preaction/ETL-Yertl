@@ -26,6 +26,8 @@ sub main {
 
     my @args = @_;
     GetOptionsFromArray( \@args, \%opt,
+        'start=s',
+        'end=s',
         'short|s',
         'tags=s%',
     );
@@ -84,7 +86,12 @@ sub main {
     else {
         die "Must give a metric\n" unless $metric;
         my $out_fmt = load_module( format => 'default' )->new;
-        my @points = $db->read_ts( { metric => $metric, tags => $opt{tags} } );
+        my @points = $db->read_ts( {
+            metric => $metric,
+            tags => $opt{tags},
+            start => $opt{start},
+            end => $opt{end},
+        } );
         if ( $opt{short} ) {
             my %ts = map { $_->{timestamp} => $_->{value} } @points;
             print $out_fmt->write( \%ts );
