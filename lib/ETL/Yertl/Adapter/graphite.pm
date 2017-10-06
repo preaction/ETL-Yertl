@@ -153,6 +153,7 @@ sub read_ts {
     my %form = (
         target => $metric,
         format => 'json',
+        noNullPoints => 'true',
     );
 
     if ( $query->{ start } ) {

@@ -100,6 +100,7 @@ subtest 'read ts' => sub {
     cmp_deeply { $url->query_form }, {
         target => 'cpu_load.1m',
         format => 'json',
+        noNullPoints => 'true',
     }, 'query params correct';
 };
 
