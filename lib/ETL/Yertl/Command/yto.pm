@@ -1,5 +1,5 @@
 package ETL::Yertl::Command::yto;
-our $VERSION = '0.033';
+our $VERSION = '0.034';
 # ABSTRACT: Write documents to a format like JSON or CSV
 
 use ETL::Yertl;

@@ -1,5 +1,5 @@
 package ETL::Yertl::Format::yaml;
-our $VERSION = '0.033';
+our $VERSION = '0.034';
 # ABSTRACT: YAML read/write support for Yertl
 
 use ETL::Yertl 'Class';
