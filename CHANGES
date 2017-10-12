@@ -1,14 +1,21 @@
 Changelog for ETL-Yertl
 
-{{ $NEXT }}
+0.033     2017-10-12 01:18:55-05:00 America/Chicago
 
     [Added]
 
+    - Added Graphite time series adapter. Now `yts` can read/write time
+      series from the Graphite system and related subsystems. The write
+      function is compatible with the "line" protocol, so any databases
+      that understand Graphite's line protocol can be written to.
     - Added --start and --end options to yts command to constrain the
       time series returned to a specific date/time range.
 
     [Fixed]
 
+    - Fixed the `yts` time series format. Now there is only the "metric"
+      to identify the time series, which for some time series databases
+      may contain abstractions like "database" and "column".
     - Fixed nulls appearing in Graphite time series.
 
 0.032     2017-08-25 21:42:30-05:00 America/Chicago
