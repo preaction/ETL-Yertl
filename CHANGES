@@ -2,6 +2,29 @@ Changelog for ETL-Yertl
 
 {{ $NEXT }}
 
+    [Fixed]
+
+    - Fixed a race condition that could cause `yts` to read the data and
+      not write the data passed-in on `STDIN`. This requires a new
+      dependency, IO::Interactive.
+
+    - Removed dependencies on some modules to reduce the memory
+      footprint and improve startup times:
+
+      * DateTime
+      * Moo
+      * Type::Tiny
+
+    - Removed some unused modules that are not going to be developed
+      anymore.
+
+      * Parse::RecDescent versions of the `yq` language parser. Perl
+        5.10 regex grammars work just fine.
+
+    - Fixed YAML.pm (YAML::Old) causing tests to fail. This has been
+      removed (for now) as a supported YAML module. The default
+      supported YAML module is now YAML::Tiny.
+
 0.033     2017-10-12 01:18:55-05:00 America/Chicago
 
     [Added]
