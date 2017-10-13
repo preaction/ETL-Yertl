@@ -15,6 +15,7 @@ L<yts>
 use ETL::Yertl;
 use ETL::Yertl::Util qw( load_module );
 use Getopt::Long qw( GetOptionsFromArray :config pass_through );
+use IO::Interactive qw( is_interactive );
 
 sub main {
     my $class = shift;
@@ -44,7 +45,7 @@ sub main {
     my $db = load_module( adapter => $db_type )->new( $db_spec );
 
     # Write metrics
-    if ( !-t STDIN && !-z *STDIN ) {
+    if ( !is_interactive( \*STDIN ) ) {
         if ( $opt{short} ) {
             die "Must give a metric\n" unless $metric;
         }
