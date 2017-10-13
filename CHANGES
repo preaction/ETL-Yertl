@@ -2,6 +2,8 @@ Changelog for ETL-Yertl
 
 {{ $NEXT }}
 
+0.034     2017-10-12 19:45:03-05:00 America/Chicago
+
     [Fixed]
 
     - Fixed a race condition that could cause `yts` to read the data and
