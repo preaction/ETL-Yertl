@@ -26,15 +26,6 @@ my @EXPECT_FROM = (
     [qw( foo bar baz )],
 );
 
-subtest 'constructor' => sub {
-    subtest 'invalid format module' => sub {
-        throws_ok {
-            $CLASS->new( format_module => 'Not::Supported' );
-        } qr{format_module must be one of: JSON::XS JSON::PP};
-        unlike $@, qr{json[.]pm line \d+}, 'does not contain module/line';
-    };
-};
-
 subtest 'default formatter' => sub {
     subtest 'input' => sub {
         my $formatter = $CLASS->new(

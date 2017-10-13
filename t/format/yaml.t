@@ -26,15 +26,6 @@ my @EXPECT_FROM = (
     [qw( foo bar baz )],
 );
 
-subtest 'constructor' => sub {
-    subtest 'invalid format module' => sub {
-        throws_ok {
-            $CLASS->new( format_module => 'Not::Supported' );
-        } qr{format_module must be one of: YAML::XS YAML::Syck YAML};
-        unlike $@, qr{yaml[.]pm line \d+}, 'does not contain module/line';
-    };
-};
-
 subtest 'default formatter' => sub {
     subtest 'input' => sub {
         my $formatter = $CLASS->new( input => $EXPECT_TO->openr );

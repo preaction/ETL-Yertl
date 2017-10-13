@@ -29,15 +29,6 @@ my @EXPECT_FROM = (
     },
 );
 
-subtest 'constructor' => sub {
-    subtest 'invalid format module' => sub {
-        throws_ok {
-            $CLASS->new( format_module => 'Not::Supported' );
-        } qr{format_module must be one of: Text::CSV_XS Text::CSV};
-        unlike $@, qr{csv[.]pm line \d+}, 'does not contain module/line';
-    };
-};
-
 subtest 'default formatter' => sub {
     subtest 'input' => sub {
         my $formatter = $CLASS->new( input => $EXPECT_TO->openr );

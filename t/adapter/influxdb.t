@@ -25,14 +25,14 @@ testing_loop( $loop );
 subtest 'constructor spec' => sub {
     subtest 'success' => sub {
         my $db = ETL::Yertl::Adapter::influxdb->new( 'influxdb://localhost:8086' );
-        is $db->host, 'localhost', 'host is correct';
-        is $db->port, 8086, 'port is correct';
+        is $db->{host}, 'localhost', 'host is correct';
+        is $db->{port}, 8086, 'port is correct';
     };
 
     subtest 'port defaults to 8086' => sub {
         my $db = ETL::Yertl::Adapter::influxdb->new( 'influxdb://localhost' );
-        is $db->host, 'localhost', 'host is correct';
-        is $db->port, 8086, 'port is correct';
+        is $db->{host}, 'localhost', 'host is correct';
+        is $db->{port}, 8086, 'port is correct';
     };
 
     subtest 'host is required' => sub {

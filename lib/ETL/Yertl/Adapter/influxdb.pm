@@ -36,42 +36,13 @@ L<InfluxDB Query language|https://docs.influxdata.com/influxdb/v1.3/query_langua
 
 =cut
 
-use ETL::Yertl 'Class';
+use ETL::Yertl;
 use Net::Async::HTTP;
 use URI;
 use JSON::MaybeXS qw( decode_json );
 use List::Util qw( first );
-use DateTime::Format::ISO8601;
 use IO::Async::Loop;
-
-has host => ( is => 'ro', required => 1 );
-has port => ( is => 'ro', default => 8086 );
-
-has _loop => (
-    is => 'ro',
-    default => sub {
-        IO::Async::Loop->new();
-    },
-);
-
-has client => (
-    is => 'ro',
-    lazy => 1,
-    default => sub {
-        my ( $self ) = @_;
-        my $http = Net::Async::HTTP->new;
-        $self->_loop->add( $http );
-        return $http;
-    },
-);
-
-has dt_fmt => (
-    is => 'ro',
-    lazy => 1,
-    default => sub {
-        DateTime::Format::ISO8601->new;
-    },
-);
+use Time::Piece ();
 
 =method new
 
@@ -83,19 +54,38 @@ Port is optional and defaults to C<8086>.
 
 =cut
 
-sub BUILDARGS {
-    my ( $class, @args ) = @_;
+sub new {
+    my $class = shift;
+
     my %args;
-    if ( @args == 1 ) {
-        if ( $args[0] =~ m{://([^:]+)(?::([^/]+))?} ) {
-            @args{qw( host port )} = ( $1, $2 );
-            delete $args{port} if !$args{port};
+    if ( @_ == 1 ) {
+        if ( $_[0] =~ m{://([^:]+)(?::([^/]+))?} ) {
+            ( $args{host}, $args{port} ) = ( $1, $2 );
         }
     }
     else {
-        %args = @args;
+        %args = @_;
     }
-    return \%args;
+
+    die "Host is required" unless $args{host};
+
+    $args{port} ||= 8086;
+
+    return bless \%args, $class;
+}
+
+sub _loop {
+    my ( $self ) = @_;
+    return $self->{_loop} ||= IO::Async::Loop->new;
+}
+
+sub client {
+    my ( $self ) = @_;
+    return $self->{http_client} ||= do {
+        my $http = Net::Async::HTTP->new;
+        $self->_loop->add( $http );
+        $http;
+    };
 }
 
 =method read_ts
@@ -153,7 +143,7 @@ sub read_ts {
         $q .= ' WHERE ' . join " AND ", @where;
     }
 
-    my $url = URI->new( sprintf 'http://%s:%s/query', $self->host, $self->port );
+    my $url = URI->new( sprintf 'http://%s:%s/query', $self->{host}, $self->{port} );
     $url->query_form( db => $db, q => $q );
 
     #; say "Fetching $url";
@@ -222,8 +212,9 @@ sub write_ts {
 
         my $ts = '';
         if ( $point->{timestamp} ) {
+            $point->{timestamp} =~ s/[.]\d+Z?$//; # We do not support nanoseconds
             $ts = " " . (
-                $self->dt_fmt->parse_datetime( $point->{timestamp} )->hires_epoch * 10**9
+                Time::Piece->strptime( $point->{timestamp}, '%Y-%m-%dT%H:%M:%S' )->epoch * 10**9
             );
         }
 
@@ -235,7 +226,7 @@ sub write_ts {
     for my $db ( keys %db_lines ) {
         my @lines = @{ $db_lines{ $db } };
         my $body = join "\n", @lines;
-        my $url = URI->new( sprintf 'http://%s:%s/write?db=%s', $self->host, $self->port, $db );
+        my $url = URI->new( sprintf 'http://%s:%s/write?db=%s', $self->{host}, $self->{port}, $db );
         my $res = $self->client->POST( $url, $body, content_type => 'text/plain' )->get;
         if ( $res->is_error ) {
             my $result = decode_json( $res->decoded_content );

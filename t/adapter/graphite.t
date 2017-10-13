@@ -25,16 +25,16 @@ testing_loop( $loop );
 subtest 'constructor spec' => sub {
     subtest 'success' => sub {
         my $db = ETL::Yertl::Adapter::graphite->new( 'graphite://localhost:2003' );
-        is $db->host, 'localhost', 'host is correct';
-        is $db->write_port, 2003, 'write_port is correct';
-        is $db->http_port, 2003, 'http_port is correct';
+        is $db->{host}, 'localhost', 'host is correct';
+        is $db->{write_port}, 2003, 'write_port is correct';
+        is $db->{http_port}, 2003, 'http_port is correct';
     };
 
     subtest 'port defaults to 8086' => sub {
         my $db = ETL::Yertl::Adapter::graphite->new( 'graphite://localhost' );
-        is $db->host, 'localhost', 'host is correct';
-        is $db->write_port, 2003, 'write_port is correct';
-        is $db->http_port, 8080, 'http_port is correct';
+        is $db->{host}, 'localhost', 'host is correct';
+        is $db->{write_port}, 2003, 'write_port is correct';
+        is $db->{http_port}, 8080, 'http_port is correct';
     };
 
     subtest 'host is required' => sub {

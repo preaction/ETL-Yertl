@@ -33,56 +33,13 @@ L<Read from Graphite|http://graphite.readthedocs.io/en/latest/render_api.html>
 
 =cut
 
-use ETL::Yertl 'Class';
+use ETL::Yertl;
 use Net::Async::HTTP;
 use URI;
 use JSON::MaybeXS qw( decode_json );
 use List::Util qw( first );
-use DateTime::Format::ISO8601;
 use IO::Async::Loop;
-
-has host => ( is => 'ro', required => 1 );
-has write_port => ( is => 'ro', default => 2003 ); # "plaintext" port
-has http_port => ( is => 'ro', default => 8080 ); # http port
-
-has _loop => (
-    is => 'ro',
-    default => sub {
-        IO::Async::Loop->new();
-    },
-);
-
-has write_client => (
-    is => 'ro',
-    lazy => 1,
-    default => sub {
-        my ( $self ) = @_;
-        return $self->_loop->connect(
-            socktype => 'stream',
-            host => $self->host,
-            service => $self->write_port,
-        )->get;
-    },
-);
-
-has http_client => (
-    is => 'ro',
-    lazy => 1,
-    default => sub {
-        my ( $self ) = @_;
-        my $http = Net::Async::HTTP->new;
-        $self->_loop->add( $http );
-        return $http;
-    },
-);
-
-has dt_fmt => (
-    is => 'ro',
-    lazy => 1,
-    default => sub {
-        DateTime::Format::ISO8601->new;
-    },
-);
+use Time::Piece ();
 
 =method new
 
@@ -95,11 +52,12 @@ and C<8080> (the default Graphite HTTP API port) for reading.
 
 =cut
 
-sub BUILDARGS {
-    my ( $class, @args ) = @_;
+sub new {
+    my $class = shift;
+
     my %args;
-    if ( @args == 1 ) {
-        if ( $args[0] =~ m{://([^:]+)(?::([^/]+))?} ) {
+    if ( @_ == 1 ) {
+        if ( $_[0] =~ m{://([^:]+)(?::([^/]+))?} ) {
             ($args{host}, my $port ) = ( $1, $2 );
             if ( $port ) {
                 @args{qw( http_port write_port )} = ( $port ) x 2;
@@ -107,9 +65,38 @@ sub BUILDARGS {
         }
     }
     else {
-        %args = @args;
+        %args = @_;
     }
-    return \%args;
+
+    die "Host is required" unless $args{host};
+
+    $args{write_port} ||= 2003; # "plaintext" port
+    $args{http_port} ||= 8080; # http port
+
+    return bless \%args, $class;
+}
+
+sub _loop {
+    my ( $self ) = @_;
+    return $self->{_loop} ||= IO::Async::Loop->new;
+}
+
+sub write_client {
+    my ( $self ) = @_;
+    return $self->{write_client} ||= $self->_loop->connect(
+        socktype => 'stream',
+        host => $self->{host},
+        service => $self->{write_port},
+    )->get;
+}
+
+sub http_client {
+    my ( $self ) = @_;
+    return $self->{http_client} ||= do {
+        my $http = Net::Async::HTTP->new;
+        $self->_loop->add( $http );
+        $http;
+    };
 }
 
 =method read_ts
@@ -163,7 +150,7 @@ sub read_ts {
         $form{ until } = _format_graphite_dt( $query->{end} );
     }
 
-    my $url = URI->new( sprintf 'http://%s:%s/render', $self->host, $self->http_port );
+    my $url = URI->new( sprintf 'http://%s:%s/render', $self->{host}, $self->{http_port} );
     $url->query_form( %form );
 
     #; say "Fetching $url";
@@ -175,13 +162,12 @@ sub read_ts {
     }
 
     my $result = decode_json( $res->decoded_content );
-    my $fmt = $self->dt_fmt;
     my @points;
     for my $series ( @{ $result } ) {
         for my $point ( @{ $series->{datapoints} } ) {
             push @points, {
                 metric => $series->{target},
-                timestamp => DateTime->from_epoch( epoch => $point->[1] )->iso8601 . 'Z',
+                timestamp => Time::Piece->gmtime( $point->[1] )->datetime . 'Z',
                 value => $point->[0],
             };
         }
@@ -227,9 +213,10 @@ sub write_ts {
     my $sock = $self->write_client;
     for my $point ( @points ) {
         die "Tags are not supported by Graphite" if $point->{tags} && keys %{ $point->{tags} };
+        $point->{timestamp} =~ s/[.]\d+Z?$//; # We do not support nanoseconds
         $sock->write(
             join( " ", $point->{metric}, $point->{value},
-            $self->dt_fmt->parse_datetime( $point->{timestamp} )->epoch, )
+            Time::Piece->strptime( $point->{timestamp}, '%Y-%m-%dT%H:%M:%S' )->epoch, )
             . "\n",
         );
     }

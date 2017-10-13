@@ -2,20 +2,10 @@ package ETL::Yertl::Format::yaml;
 our $VERSION = '0.034';
 # ABSTRACT: YAML read/write support for Yertl
 
-use ETL::Yertl 'Class';
+use ETL::Yertl;
+use base 'ETL::Yertl::Format';
 use Module::Runtime qw( use_module );
 use List::Util qw( pairs pairkeys pairfirst );
-
-=attr input
-
-The filehandle to read from for input.
-
-=cut
-
-has input => (
-    is => 'ro',
-    isa => FileHandle,
-);
 
 =attr format_module
 
@@ -39,42 +29,29 @@ The module being used for this format. Possible modules, in order of importance:
 our @FORMAT_MODULES = (
     'YAML::XS' => 0,
     'YAML::Syck' => 0,
-    'YAML' => 0,
+    #'YAML' => 0, # Disabled: YAML::Old changes have broke something here...
     'YAML::Tiny' => 0,
 );
 
-has format_module => (
-    is => 'rw',
-    isa => sub {
-        my ( $format_module ) = @_;
-        die "format_module must be one of: " . join( " ", pairkeys @FORMAT_MODULES ) . "\n"
-            unless pairfirst { $a eq $format_module } @FORMAT_MODULES;
+sub format_module {
+    my ( $self ) = @_;
+    return $self->{_format_module} if $self->{_format_module};
+    for my $format_module ( pairs @FORMAT_MODULES ) {
         eval {
-            use_module( $format_module );
+            # Prototypes on use_module() make @$format_module not work correctly
+            use_module( $format_module->[0], $format_module->[1] );
         };
-        if ( $@ ) {
-            die "Could not load format module '$format_module': $@";
+        if ( !$@ ) {
+            return $self->{_format_module} = $format_module->[0];
         }
-    },
-    lazy => 1,
-    default => sub {
-        for my $format_module ( pairs @FORMAT_MODULES ) {
-            eval {
-                # Prototypes on use_module() make @$format_module not work correctly
-                use_module( $format_module->[0], $format_module->[1] );
-            };
-            if ( !$@ ) {
-                return $format_module->[0];
-            }
-        }
-        die "Could not load a formatter for YAML. Please install one of the following modules:\n"
-            . join( "",
-                map { sprintf "\t%s (%s)", $_->[0], $_->[1] ? "version $_->[1]" : "Any version" }
-                pairs @FORMAT_MODULES
-            )
-            . "\n";
-    },
-);
+    }
+    die "Could not load a formatter for YAML. Please install one of the following modules:\n"
+        . join( "",
+            map { sprintf "\t%s (%s)", $_->[0], $_->[1] ? "version $_->[1]" : "Any version" }
+            pairs @FORMAT_MODULES
+        )
+        . "\n";
+}
 
 
 # Hash of MODULE => formatter sub
@@ -93,7 +70,7 @@ my %FORMAT_SUB = (
 
         read => sub {
             my $self = shift;
-            my $yaml = do { local $/; readline $self->input };
+            my $yaml = do { local $/; readline $self->{input} };
             return $yaml ? YAML::XS::Load( $yaml ) : ();
         },
 
@@ -112,7 +89,7 @@ my %FORMAT_SUB = (
 
         read => sub {
             my $self = shift;
-            my $yaml = do { local $/; readline $self->input };
+            my $yaml = do { local $/; readline $self->{input} };
             return $yaml ? YAML::Syck::Load( $yaml ) : ();
         },
 
@@ -131,7 +108,7 @@ my %FORMAT_SUB = (
 
         read => sub {
             my $self = shift;
-            my $yaml = do { local $/; readline $self->input };
+            my $yaml = do { local $/; readline $self->{input} };
             return $yaml ? YAML::Load( $yaml ) : ();
         },
 
@@ -150,7 +127,7 @@ my %FORMAT_SUB = (
 
         read => sub {
             my $self = shift;
-            my $yaml = do { local $/; readline $self->input };
+            my $yaml = do { local $/; readline $self->{input} };
             return $yaml ? YAML::Tiny::Load( $yaml ) : ();
         },
 

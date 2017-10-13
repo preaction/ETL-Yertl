@@ -2,20 +2,10 @@ package ETL::Yertl::Format::json;
 our $VERSION = '0.034';
 # ABSTRACT: JSON read/write support for Yertl
 
-use ETL::Yertl 'Class';
+use ETL::Yertl;
+use base 'ETL::Yertl::Format';
 use Module::Runtime qw( use_module );
 use List::Util qw( pairs pairkeys pairfirst );
-
-=attr input
-
-The filehandle to read from for input.
-
-=cut
-
-has input => (
-    is => 'ro',
-    isa => FileHandle,
-);
 
 =attr format_module
 
@@ -37,38 +27,25 @@ our @FORMAT_MODULES = (
     'JSON::PP' => 0,
 );
 
-has format_module => (
-    is => 'rw',
-    isa => sub {
-        my ( $format_module ) = @_;
-        die "format_module must be one of: " . join( " ", pairkeys @FORMAT_MODULES ) . "\n"
-            unless pairfirst { $a eq $format_module } @FORMAT_MODULES;
+sub format_module {
+    my ( $self ) = @_;
+    return $self->{_format_module} if $self->{_format_module};
+    for my $format_module ( pairs @FORMAT_MODULES ) {
         eval {
-            use_module( $format_module );
+            # Prototypes on use_module() make @$format_module not work correctly
+            use_module( $format_module->[0], $format_module->[1] );
         };
-        if ( $@ ) {
-            die "Could not load format module '$format_module': $@";
+        if ( !$@ ) {
+            return $format_module->[0];
         }
-    },
-    lazy => 1,
-    default => sub {
-        for my $format_module ( pairs @FORMAT_MODULES ) {
-            eval {
-                # Prototypes on use_module() make @$format_module not work correctly
-                use_module( $format_module->[0], $format_module->[1] );
-            };
-            if ( !$@ ) {
-                return $format_module->[0];
-            }
-        }
-        die "Could not load a formatter for JSON. Please install one of the following modules:\n"
-            . join( "",
-                map { sprintf "\t%s (%s)", $_->[0], $_->[1] ? "version $_->[1]" : "Any version" }
-                pairs @FORMAT_MODULES
-            )
-            . "\n";
-    },
-);
+    }
+    die "Could not load a formatter for JSON. Please install one of the following modules:\n"
+        . join( "",
+            map { sprintf "\t%s (%s)", $_->[0], $_->[1] ? "version $_->[1]" : "Any version" }
+            pairs @FORMAT_MODULES
+        )
+        . "\n";
+}
 
 
 # Hash of MODULE => formatter sub
@@ -88,7 +65,7 @@ my %FORMAT_SUB = (
         read => sub {
             my $self = shift;
             state $json = JSON::XS->new->relaxed;
-            return $json->incr_parse( do { local $/; readline $self->input } );
+            return $json->incr_parse( do { local $/; readline $self->{input} } );
         },
     },
 
@@ -111,7 +88,7 @@ my %FORMAT_SUB = (
 
             # Work around a bug in JSON::PP.
             # incr_parse() only returns the first item, see: https://github.com/makamaka/JSON-PP/pull/7
-            my $text = do { local $/; readline $self->input };
+            my $text = do { local $/; readline $self->{input} };
             my @objs = $json->incr_parse( $text );
             if ( scalar @objs == 1 ) {
                 my @more_objs = $json->incr_parse( $text );
