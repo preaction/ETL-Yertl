@@ -1,5 +1,5 @@
 package ETL::Yertl::Adapter::graphite;
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 # ABSTRACT: Adapter to read/write from Graphite time series database
 
 =head1 SYNOPSIS

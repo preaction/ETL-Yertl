@@ -1,5 +1,5 @@
 package ETL::Yertl;
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 # ABSTRACT: ETL with a Shell
 
 use strict;
