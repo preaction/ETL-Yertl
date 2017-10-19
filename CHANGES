@@ -2,6 +2,13 @@ Changelog for ETL-Yertl
 
 {{ $NEXT }}
 
+    [Fixed]
+
+    - Removed 'Z' time zone indicator from yts input/output and time
+      series adapters. Time zone does not enter in to any of the things
+      we're doing with time series. If users need to do things with time
+      zones, they'll have to do it themselves (poor souls).
+
 0.034     2017-10-12 19:45:03-05:00 America/Chicago
 
     [Fixed]

@@ -91,12 +91,12 @@ subtest 'write' => sub {
 
     my @ts = (
         {
-            timestamp => '2017-01-01T00:00:00Z',
+            timestamp => '2017-01-01T00:00:00',
             metric => 'cpu_load_1m',
             value => 1.23,
         },
         {
-            timestamp => '2017-01-01T00:01:00Z',
+            timestamp => '2017-01-01T00:01:00',
             metric => 'cpu_load_1m',
             value => 1.26,
         },

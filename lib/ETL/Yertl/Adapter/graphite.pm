@@ -167,7 +167,7 @@ sub read_ts {
         for my $point ( @{ $series->{datapoints} } ) {
             push @points, {
                 metric => $series->{target},
-                timestamp => Time::Piece->gmtime( $point->[1] )->datetime . 'Z',
+                timestamp => Time::Piece->gmtime( $point->[1] )->datetime,
                 value => $point->[0],
             };
         }

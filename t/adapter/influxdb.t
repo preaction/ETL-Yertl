@@ -58,11 +58,11 @@ subtest 'read ts' => sub {
                             columns => [qw( time value )],
                             values => [
                                 [
-                                    "2017-01-01T00:00:00.000000000Z",
+                                    "2017-01-01T00:00:00",
                                     1.23
                                 ],
                                 [
-                                    "2017-01-01T00:00:10.000000000Z",
+                                    "2017-01-01T00:00:10",
                                     1.26
                                 ]
                             ]
@@ -90,12 +90,12 @@ subtest 'read ts' => sub {
     my @points = $db->read_ts( { metric => 'mydb.cpu_load_1m.value' } );
     cmp_deeply \@points, [
         {
-            timestamp => '2017-01-01T00:00:00.000000000Z',
+            timestamp => '2017-01-01T00:00:00',
             metric => 'mydb.cpu_load_1m',
             value => 1.23,
         },
         {
-            timestamp => '2017-01-01T00:00:10.000000000Z',
+            timestamp => '2017-01-01T00:00:10',
             metric => 'mydb.cpu_load_1m',
             value => 1.26,
         },
@@ -132,7 +132,7 @@ subtest 'write ts' => sub {
 
     my @points = (
         {
-            timestamp => '2017-01-01T00:00:00.000000000Z',
+            timestamp => '2017-01-01T00:00:00',
             metric => 'mydb.cpu_load.5m',
             value => 1.23,
         },
