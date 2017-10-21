@@ -5,7 +5,7 @@ our $VERSION = '0.036';
 use ETL::Yertl;
 use base 'ETL::Yertl::Format';
 use Module::Runtime qw( use_module );
-use List::Util qw( pairs pairkeys pairfirst );
+use ETL::Yertl::Util qw( pairs );
 
 sub new {
     my ( $class, %args ) = @_;

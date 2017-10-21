@@ -15,7 +15,7 @@ use Exporter qw( import );
 use Module::Runtime qw( use_module compose_module_name );
 
 our @EXPORT_OK = qw(
-    load_module
+    load_module pairs pairkeys
 );
 
 =sub load_module
@@ -52,6 +52,37 @@ sub load_module {
     }
 
     return $class;
+}
+
+=sub pairs
+
+    my @pairs = pairs @array;
+
+Return an array of arrayrefs of pairs from the given even-sized array.
+
+=cut
+
+# This duplicates List::Util pair, but this is not included in Perl 5.10
+sub pairs(@) {
+    my ( @array ) = @_;
+    my @pairs;
+    while ( @array ) {
+        push @pairs, [ shift( @array ), shift( @array ) ];
+    }
+    return @pairs;
+}
+
+=sub pairkeys
+
+    my @keys = pairkeys @array;
+
+Return the first item of every pair of items in an even-sized array.
+
+=cut
+
+# This duplicates List::Util pairkeys, but this is not included in Perl 5.10
+sub pairkeys(@) {
+    return map $_[$_], grep { $_ % 2 == 0 } 0..$#_;
 }
 
 1;

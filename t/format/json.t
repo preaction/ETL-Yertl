@@ -2,7 +2,7 @@
 use ETL::Yertl 'Test';
 use Test::Lib;
 use ETL::Yertl::Format::json;
-use List::Util qw( pairkeys );
+use ETL::Yertl::Util qw( pairkeys );
 
 my @FORMATTER_MODULES;
 BEGIN {
