@@ -36,13 +36,13 @@ our $GRAMMAR = qr{
         (?<OP>eq|ne|==?|!=|>=?|<=?)
         (?<FUNC_NAME>empty|select|grep|group_by|keys|length|sort|each)
         (?<EXPR>
-            \{(\s*(?&FILTER)\s*:\s*(?0)\s*(?:,(?-1))*)\} # Hash constructor
+            \{\s*(?&FILTER)\s*:\s*(?0)\s*(?:,(?-1))*\} # Hash constructor
             |
-            \[(\s*(?0)\s*(?:,(?-1))*)\] # Array constructor
+            \[\s*(?0)\s*(?:,(?-1))*\] # Array constructor
             |
             (?&FUNC_NAME)(?:\(\s*(?&EXPR)\s*(?:,\s*(?&EXPR)\s*)*\))? # Function with optional argument(s)
             |
-            (?:(?&FILTER)|(?&FUNC_NAME)(?:\(\s*((?&EXPR))\s*\))?)\s+(?&OP)\s+(?&EXPR) # Binop with filter
+            (?:(?&FILTER)|(?&FUNC_NAME)(?:\(\s*(?&EXPR)\s*\))?)\s+(?&OP)\s+(?&EXPR) # Binop with filter
             |
             (?&FILTER)
         )
