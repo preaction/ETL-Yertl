@@ -40,7 +40,7 @@ our $GRAMMAR = qr{
             |
             \[(\s*(?0)\s*(?:,(?-1))*)\] # Array constructor
             |
-            (?&FUNC_NAME)(?:\(\s*((?&EXPR))\s*\))? # Function with optional argument
+            (?&FUNC_NAME)(?:\(\s*(?&EXPR)\s*(?:,\s*(?&EXPR)\s*)*\))? # Function with optional argument(s)
             |
             (?:(?&FILTER)|(?&FUNC_NAME)(?:\(\s*((?&EXPR))\s*\))?)\s+(?&OP)\s+(?&EXPR) # Binop with filter
             |
@@ -99,36 +99,35 @@ sub filter {
         return map { $class->filter( $_, $doc, $scope, $orig_doc ) } @filters;
     }
     # Function calls
-    elsif ( $filter =~ /^((?&FUNC_NAME))(?:\(\s*((?&EXPR))\s*\))?$GRAMMAR$/ ) {
-        my ( $func, $expr ) = ( $1, $2 );
-        diag( 1, "F: $func, ARG: " . ( $expr || '' ) );
+    elsif ( my ( $func, @args ) = $filter =~ /^((?&FUNC_NAME))(?:\(\s*((?&EXPR))\s*(?:,\s*((?&EXPR))\s*)*\))?$GRAMMAR$/ ) {
+        diag( 1, "F: $func, ARGS: " . ( join( ', ', grep defined, @args ) || '' ) );
         if ( $func eq 'empty' ) {
-            if ( $expr ) {
+            if ( @args ) {
                 warn "empty does not take arguments\n";
             }
             return empty;
         }
         elsif ( $func eq 'select' || $func eq 'grep' ) {
-            if ( !$expr ) {
+            if ( !@args ) {
                 warn "'$func' takes an expression argument";
                 return empty;
             }
-            return $class->filter( $expr, $doc, $scope, $orig_doc ) ? $doc : empty;
+            return $class->filter( $args[0], $doc, $scope, $orig_doc ) ? $doc : empty;
         }
         elsif ( $func eq 'group_by' ) {
-            my $grouping = $class->filter( $expr, $doc, $scope, $orig_doc );
+            my $grouping = $class->filter( $args[0], $doc, $scope, $orig_doc );
             push @{ $scope->{ group_by }{ $grouping } }, $doc;
             return;
         }
         elsif ( $func eq 'sort' ) {
-            $expr ||= '.';
-            my $value = $class->filter( $expr, $doc, $scope, $orig_doc );
+            $args[0] ||= '.';
+            my $value = $class->filter( $args[0], $doc, $scope, $orig_doc );
             push @{ $scope->{sort} }, [ "$value", $doc ];
             return;
         }
         elsif ( $func eq 'keys' ) {
-            $expr ||= '.';
-            my $value = $class->filter( $expr, $doc, $scope, $orig_doc );
+            $args[0] ||= '.';
+            my $value = $class->filter( $args[0], $doc, $scope, $orig_doc );
             if ( ref $value eq 'HASH' ) {
                 return [ keys %$value ];
             }
@@ -141,8 +140,8 @@ sub filter {
             }
         }
         elsif ( $func eq 'each' ) {
-            $expr ||= '.';
-            my $value = $class->filter( $expr, $doc, $scope, $orig_doc );
+            $args[0] ||= '.';
+            my $value = $class->filter( $args[0], $doc, $scope, $orig_doc );
             if ( ref $value eq 'HASH' ) {
                 return map +{ key => $_, value => $value->{ $_ } }, keys %$value;
             }
@@ -155,8 +154,8 @@ sub filter {
             }
         }
         elsif ( $func eq 'length' ) {
-            $expr ||= '.';
-            my $value = $class->filter( $expr, $doc, $scope, $orig_doc );
+            $args[0] ||= '.';
+            my $value = $class->filter( $args[0], $doc, $scope, $orig_doc );
             if ( ref $value eq 'HASH' ) {
                 return scalar keys %$value;
             }
