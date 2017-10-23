@@ -43,6 +43,7 @@ use JSON::MaybeXS qw( decode_json );
 use List::Util qw( first );
 use IO::Async::Loop;
 use Time::Piece ();
+use Scalar::Util qw( looks_like_number );
 
 =method new
 
@@ -211,11 +212,12 @@ sub write_ts {
         }
 
         my $ts = '';
-        if ( $point->{timestamp} ) {
-            $point->{timestamp} =~ s/[.]\d+Z?$//; # We do not support nanoseconds
-            $ts = " " . (
-                Time::Piece->strptime( $point->{timestamp}, '%Y-%m-%dT%H:%M:%S' )->epoch * 10**9
-            );
+        if ( my $epoch = $point->{timestamp} ) {
+            if ( !looks_like_number( $epoch ) ) {
+                $epoch =~ s/[.]\d+Z?$//; # We do not support nanoseconds
+                $epoch = Time::Piece->strptime( $epoch, '%Y-%m-%dT%H:%M:%S' )->epoch;
+            }
+            $ts = " " . ( $epoch * 10**9 );
         }
 
         push @{ $db_lines{ $db } }, sprintf '%s%s %s=%s%s',

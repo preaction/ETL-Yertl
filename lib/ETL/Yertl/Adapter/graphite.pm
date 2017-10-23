@@ -40,6 +40,7 @@ use JSON::MaybeXS qw( decode_json );
 use List::Util qw( first );
 use IO::Async::Loop;
 use Time::Piece ();
+use Scalar::Util qw( looks_like_number );
 
 =method new
 
@@ -214,9 +215,11 @@ sub write_ts {
     for my $point ( @points ) {
         die "Tags are not supported by Graphite" if $point->{tags} && keys %{ $point->{tags} };
         $point->{timestamp} =~ s/[.]\d+Z?$//; # We do not support nanoseconds
+        if ( !looks_like_number( $point->{timestamp} ) ) {
+            $point->{timestamp} = Time::Piece->strptime( $point->{timestamp}, '%Y-%m-%dT%H:%M:%S' )->epoch;
+        }
         $sock->write(
-            join( " ", $point->{metric}, $point->{value},
-            Time::Piece->strptime( $point->{timestamp}, '%Y-%m-%dT%H:%M:%S' )->epoch, )
+            join( " ", $point->{metric}, $point->{value}, $point->{timestamp}, )
             . "\n",
         );
     }
@@ -231,6 +234,10 @@ sub write_ts {
 # HH:MM_YYYYMMDD
 sub _format_graphite_dt {
     my ( $iso ) = @_;
+    if ( looks_like_number( $iso ) ) {
+        my $t = Time::Piece->new( $iso );
+        return sprintf "%s:%s_%s%s%s", $t->hour, $t->min, $t->year, $t->mon, $t->mday;
+    }
     if ( $iso =~ /^(\d{4})-?(\d{2})-?(\d{2})$/ ) {
         return join "", $1, $2, $3;
     }

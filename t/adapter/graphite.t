@@ -123,7 +123,7 @@ subtest 'write ts' => sub {
 
     my @points = (
         {
-            timestamp => '2017-01-01T00:00:00',
+            timestamp => 1483228800,
             metric => 'mydb.cpu_load.5m',
             value => 1.23,
         },

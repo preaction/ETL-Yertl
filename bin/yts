@@ -100,8 +100,8 @@ formats:
 This format is a series of YAML documents that describe each point
 fully. Use this format if you want to write to many different metrics
 with different tags for each metric. The timestamp can be any ISO8601
-date/time format. The value can be anything the time series database
-accepts.
+date/time format or an epoch timestamp. The value can be anything the
+time series database accepts.
 
     ---
     timestamp: 2017-01-01T00:00:00
@@ -123,8 +123,8 @@ tagging, C<yts> will exit with an error message.
 
 If you pass in the C<--short> option, you can use the short format.
 This format is a set of date/value pairs. The date can be any ISO8601
-date/time format. The value can be anything the time series database
-accepts.
+date/time format or an epoch timestamp. The value can be anything the
+time series database accepts.
 
     ---
     '2017-01-01T00:00:00': 1.23
@@ -162,13 +162,13 @@ See the adapter documentation for more information.
 
 When reading, only get points starting at or after the given date/time.
 Date/time are accepted in any ISO8601 format (C<YYYY-MM-DD>,
-C<YYYY-MM-DDTHH:MM:SS>).
+C<YYYY-MM-DDTHH:MM:SS>) or as a UNIX epoch timestamp.
 
 =head2 --end <datetime>
 
 When reading, only get points ending at or before the given date/time.
 Date/time are accepted in any ISO8601 format (C<YYYY-MM-DD>,
-C<YYYY-MM-DDTHH:MM:SS>).
+C<YYYY-MM-DDTHH:MM:SS>) or as a UNIX epoch timestamp.
 
 =head2 --tag <name>=<value>
 
