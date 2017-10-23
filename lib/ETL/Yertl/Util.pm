@@ -15,7 +15,7 @@ use Exporter qw( import );
 use Module::Runtime qw( use_module compose_module_name );
 
 our @EXPORT_OK = qw(
-    load_module pairs pairkeys
+    load_module pairs pairkeys firstidx
 );
 
 =sub load_module
@@ -83,6 +83,25 @@ Return the first item of every pair of items in an even-sized array.
 # This duplicates List::Util pairkeys, but this is not included in Perl 5.10
 sub pairkeys(@) {
     return map $_[$_], grep { $_ % 2 == 0 } 0..$#_;
+}
+
+=sub firstidx
+
+    my $i = firstidx { ... } @array;
+
+Return the index of the first item that matches the code block, or C<-1> if
+none match
+
+=cut
+
+# This duplicates List::Util firstidx, but this is not included in Perl 5.10
+sub firstidx(&@) {
+    my $code = shift;
+    for my $i ( 0 .. @_ ) {
+        local $_ = $_[ $i ];
+        return $i if $code->();
+    }
+    return -1;
 }
 
 1;

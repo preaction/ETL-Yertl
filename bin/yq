@@ -590,7 +590,44 @@ document containing a hash of arrays.
 
 NOTE: If you are filtering a lot of documents, this will consume a lot of memory.
 
+=item parse_time( EXPRESSION, FORMAT )
+
+Parse the date/time string in C<EXPRESSION> and return the number of
+seconds since the UNIX epoch (1970-01-01 00:00:00). C<FORMAT> is
+optional, and will try to guess what format the date/time is in.
+
+C<FORMAT> may be one of the following:
+
+=over
+
+=item iso
+
+An ISO8601 date/time string with a 4-digit year. 2-digit years, week
+numbers, and year days are not (yet) supported.
+
+    2017-01-01T00:00:00
+    2017-01-01 00:00:00
+    2017-01-01
+    20170101000000
+    201701010000
+    20170101
+
+=item apache
+
+The date/time format used by the Common Log Format (Apache HTTP logs).
+
+    01/Jan/2017:00:00:00
+
 =back
+
+    # INPUT
+    timestamp: 2017-01-01 00:00:00
+
+    $ yq '.timestamp = parse_time( .timestamp, "iso" )'
+    timestamp: 1483228800
+
+    $ yq '.timestamp = parse_time( .timestamp )'
+    timestamp: 1483228800
 
 =head2 CONDITIONALS
 

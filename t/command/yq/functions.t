@@ -248,4 +248,60 @@ subtest 'length( EXPR )' => sub {
     };
 };
 
+subtest 'date/time functions' => sub {
+
+    my $epoch = 1483228800;
+    my %parse_formats = (
+        iso => [
+            '2017-01-01T00:00:00',
+            '2017-01-01 00:00:00',
+            '2017-01-01',
+            '20170101000000',
+            '201701010000',
+            '20170101',
+        ],
+        # http => [
+        #     'Sun, 01 Jan 2017 00:00:00 GMT', # Current HTTP date
+        #     'Sunday, 01-Jan-17 00:00:00 GMT', # Obsolete HTTP date
+        #     'Sun Jan  1 00:00:00 2017', # Obsolete HTTP date
+        #     '01/Jan/2017:00:00:00 -0000', # Common Log Format
+        # ],
+        apache => [
+            '01/Jan/2017:00:00:00 -0000', # Common Log Format
+        ],
+        # mail => [
+        #     'Sun, 01 Jan 2017 00:00:00', # RFC2822 date
+        # ],
+    );
+
+    my $test_parse = sub {
+        my ( $str, $format ) = @_;
+        $format ||= '';
+        if ( $format ) {
+            $format = ", $format";
+        }
+        my $doc = {
+            timestamp => $str,
+        };
+        my @out;
+        eval {
+            @out = $class->filter( ".timestamp = parse_time( .timestamp$format )", $doc );
+        };
+        ok !$@, 'filter ran successfully' or diag $@;
+        cmp_deeply \@out, bag(
+            { timestamp => 1483228800 },
+        ) or diag explain \@out;
+    };
+
+    subtest 'parse_time' => sub {
+        for my $format ( keys %parse_formats ) {
+            for my $str ( @{ $parse_formats{ $format } } ) {
+                subtest "parse format $format - $str" => $test_parse, $str, $format;
+                subtest "parse format $format - $str (autodetect)" => $test_parse, $str;
+            }
+        }
+    };
+
+};
+
 done_testing;

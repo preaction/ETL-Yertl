@@ -5,6 +5,8 @@ our $VERSION = '0.036';
 use ETL::Yertl;
 use boolean qw( :all );
 use Regexp::Common;
+use Time::Local qw( timegm );
+use ETL::Yertl::Util qw( firstidx );
 
 sub empty() {
     bless {}, 'empty';
@@ -34,7 +36,7 @@ our $GRAMMAR = qr{
             \w+ # Constant/bareword
         )
         (?<OP>eq|ne|==?|!=|>=?|<=?)
-        (?<FUNC_NAME>empty|select|grep|group_by|keys|length|sort|each)
+        (?<FUNC_NAME>empty|select|grep|group_by|keys|length|sort|each|parse_time)
         (?<EXPR>
             \{\s*(?&FILTER)\s*:\s*(?0)\s*(?:,(?-1))*\} # Hash constructor
             |
@@ -55,6 +57,17 @@ my $FUNC_NAME = qr{(?&FUNC_NAME)$GRAMMAR};
 my $EXPR = qr{(?&EXPR)$GRAMMAR};
 my $PIPE = qr{[|]};
 
+my @DAYS = qw< sun sunday mon monday tue tuesday wed wednesday thu thursday fri friday sat saturday sun sunday>;
+my $DAYS = qr{@{[ join '|', @DAYS ]}}i;
+my @MONTHS = qw< jan feb mar apr may jun jul aug sep oct nov dec >;
+my $MONTHS = qr{@{[ join '|', @MONTHS ]}}i;
+
+my %PARSE_TIME = (
+    iso => qr{(?<y>\d{4})-?(?<m>\d{2})-?(?<d>\d{2})(?:[ T]?(?<h>\d{2}):?(?<n>\d{2})(?::?(?<s>\d{2})))?},
+    apache => qr{(?<d>\d{2})/(?<mn>$MONTHS)/(?<y>\d{4}):(?<h>\d{2}):(?<n>\d{2}):(?<s>\d{2})},
+);
+$PARSE_TIME{auto} = qr{$PARSE_TIME{iso}|$PARSE_TIME{apache}};
+
 # Filter MUST NOT mutate $doc!
 sub filter {
     my ( $class, $filter, $doc, $scope, $orig_doc ) = @_;
@@ -73,6 +86,7 @@ sub filter {
         }
         return @in;
     }
+
     # Hash constructor
     elsif ( $filter =~ /^{/ ) {
         my %out;
@@ -84,6 +98,7 @@ sub filter {
         }
         return \%out;
     }
+
     # Array constructor
     elsif ( $filter =~ /^\[/ ) {
         my @out;
@@ -93,11 +108,7 @@ sub filter {
         }
         return \@out;
     }
-    # , does multiple filters, yielding multiple documents
-    elsif ( $filter =~ /,/ ) {
-        my @filters = split /\s*,\s*/, $filter;
-        return map { $class->filter( $_, $doc, $scope, $orig_doc ) } @filters;
-    }
+
     # Function calls
     elsif ( my ( $func, @args ) = $filter =~ /^((?&FUNC_NAME))(?:\(\s*((?&EXPR))\s*(?:,\s*((?&EXPR))\s*)*\))?$GRAMMAR$/ ) {
         diag( 1, "F: $func, ARGS: " . ( join( ', ', grep defined, @args ) || '' ) );
@@ -170,7 +181,28 @@ sub filter {
                 return empty;
             }
         }
+        elsif ( $func eq 'parse_time' ) {
+            my ( $expr, $format ) = @args;
+            $format ||= 'auto';
+            die sprintf "Invalid format '%s' in parse_time()\n", $format
+                if !$PARSE_TIME{ $format};
+            my $value = $class->filter( $expr, $doc, $scope, $orig_doc );
+            diag( 1, "FMT: $PARSE_TIME{ $format }, VAL: $value" );
+            if ( $value =~ $PARSE_TIME{ $format } ) {
+                my @tlargs = @{+}{qw< s n h d m y >};
+                if ( !$+{m} && ( my $mname = $+{mn} ) ) {
+                    $tlargs[4] = firstidx { /$mname/i } @MONTHS;
+                }
+                else {
+                    $tlargs[4] -= 1;
+                }
+                return timegm( @tlargs );
+            }
+            warn sprintf "time '%s' does not match format '%s'\n", $value, $format;
+            return empty;
+        }
     }
+
     # Hash and array keys to traverse the data structure
     elsif ( $filter =~ /^((?&FILTER))$GRAMMAR$/ ) {
         # Extract quoted strings
@@ -274,6 +306,7 @@ sub filter {
             }
         }
     }
+
     # Conditional (if/then/else)
     # NOTE: If we're capturing using $EXPR, then we _must_ use named captures,
     # because $EXPR has captures in itself
@@ -287,6 +320,17 @@ sub filter {
             return $false_filter ? $class->filter( $false_filter, $doc, $scope, $orig_doc ) : ();
         }
     }
+
+    # , does multiple filters, yielding multiple documents
+    # This must be the least-specific rule because of all the other
+    # possible uses of the comma
+    # XXX: In the future, this should be used to parse function
+    # arguments to allow for recursion
+    elsif ( $filter =~ /,/ ) {
+        my @filters = split /\s*,\s*/, $filter;
+        return map { $class->filter( $_, $doc, $scope, $orig_doc ) } @filters;
+    }
+
     else {
         die "Could not parse filter '$filter'\n";
     }
