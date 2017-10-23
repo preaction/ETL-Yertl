@@ -193,8 +193,8 @@ The metric to write. For Graphite, this is a path separated by dots
 
 =item timestamp
 
-An ISO8601 timestamp. Optional. Defaults to the current time on the
-InfluxDB server.
+An ISO8601 timestamp or UNIX epoch time. Optional. Defaults to the
+current time.
 
 =item value
 
@@ -214,6 +214,7 @@ sub write_ts {
     my $sock = $self->write_client;
     for my $point ( @points ) {
         die "Tags are not supported by Graphite" if $point->{tags} && keys %{ $point->{tags} };
+        $point->{timestamp} ||= time;
         $point->{timestamp} =~ s/[.]\d+Z?$//; # We do not support nanoseconds
         if ( !looks_like_number( $point->{timestamp} ) ) {
             $point->{timestamp} = Time::Piece->strptime( $point->{timestamp}, '%Y-%m-%dT%H:%M:%S' )->epoch;

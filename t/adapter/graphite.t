@@ -132,14 +132,21 @@ subtest 'write ts' => sub {
             metric => 'mydb.cpu_load.1m',
             value => 1.26,
         },
+        {
+            metric => 'mydb.cpu_load.1m',
+            value => 1.31,
+        },
     );
 
+    my $time = time;
+    local *CORE::GLOBAL::time = sub { $time };
     $db->write_ts( @points );
     wait_for { $empty };
 
     my @lines = (
         "mydb.cpu_load.5m 1.23 1483228800",
         "mydb.cpu_load.1m 1.26 1483229100",
+        "mydb.cpu_load.1m 1.31 " . $time,
         ""
     );
     my $buffer;

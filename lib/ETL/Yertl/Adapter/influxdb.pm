@@ -189,8 +189,8 @@ and field separated by dots (C<.>). Field defaults to C<value>.
 
 =item timestamp
 
-An ISO8601 timestamp. Optional. Defaults to the current time on the
-InfluxDB server.
+An ISO8601 timestamp or UNIX epoch time. Optional. Defaults to the
+current time.
 
 =item value
 
@@ -212,7 +212,7 @@ sub write_ts {
         }
 
         my $ts = '';
-        if ( my $epoch = $point->{timestamp} ) {
+        if ( my $epoch = $point->{timestamp} || time ) {
             if ( !looks_like_number( $epoch ) ) {
                 $epoch =~ s/[.]\d+Z?$//; # We do not support nanoseconds
                 $epoch = Time::Piece->strptime( $epoch, '%Y-%m-%dT%H:%M:%S' )->epoch;
