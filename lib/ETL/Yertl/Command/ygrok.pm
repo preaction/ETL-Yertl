@@ -112,6 +112,13 @@ our %PATTERNS = (
         ),
     },
 
+    LINUX => {
+        PROC => {
+            UPTIME => '%{NUM:uptime}\s+%{NUM:idletime}',
+            LOADAVG => '%{NUM:load1m}\s+%{NUM:load5m}\s+%{NUM:load15m}\s+%{INT:running}/%{INT:total}\s+%{INT:lastpid}',
+        },
+    },
+
 );
 
 sub main {
