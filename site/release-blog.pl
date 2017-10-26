@@ -49,7 +49,6 @@ sub main {
     say "";
     say "In this release:";
     say "";
-    say "[More information about $DIST v$version on MetaCPAN](http://metacpan.org/release/PREACTION/$DIST-$version)";
 
     for my $group ( $release->groups ) {
         say "## $group";
@@ -61,6 +60,8 @@ sub main {
         }
         say "";
     }
+
+    say "[More information about $DIST v$version on MetaCPAN](http://metacpan.org/release/PREACTION/$DIST-$version)";
 
     return 0;
 }
