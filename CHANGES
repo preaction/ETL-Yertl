@@ -2,6 +2,8 @@ Changelog for ETL-Yertl
 
 {{ $NEXT }}
 
+0.036     2017-10-25 23:32:12-05:00 America/Chicago
+
     [Removed]
 
     - Removed the `ymask` command and associated prereqs. This command
