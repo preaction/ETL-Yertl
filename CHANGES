@@ -2,6 +2,34 @@ Changelog for ETL-Yertl
 
 {{ $NEXT }}
 
+    [Removed]
+
+    - Removed the `ymask` command and associated prereqs. This command
+      just wasn't very useful, and depended on a module that requires
+      a compiler.
+
+    [Added]
+
+    - Added `parse_time` function to `yq`. This function parses
+      a date/time string into a UNIX epoch.
+
+    - Added epoch timestamps as an allowed format for `yts` time series
+      timestamps.
+
+    - Add default timestamps of "now" in `yts`. This makes all time
+      series databases the same and makes it easier to add metrics.
+
+    - Added 'LINUX.PROC.LOADAVG' and 'LINUX.PROC.UPTIME' patterns to
+      `ygrok` to parse the `/proc/loadavg` and `/proc/uptime` files on
+      Linux systems.
+
+    [Fixed]
+
+    - Reduced version requirement for List::Util. This continues our
+      quest to be installable on a core Perl 5.10 without a compiler.
+
+    - Removed unused prereq (Text::Trim).
+
 0.035     2017-10-18 20:52:11-05:00 America/Chicago
 
     [Fixed]

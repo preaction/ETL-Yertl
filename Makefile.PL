@@ -16,7 +16,6 @@ my %WriteMakefileArgs = (
   "EXE_FILES" => [
     "bin/yfrom",
     "bin/ygrok",
-    "bin/ymask",
     "bin/yq",
     "bin/ysql",
     "bin/yto",
@@ -26,7 +25,6 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "ETL::Yertl",
   "PREREQ_PM" => {
-    "Data::Partial::Google" => 0,
     "File::HomeDir" => 0,
     "File::Spec" => 0,
     "Getopt::Long" => "2.36",
@@ -34,14 +32,14 @@ my %WriteMakefileArgs = (
     "IO::Interactive" => 0,
     "Import::Base" => "0.010",
     "JSON::MaybeXS" => 0,
-    "List::Util" => "1.29",
+    "List::Util" => 0,
     "Module::Runtime" => 0,
     "Net::Async::HTTP" => 0,
     "Path::Tiny" => "0.072",
     "Pod::Usage::Return" => 0,
     "Regexp::Common" => "2013031301",
     "SQL::Abstract" => 0,
-    "Text::Trim" => 0,
+    "Time::Local" => 0,
     "Time::Piece" => 0,
     "URI" => 0,
     "YAML::Tiny" => 0,
@@ -65,14 +63,13 @@ my %WriteMakefileArgs = (
   },
   "VERSION" => "0.036",
   "test" => {
-    "TESTS" => "t/*.t t/adapter/*.t t/bin/*.t t/command/ygrok/*.t t/command/ygrok/pattern/*.t t/command/yq/*.t t/format/*.t"
+    "TESTS" => "t/*.t t/adapter/*.t t/bin/*.t t/command/ygrok/*.t t/command/ygrok/pattern/*.t t/command/yq/*.t t/format/*.t t/integration/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
   "Capture::Tiny" => 0,
-  "Data::Partial::Google" => 0,
   "Dir::Self" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::HomeDir" => 0,
@@ -86,7 +83,7 @@ my %FallbackPrereqs = (
   "Import::Base" => "0.010",
   "JSON::MaybeXS" => 0,
   "JSON::PP" => 0,
-  "List::Util" => "1.29",
+  "List::Util" => 0,
   "Mock::MonkeyPatch" => 0,
   "Module::Runtime" => 0,
   "Net::Async::HTTP" => 0,
@@ -99,7 +96,7 @@ my %FallbackPrereqs = (
   "Test::Exception" => 0,
   "Test::Lib" => 0,
   "Test::More" => "1.001005",
-  "Text::Trim" => 0,
+  "Time::Local" => 0,
   "Time::Piece" => 0,
   "URI" => 0,
   "YAML::Tiny" => 0,
