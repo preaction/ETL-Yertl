@@ -54,7 +54,7 @@ sub main {
         say "## $group";
         say "";
         for my $change ( @{ $release->changes( $group ) } ) {
-            $change =~ s{\[Github \#(\d+)\]}{[\[Github #$1\]]($GITHUB_ROOT/issues/$1)}g;
+            $change =~ s{[\[(]Github \#(\d+)[\])]}{[\[Github #$1\]]($GITHUB_ROOT/issues/$1)}g;
             $change =~ s{\@(\w+)}{[\@$1](http://github.com/$1)}g;
             say "* " . $change;
         }
