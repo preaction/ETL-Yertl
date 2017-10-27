@@ -1,6 +1,6 @@
 
 use ETL::Yertl 'Test';
-use YAML qw( Dump Load );
+use YAML::Tiny;
 use Capture::Tiny qw( capture );
 use File::Spec;
 my $SHARE_DIR = path( __DIR__, '..', 'share' );
@@ -31,7 +31,7 @@ subtest 'empty does not print' => sub {
     my $filter = 'if .foo eq bar then .foo else empty';
     my ( $output, $stderr ) = capture { yq->main( $filter ) };
     ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
-    my @got = YAML::Load( $output );
+    my @got = @{ YAML::Tiny->read_string( $output ) };
     cmp_deeply \@got, [ 'bar' ];
 };
 
@@ -40,7 +40,7 @@ subtest 'single document with no --- separator' => sub {
     my $filter = '.flip.[0]';
     my ( $output, $stderr ) = capture { yq->main( $filter ) };
     ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
-    my @got = YAML::Load( $output );
+    my @got = @{ YAML::Tiny->read_string( $output ) };
     cmp_deeply \@got, [ 'flop' ];
 };
 
@@ -49,7 +49,7 @@ subtest 'file in ARGV' => sub {
     my $filter = '.foo';
     my ( $output, $stderr ) = capture { yq->main( $filter, "$file" ) };
     ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
-    my @got = YAML::Load( $output );
+    my @got = @{ YAML::Tiny->read_string( $output ) };
     cmp_deeply \@got, [ 'bar' ];
 
     subtest 'multiple files with no seperators' => sub {
@@ -57,7 +57,7 @@ subtest 'file in ARGV' => sub {
         my $filter = '.foo';
         my ( $output, $stderr ) = capture { yq->main( $filter, "$file", "$file" ) };
         ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
-        my @got = YAML::Load( $output );
+        my @got = @{ YAML::Tiny->read_string( $output ) };
         cmp_deeply \@got, [ 'bar', 'bar' ];
     };
 };
@@ -67,7 +67,7 @@ subtest 'multiple documents print properly' => sub {
     my $filter = '.foo, .baz';
     my ( $output, $stderr ) = capture { yq->main( $filter ) };
     ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
-    my @got = YAML::Load( $output );
+    my @got = @{ YAML::Tiny->read_string( $output ) };
     cmp_deeply \@got, [ 'bar', 'buzz' ];
 };
 
