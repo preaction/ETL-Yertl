@@ -1,5 +1,5 @@
 package ETL::Yertl::Command::yts;
-our $VERSION = '0.037';
+our $VERSION = '0.038';
 # ABSTRACT: Read/Write time series data
 
 =head1 SYNOPSIS

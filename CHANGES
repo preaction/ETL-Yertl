@@ -2,6 +2,8 @@ Changelog for ETL-Yertl
 
 {{ $NEXT }}
 
+0.037     2017-10-27 17:27:41-05:00 America/Chicago
+
     [Fixed]
 
     - Fixed test that depended on YAML.pm (which we removed as
