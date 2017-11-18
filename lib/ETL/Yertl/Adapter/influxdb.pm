@@ -44,6 +44,7 @@ use List::Util qw( first );
 use IO::Async::Loop;
 use Time::Piece ();
 use Scalar::Util qw( looks_like_number );
+use bigint;
 
 =method new
 

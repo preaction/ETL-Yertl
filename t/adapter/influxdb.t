@@ -148,18 +148,22 @@ subtest 'write ts' => sub {
     );
 
     my $time = time;
+    no warnings 'once';
     local *CORE::GLOBAL::time = sub { $time };
     $db->write_ts( @points );
 
     ok $mock->called, 'mock POST called';
     my $args = $mock->method_arguments;
     is $args->[0], 'http://localhost:8086/write?db=mydb', 'POST URL correct';
-    my @lines = (
-        "cpu_load 5m=1.23 1483228800000000000",
-        "cpu_load 5m=1.25 1483229100000000000",
-        "cpu_load 1m=1.26 " . ( $time * 10**9 ),
-    );
-    is $args->[1], join( "\n", @lines ), 'influxdb line protocol points correct';
+    {
+        use bigint;
+        my @lines = (
+            "cpu_load 5m=1.23 1483228800000000000",
+            "cpu_load 5m=1.25 1483229100000000000",
+            "cpu_load 1m=1.26 " . ( $time * 10**9 ),
+        );
+        is $args->[1], join( "\n", @lines ), 'influxdb line protocol points correct';
+    }
     cmp_deeply { @{ $args }[ 2..$#$args ] },
         { content_type => 'text/plain' },
         'additional options are correct';
