@@ -282,7 +282,7 @@ sub config {
     my $conf_file = path( File::HomeDir->my_home, '.yertl', 'ysql.yml' );
     my $config;
     if ( $conf_file->exists ) {
-        ( $config ) = docs_from_string( $conf_file->slurp );
+        ( $config ) = docs_from_string( yaml => $conf_file->slurp );
     }
     return $config || {};
 }
