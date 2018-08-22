@@ -42,6 +42,7 @@ sub main {
 
     my $out = ETL::Yertl::FormatStream->new_for_stdout(
         format => $out_format,
+        autoflush => 1,
     );
     $loop->add( $out );
 

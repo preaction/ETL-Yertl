@@ -53,6 +53,8 @@ sub read_buffer {
         chomp( my $e = $@ );
 
         if ( $doc ) {
+            #; use Data::Dumper;
+            #; say STDERR "## Got document " . Dumper $doc;
             push @docs, $doc;
             redo PARSE_ONE;
         }

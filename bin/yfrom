@@ -40,7 +40,9 @@ sub main {
 
     my $loop = IO::Async::Loop->new;
 
-    my $out = ETL::Yertl::FormatStream->new_for_stdout;
+    my $out = ETL::Yertl::FormatStream->new_for_stdout(
+        autoflush => 1,
+    );
     $loop->add( $out );
 
     push @files, "-" unless @files;
