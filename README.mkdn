@@ -4,7 +4,7 @@ ETL::Yertl - ETL with a Shell
 
 # VERSION
 
-version 0.037
+version 0.038
 
 # STATUS
 

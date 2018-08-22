@@ -2,6 +2,13 @@ Changelog for ETL-Yertl
 
 {{ $NEXT }}
 
+    [Fixed]
+
+    - Fixed many Yertl commands running out of memory when parsing
+      large-ish files.
+    - Fixed long delay before producing documents when reading large
+      files.
+
 0.037     2017-10-27 17:27:41-05:00 America/Chicago
 
     [Fixed]
