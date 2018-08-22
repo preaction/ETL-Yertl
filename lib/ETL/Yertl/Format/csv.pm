@@ -1,5 +1,5 @@
 package ETL::Yertl::Format::csv;
-our $VERSION = '0.039';
+our $VERSION = '0.040';
 # ABSTRACT: CSV read/write support for Yertl
 
 =head1 SYNOPSIS

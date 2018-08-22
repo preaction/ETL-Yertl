@@ -2,6 +2,8 @@ Changelog for ETL-Yertl
 
 {{ $NEXT }}
 
+0.039     2018-08-22 13:09:41-05:00 America/Chicago
+
     [Fixed]
 
     - Fixed output from commands not having all the documents. We now
