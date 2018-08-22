@@ -161,13 +161,13 @@ sub main {
                     say $pattern;
                 }
                 else {
-                    my $out_fmt = load_module( format => 'default' )->new;
+                    my $out_fmt = ETL::Yertl::Format->get_default;
                     say $out_fmt->format( $pattern );
                 }
             }
             else {
                 # Show all patterns we know about
-                my $out_fmt = load_module( format => 'default' )->new;
+                my $out_fmt = ETL::Yertl::Format->get_default;
                 say $out_fmt->format( $patterns );
             }
         }

@@ -92,7 +92,7 @@ sub main {
     # Read metrics
     else {
         die "Must give a metric\n" unless $metric;
-        my $out_fmt = load_module( format => 'default' )->new;
+        my $out_fmt = ETL::Yertl::Format->get_default;
         my @points = $db->read_ts( {
             metric => $metric,
             tags => $opt{tags},
