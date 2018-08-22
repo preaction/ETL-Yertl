@@ -2,6 +2,8 @@ Changelog for ETL-Yertl
 
 {{ $NEXT }}
 
+0.038     2018-08-22 00:11:50-05:00 America/Chicago
+
     [Fixed]
 
     - Fixed many Yertl commands running out of memory when parsing

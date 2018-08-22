@@ -1,5 +1,5 @@
 package ETL::Yertl::Command::yq;
-our $VERSION = '0.038';
+our $VERSION = '0.039';
 # ABSTRACT: Filter and construct documents using a mini-language
 
 use ETL::Yertl;
