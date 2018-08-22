@@ -1,8 +1,6 @@
 
 use ETL::Yertl 'Test';
 use Capture::Tiny qw( capture );
-use ETL::Yertl::Format::yaml;
-use ETL::Yertl::Format::json;
 my $SHARE_DIR = path( __DIR__, '..', 'share' );
 
 my $script = "$FindBin::Bin/../../bin/yto";
@@ -25,15 +23,13 @@ subtest 'error checking' => sub {
 };
 
 subtest 'DOC -> JSON' => sub {
-    my @expect = ETL::Yertl::Format::yaml->new( input => $doc_fn->openr )->read;
+    my @expect = docs_from_string( yaml => $doc_fn->slurp );
 
     subtest 'filename' => sub {
         my ( $stdout, $stderr, $exit ) = capture { yto->main( 'json', $doc_fn ) };
         is $exit, 0, 'exit 0';
         ok !$stderr, 'nothing on stderr' or diag $stderr;
-        open my $fh, '<', \$stdout;
-        my $json_fmt = ETL::Yertl::Format::json->new( input => $fh );
-        cmp_deeply [ $json_fmt->read ], \@expect;
+        cmp_deeply [ docs_from_string( json => $stdout ) ], \@expect;
     };
 
     subtest 'stdin' => sub {
@@ -43,9 +39,7 @@ subtest 'DOC -> JSON' => sub {
         is $exit, 0, 'exit 0';
         ok !$stderr, 'nothing on stderr' or diag $stderr;
 
-        open my $fh, '<', \$stdout;
-        my $json_fmt = ETL::Yertl::Format::json->new( input => $fh );
-        cmp_deeply [ $json_fmt->read ], \@expect;
+        cmp_deeply [ docs_from_string( json => $stdout ) ], \@expect;
     };
 };
 

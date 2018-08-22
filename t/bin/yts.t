@@ -40,9 +40,7 @@ subtest 'read' => sub {
         is $exit, 0;
         ok !$stderr, 'nothing on stderr' or diag $stderr;
 
-        open my $fh, '<', \$stdout;
-        my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
-        cmp_deeply [ $yaml_fmt->read ], \@ts;
+        cmp_deeply [ docs_from_string( $stdout ) ], \@ts;
     };
 
     subtest 'read metric -- short' => sub {
@@ -52,9 +50,9 @@ subtest 'read' => sub {
         is $exit, 0;
         ok !$stderr, 'nothing on stderr' or diag $stderr;
 
-        open my $fh, '<', \$stdout;
-        my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
-        cmp_deeply [ $yaml_fmt->read ], [ { map {; $_->{timestamp}, $_->{value} } @ts } ];
+        cmp_deeply
+            [ docs_from_string( $stdout ) ],
+            [ { map {; $_->{timestamp}, $_->{value} } @ts } ];
     };
 
     subtest 'read metric -- start/end' => sub {
@@ -75,9 +73,7 @@ subtest 'read' => sub {
             'read_ts args correct'
                 or diag explain \@ETL::Yertl::Adapter::test::LAST_READ_TS_ARGS;
 
-        open my $fh, '<', \$stdout;
-        my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
-        cmp_deeply [ $yaml_fmt->read ], \@ts;
+        cmp_deeply [ docs_from_string( $stdout ) ], \@ts;
     };
 
     subtest 'error: no metric' => sub {
@@ -125,8 +121,6 @@ subtest 'write' => sub {
         is $exit, 0;
         ok !$stderr, 'nothing on stderr' or diag $stderr;
 
-        open my $fh, '<', \$stdout;
-        my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
         cmp_deeply \@ETL::Yertl::Adapter::test::WRITE_TS, \@ts;
     };
 };

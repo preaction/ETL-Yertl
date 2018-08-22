@@ -25,9 +25,7 @@ sub test_ygrok {
         my ( $stdout, $stderr, $exit ) = capture { ygrok->main( @$args, $pattern, $file ) };
         is $exit, 0, 'exit 0';
         ok !$stderr, 'nothing on stderr' or diag $stderr;
-        open my $fh, '<', \$stdout;
-        my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
-        my @docs = $yaml_fmt->read;
+        my @docs = docs_from_string( $stdout );
         cmp_deeply \@docs, $expect or diag explain \@docs;;
     };
 
@@ -36,10 +34,8 @@ sub test_ygrok {
         my ( $stdout, $stderr, $exit ) = capture { ygrok->main( @$args, $pattern ) };
         is $exit, 0, 'exit 0';
         ok !$stderr, 'nothing on stderr' or diag $stderr;
-        open my $fh, '<', \$stdout;
-        my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
-        my @docs = $yaml_fmt->read;
-        cmp_deeply \@docs, $expect or diag explain \@docs;
+        my @docs = docs_from_string( $stdout );
+        cmp_deeply \@docs, $expect or diag explain \@docs;;
     };
 }
 

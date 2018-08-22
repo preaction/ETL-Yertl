@@ -20,6 +20,7 @@ our %IMPORT_BUNDLES = (
         boolean => [':all'],
         'Path::Tiny' => [qw( path cwd tempfile tempdir )],
         'Dir::Self' => [qw( __DIR__ )],
+        'ETL::Yertl::Util' => [qw( docs_from_string )],
     ],
 );
 

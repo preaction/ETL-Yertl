@@ -76,8 +76,7 @@ subtest 'finish() gets called' => sub {
     my $filter = 'group_by( .foo )';
     my ( $output, $stderr ) = capture { yq->main( $filter ) };
     ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
-    open my $out_fh, '<', \$output;
-    my @got = ETL::Yertl::Format::yaml->new( input => $out_fh )->read;
+    my @got = docs_from_string( $output );
 
     cmp_deeply \@got, [
         {

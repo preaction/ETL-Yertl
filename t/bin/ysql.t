@@ -37,9 +37,7 @@ subtest 'config' => sub {
                 ok !$stderr, 'nothing on stderr' or diag $stderr;
                 is $exit, 0, 'success exit status';
 
-                open my $fh, '<', \$stdout;
-                my $yaml_config = ETL::Yertl::Format::yaml->new( input => $fh );
-                my ( $config ) = $yaml_config->read;
+                my ( $config ) = docs_from_string( yaml => $stdout );
                 cmp_deeply
                     $config,
                     {
@@ -57,9 +55,7 @@ subtest 'config' => sub {
                 ok !$stderr, 'nothing on stderr' or diag $stderr;
                 is $exit, 0, 'success exit status';
 
-                open my $fh, '<', \$stdout;
-                my $yaml_config = ETL::Yertl::Format::yaml->new( input => $fh );
-                my ( $config ) = $yaml_config->read;
+                my ( $config ) = docs_from_string( yaml => $stdout );
                 cmp_deeply
                     $config,
                     {
@@ -84,10 +80,8 @@ subtest 'config' => sub {
             };
 
             subtest 'config was not altered' => sub {
-                my $yaml_config = ETL::Yertl::Format::yaml->new(
-                    input => $SHARE_DIR->child( 'command', 'ysql', '.yertl', 'ysql.yml' )->openr,
-                );
-                my ( $config ) = $yaml_config->read;
+                my $config_path = $SHARE_DIR->child( 'command', 'ysql', '.yertl', 'ysql.yml' );
+                my ( $config ) = docs_from_string( yaml => $config_path->slurp );
                 cmp_deeply
                     $config,
                     {
@@ -129,9 +123,7 @@ subtest 'config' => sub {
             ok !$stderr, 'nothing on stderr' or diag $stderr;
             is $exit, 0, 'success exit status';
 
-            open my $fh, '<', \$stdout;
-            my $yaml_config = ETL::Yertl::Format::yaml->new( input => $fh );
-            my ( $config ) = $yaml_config->read;
+            my ( $config ) = docs_from_string( yaml => $stdout );
             cmp_deeply
                 $config,
                 {
@@ -163,10 +155,8 @@ subtest 'config' => sub {
                 or diag explain $config;
 
             subtest 'config was not altered' => sub {
-                my $yaml_config = ETL::Yertl::Format::yaml->new(
-                    input => $SHARE_DIR->child( 'command', 'ysql', '.yertl', 'ysql.yml' )->openr,
-                );
-                my ( $config ) = $yaml_config->read;
+                my $config_path = $SHARE_DIR->child( 'command', 'ysql', '.yertl', 'ysql.yml' );
+                my ( $config ) = docs_from_string( yaml => $config_path->slurp );
                 cmp_deeply
                     $config,
                     {
@@ -217,10 +207,8 @@ subtest 'config' => sub {
             }
             is $exit, 0, 'success exit status';
 
-            my $yaml_config = ETL::Yertl::Format::yaml->new(
-                input => $home->child( '.yertl', 'ysql.yml' )->openr,
-            );
-            my ( $config ) = $yaml_config->read;
+            my $config_path = $home->child( '.yertl', 'ysql.yml' );
+            my ( $config ) = docs_from_string( yaml => $config_path->slurp );
             cmp_deeply $config, { test => $expect }, 'config is correct'
                 or diag explain $config;
         };
@@ -450,7 +438,7 @@ subtest 'query' => sub {
         };
         my $conf_file = $home->child( '.yertl', 'ysql.yml' );
         my $yaml = ETL::Yertl::Format::yaml->new;
-        $conf_file->touchpath->spew( $yaml->write( $conf ) );
+        $conf_file->touchpath->spew( $yaml->format( $conf ) );
 
         my $dbh = DBI->connect( 'dbi:SQLite:dbname=' . $home->child( 'test.db' ) );
         $dbh->do( 'CREATE TABLE person ( id INT, name VARCHAR, email VARCHAR, paygrade VARCHAR )' );
@@ -475,9 +463,7 @@ subtest 'query' => sub {
         is $exit, 0;
         ok !$stderr, 'nothing on stderr' or diag $stderr;
 
-        open my $fh, '<', \$stdout;
-        my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
-        cmp_deeply [ $yaml_fmt->read ], bag(
+        cmp_deeply [ docs_from_string( $stdout ) ], bag(
             {
                 id => 1,
                 name => 'Hazel Murphy',
@@ -505,9 +491,7 @@ subtest 'query' => sub {
             is $exit, 0;
             ok !$stderr, 'nothing on stderr' or diag $stderr;
 
-            open my $fh, '<', \$stdout;
-            my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
-            cmp_deeply [ $yaml_fmt->read ], bag(
+            cmp_deeply [ docs_from_string( $stdout ) ], bag(
                 {
                     id => 1,
                     name => 'Hazel Murphy',
@@ -529,9 +513,7 @@ subtest 'query' => sub {
                 is $exit, 0;
                 ok !$stderr, 'nothing on stderr' or diag $stderr;
 
-                open my $fh, '<', \$stdout;
-                my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
-                cmp_deeply [ $yaml_fmt->read ], bag(
+                cmp_deeply [ docs_from_string( $stdout ) ], bag(
                     {
                         id => 2,
                         name => 'Quentin Quinn',
@@ -550,9 +532,7 @@ subtest 'query' => sub {
                     is $exit, 0;
                     ok !$stderr, 'nothing on stderr' or diag $stderr;
 
-                    open my $fh, '<', \$stdout;
-                    my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
-                    cmp_deeply [ $yaml_fmt->read ], [
+                    cmp_deeply [ docs_from_string( $stdout ) ], [
                         {
                             id => 2,
                             name => 'Quentin Quinn',
@@ -575,9 +555,7 @@ subtest 'query' => sub {
                     is $exit, 0;
                     ok !$stderr, 'nothing on stderr' or diag $stderr;
 
-                    open my $fh, '<', \$stdout;
-                    my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
-                    cmp_deeply [ $yaml_fmt->read ], [
+                    cmp_deeply [ docs_from_string( $stdout ) ], [
                         {
                             id => 2,
                             name => 'Quentin Quinn',
@@ -606,9 +584,7 @@ subtest 'query' => sub {
             is $exit, 0;
             ok !$stderr, 'nothing on stderr' or diag $stderr;
 
-            open my $fh, '<', \$stdout;
-            my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
-            cmp_deeply [ $yaml_fmt->read ], bag(
+            cmp_deeply [ docs_from_string( $stdout ) ], bag(
                 {
                     value => 2,
                 },
@@ -621,9 +597,7 @@ subtest 'query' => sub {
                 is $exit, 0;
                 ok !$stderr, 'nothing on stderr' or diag $stderr;
 
-                open my $fh, '<', \$stdout;
-                my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
-                cmp_deeply [ $yaml_fmt->read ], bag(
+                cmp_deeply [ docs_from_string( $stdout ) ], bag(
                     {
                         value => 1,
                     },
@@ -643,7 +617,7 @@ subtest 'query' => sub {
             };
             my $conf_file = $home->child( '.yertl', 'ysql.yml' );
             my $yaml = ETL::Yertl::Format::yaml->new;
-            $conf_file->touchpath->spew( $yaml->write( $conf ) );
+            $conf_file->touchpath->spew( $yaml->format( $conf ) );
 
             my $dbh = DBI->connect( 'dbi:SQLite:dbname=' . $home->child( 'test.db' ) );
             $dbh->do( 'CREATE TABLE person ( id INT, name VARCHAR, email VARCHAR )' );
@@ -716,8 +690,7 @@ subtest 'query' => sub {
                 ok !$stdout, 'nothing on stdout, query is not run' or diag $stdout;
 
                 my $conf_file = $home->child( '.yertl', 'ysql.yml' );
-                my $yaml = ETL::Yertl::Format::yaml->new( input => $conf_file->openr );
-                my ( $config ) = $yaml->read;
+                my ( $config ) = docs_from_string( $conf_file->slurp );
                 cmp_deeply $config, {
                     testdb => {
                         driver => 'SQLite',
@@ -736,9 +709,7 @@ subtest 'query' => sub {
                 is $exit, 0;
                 ok !$stderr, 'nothing on stderr' or diag $stderr;
 
-                open my $fh, '<', \$stdout;
-                my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
-                cmp_deeply [ $yaml_fmt->read ], bag(
+                cmp_deeply [ docs_from_string( $stdout ) ], bag(
                     {
                         id => 1,
                         name => 'Hazel Murphy',
@@ -771,8 +742,7 @@ subtest 'query' => sub {
                 ok !$stdout, 'nothing on stdout, query is not run' or diag $stdout;
 
                 my $conf_file = $home->child( '.yertl', 'ysql.yml' );
-                my $yaml = ETL::Yertl::Format::yaml->new( input => $conf_file->openr );
-                my ( $config ) = $yaml->read;
+                my ( $config ) = docs_from_string( $conf_file->slurp );
                 cmp_deeply $config, {
                     testdb => {
                         driver => 'SQLite',
@@ -791,9 +761,7 @@ subtest 'query' => sub {
                 is $exit, 0;
                 ok !$stderr, 'nothing on stderr' or diag $stderr;
 
-                open my $fh, '<', \$stdout;
-                my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
-                cmp_deeply [ $yaml_fmt->read ], bag(
+                cmp_deeply [ docs_from_string( $stdout ) ], bag(
                     {
                         id => 1,
                         name => 'Hazel Murphy',
@@ -818,7 +786,7 @@ subtest 'query' => sub {
         };
         my $conf_file = $home->child( '.yertl', 'ysql.yml' );
         my $yaml = ETL::Yertl::Format::yaml->new;
-        $conf_file->touchpath->spew( $yaml->write( $conf ) );
+        $conf_file->touchpath->spew( $yaml->format( $conf ) );
 
         my $dbh = DBI->connect( 'dbi:SQLite:dbname=' . $home->child( 'test.db' ) );
         $dbh->do( 'CREATE TABLE person ( id INT, name VARCHAR, email VARCHAR )' );
@@ -855,7 +823,7 @@ subtest 'query' => sub {
             };
             my $conf_file = $home->child( '.yertl', 'ysql.yml' );
             my $yaml = ETL::Yertl::Format::yaml->new;
-            $conf_file->touchpath->spew( $yaml->write( $conf ) );
+            $conf_file->touchpath->spew( $yaml->format( $conf ) );
 
             my $dbh = DBI->connect( 'dbi:SQLite:dbname=' . $home->child( 'test.db' ) );
             $dbh->do( 'CREATE TABLE person ( id INT, name VARCHAR, email VARCHAR )' );
@@ -937,7 +905,7 @@ subtest 'query' => sub {
             };
             my $conf_file = $home->child( '.yertl', 'ysql.yml' );
             my $yaml = ETL::Yertl::Format::yaml->new;
-            $conf_file->touchpath->spew( $yaml->write( $conf ) );
+            $conf_file->touchpath->spew( $yaml->format( $conf ) );
 
             my $dbh = DBI->connect( 'dbi:SQLite:dbname=' . $home->child( 'test.db' ) );
             $dbh->do( 'CREATE TABLE person ( id INT, name VARCHAR, email VARCHAR )' );

@@ -3,11 +3,14 @@ our $VERSION = '0.038';
 # ABSTRACT: Read and write documents with a SQL database
 
 use ETL::Yertl;
-use ETL::Yertl::Util qw( load_module );
+use ETL::Yertl::Util qw( load_module docs_from_string );
 use Getopt::Long qw( GetOptionsFromArray :config pass_through );
 use File::HomeDir;
 use Path::Tiny qw( tempfile );
 use SQL::Abstract;
+use IO::Async::Loop;
+use ETL::Yertl::Format;
+use ETL::Yertl::FormatStream;
 
 sub main {
     my $class = shift;
@@ -45,14 +48,14 @@ sub main {
     #; say Dumper \@args;
     #; say Dumper \%opt;
 
-    my $out_fmt = load_module( format => 'default' )->new;
+    my $out_fmt = ETL::Yertl::Format->get_default;
 
     if ( $opt{config} ) {
         my $db_key = shift @args;
 
         if ( !$db_key ) {
-            my $out_fmt = load_module( format => 'yaml' )->new;
-            print $out_fmt->write( config() );
+            my $out_fmt = ETL::Yertl::Format->get( 'yaml' );
+            print $out_fmt->format( config() );
             return 0;
         }
 
@@ -61,8 +64,8 @@ sub main {
 
         if ( !@args && !grep { defined } @opt{qw( dsn driver database host port user password )} ) {
             die "Database key '$db_key' does not exist" unless keys %$db_conf;
-            my $out_fmt = load_module( format => 'yaml' )->new;
-            print $out_fmt->write( $db_conf );
+            my $out_fmt = ETL::Yertl::Format->get( 'yaml' );
+            print $out_fmt->format( $db_conf );
             return 0;
         }
 
@@ -167,29 +170,37 @@ sub main {
         # with every document inserted.
         if ( $opt{insert} ) {
             if ( !-t *STDIN && !-z *STDIN ) {
-                my $in_fmt = load_module( format => 'default' )->new( input => \*STDIN );
-
                 my $query;
                 my @bind_args;
                 my $sth;
-                for my $doc ( $in_fmt->read ) {
-                    if ( grep { ref } values %$doc ) {
-                        die q{Can't insert complex data structures using '--insert'. Please use SQL with '$' placeholders instead}."\n";
-                    }
 
-                    my ( $new_query, @bind_args ) = $sql->insert( $opt{insert}, $doc );
-                    if ( !$query || $new_query ne $query ) {
-                        $query = $new_query;
-                        $sth = $dbh->prepare( $query )
-                            or die "SQL error in prepare: " . $dbh->errstr . "\n";
-                    }
+                my $loop = IO::Async::Loop->new;
+                my $in_stream = ETL::Yertl::FormatStream->new_for_stdin(
+                    on_doc => sub {
+                        my ( $self, $doc, $eof ) = @_;
+                        return unless $doc;
 
-                    $sth->execute( @bind_args )
-                        or die "SQL error in execute: " . $dbh->errstr . "\n";
-                    while ( my $doc = $sth->fetchrow_hashref ) {
-                        print $out_fmt->write( $doc );
-                    }
-                }
+                        if ( grep { ref } values %$doc ) {
+                            die q{Can't insert complex data structures using '--insert'. Please use SQL with '$' placeholders instead}."\n";
+                        }
+
+                        my ( $new_query, @bind_args ) = $sql->insert( $opt{insert}, $doc );
+                        if ( !$query || $new_query ne $query ) {
+                            $query = $new_query;
+                            $sth = $dbh->prepare( $query )
+                                or die "SQL error in prepare: " . $dbh->errstr . "\n";
+                        }
+
+                        $sth->execute( @bind_args )
+                            or die "SQL error in execute: " . $dbh->errstr . "\n";
+                        while ( my $doc = $sth->fetchrow_hashref ) {
+                            print $out_fmt->format( $doc );
+                        }
+                    },
+                    on_read_eof => sub { $loop->stop },
+                );
+                $loop->add( $in_stream );
+                $loop->run;
 
             }
             else {
@@ -200,7 +211,7 @@ sub main {
                 $sth->execute( @bind_args )
                     or die "SQL error in execute: " . $dbh->errstr . "\n";
                 while ( my $doc = $sth->fetchrow_hashref ) {
-                    print $out_fmt->write( $doc );
+                    print $out_fmt->format( $doc );
                 }
             }
             return 0;
@@ -237,22 +248,29 @@ sub main {
             or die "SQL error in prepare: " . $dbh->errstr . "\n";
 
         if ( !-t *STDIN && !-z *STDIN ) {
-            my $in_fmt = load_module( format => 'default' )->new( input => \*STDIN );
+            my $loop = IO::Async::Loop->new;
+            my $in_stream = ETL::Yertl::FormatStream->new_for_stdin(
+                on_doc => sub {
+                    my ( $self, $doc, $eof ) = @_;
+                    return unless $doc;
 
-            for my $doc ( $in_fmt->read ) {
-                $sth->execute( map { select_doc( $_, $doc ) } @fields )
-                    or die "SQL error in execute: " . $dbh->errstr . "\n";
-                while ( my $doc = $sth->fetchrow_hashref ) {
-                    print $out_fmt->write( $doc );
-                }
-            }
+                    $sth->execute( map { select_doc( $_, $doc ) } @fields )
+                        or die "SQL error in execute: " . $dbh->errstr . "\n";
+                    while ( my $doc = $sth->fetchrow_hashref ) {
+                        print $out_fmt->write( $doc );
+                    }
+                },
+                on_read_eof => sub { $loop->stop },
+            );
 
+            $loop->add( $in_stream );
+            $loop->run;
         }
         else {
             $sth->execute( @args )
                 or die "SQL error in execute: " . $dbh->errstr . "\n";
             while ( my $doc = $sth->fetchrow_hashref ) {
-                print $out_fmt->write( $doc );
+                print $out_fmt->format( $doc );
             }
         }
 
@@ -262,12 +280,11 @@ sub main {
 
 sub config {
     my $conf_file = path( File::HomeDir->my_home, '.yertl', 'ysql.yml' );
-    my $config = {};
+    my $config;
     if ( $conf_file->exists ) {
-        my $yaml = load_module( format => 'yaml' )->new( input => $conf_file->openr );
-        ( $config ) = $yaml->read;
+        ( $config ) = docs_from_string( $conf_file->slurp );
     }
-    return $config;
+    return $config || {};
 }
 
 sub db_config {
@@ -280,7 +297,7 @@ sub db_config {
         my $all_config = config();
         $all_config->{ $db_key } = $config;
         my $yaml = load_module( format => 'yaml' )->new;
-        $conf_file->spew( $yaml->write( $all_config ) );
+        $conf_file->spew( $yaml->format( $all_config ) );
         return;
     }
     return config()->{ $db_key } || {};
@@ -300,8 +317,7 @@ sub dbi_args {
     my ( $db_name ) = @_;
     my $conf_file = path( File::HomeDir->my_home, '.yertl', 'ysql.yml' );
     if ( $conf_file->exists ) {
-        my $yaml = load_module( format => 'yaml' )->new( input => $conf_file->openr );
-        my ( $config ) = $yaml->read;
+        my ( $config ) = docs_from_string( yaml => $conf_file->slurp );
         my $db_config = $config->{ $db_name };
 
         my $driver_dsn =

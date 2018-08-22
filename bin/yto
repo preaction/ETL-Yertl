@@ -6,7 +6,9 @@ our $VERSION = '0.038';
 use ETL::Yertl;
 use Pod::Usage::Return qw( pod2usage );
 use Getopt::Long qw( GetOptionsFromArray );
-use ETL::Yertl::Command::yto;
+use ETL::Yertl::Format;
+use ETL::Yertl::FormatStream;
+use IO::Async::Loop;
 
 $|++; # no buffering
 
@@ -24,12 +26,54 @@ sub main {
         return 0;
     }
 
-    eval {
-        ETL::Yertl::Command::yto->main( @argv, \%opt );
-    };
-    if ( $@ ) {
-        return pod2usage( "ERROR: $@" );
+    my ( $format, @files ) = @argv;
+
+    if ( !$format ) {
+        return pod2usage( "ERROR: Must give a format" );
     }
+
+    my $out_format = eval { ETL::Yertl::Format->get( $format, %opt ) };
+    if ( $@ ) {
+        warn "ERROR: $@\n";
+        return 1;
+    }
+
+    my $loop = IO::Async::Loop->new;
+
+    my $out = ETL::Yertl::FormatStream->new_for_stdout(
+        format => $out_format,
+    );
+    $loop->add( $out );
+
+    push @files, "-" unless @files;
+    for my $file ( @files ) {
+
+        # We're doing a similar behavior to <>, but manually for easier testing.
+        my %args = (
+            on_doc => sub {
+                my ( $self, $doc, $eof ) = @_;
+                $out->write( $doc );
+            },
+            on_read_eof => sub { $loop->stop },
+        );
+        my $in;
+        if ( $file eq '-' ) {
+            $in = ETL::Yertl::FormatStream->new_for_stdin( %args );
+        }
+        else {
+            open my $fh, '<', $file or do {
+                warn "Could not open file '$file' for reading: $!\n";
+                next;
+            };
+            $in = ETL::Yertl::FormatStream->new(
+                read_handle => $fh,
+                %args,
+            );
+        }
+        $loop->add( $in );
+        $loop->run;
+    }
+
     return 0;
 }
 

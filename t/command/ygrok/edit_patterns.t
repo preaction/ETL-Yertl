@@ -1,7 +1,6 @@
 
 use ETL::Yertl 'Test';
 use Capture::Tiny qw( capture );
-use ETL::Yertl::Format::yaml;
 use ETL::Yertl::Command::ygrok;
 my $SHARE_DIR = path( __DIR__, '..', '..', 'share' );
 
@@ -16,9 +15,7 @@ sub test_ygrok {
         };
         ok !$exit, 'nothing returned';
         ok !$stderr, 'nothing on stderr' or diag $stderr;
-        open my $fh, '<', \$stdout;
-        my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
-        my @docs = $yaml_fmt->read;
+        my @docs = docs_from_string( $stdout );
         cmp_deeply \@docs, $expect or diag explain \@docs;;
     };
 
@@ -29,10 +26,8 @@ sub test_ygrok {
         };
         ok !$exit, 'nothing returned';
         ok !$stderr, 'nothing on stderr' or diag $stderr;
-        open my $fh, '<', \$stdout;
-        my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
-        my @docs = $yaml_fmt->read;
-        cmp_deeply \@docs, $expect or diag explain \@docs;
+        my @docs = docs_from_string( $stdout );
+        cmp_deeply \@docs, $expect or diag explain \@docs;;
     };
 }
 
@@ -45,10 +40,7 @@ my $test_conf = sub {
     ok !$exit, 'nothing returned';
     ok !$stderr, 'nothing on stderr' or diag $stderr;
 
-    my $yaml_config = ETL::Yertl::Format::yaml->new(
-        input => $home->child( '.yertl', 'ygrok.yml' )->openr,
-    );
-    my ( $config ) = $yaml_config->read;
+    my ( $config ) = docs_from_string( $home->child( '.yertl', 'ygrok.yml' )->slurp );
     cmp_deeply $config, $expect, 'config is correct'
         or diag explain $config;
 };
@@ -232,9 +224,7 @@ subtest 'list patterns' => sub {
         };
         ok !$exit, 'nothing returned';
         ok !$stderr, 'nothing on stderr' or diag $stderr;
-        open my $fh, '<', \$stdout;
-        my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
-        my @docs = $yaml_fmt->read;
+        my @docs = docs_from_string( $stdout );
         cmp_deeply \@docs,
             [
                 {
@@ -251,9 +241,7 @@ subtest 'list patterns' => sub {
         };
         ok !$exit, 'nothing returned';
         ok !$stderr, 'nothing on stderr' or diag $stderr;
-        open my $fh, '<', \$stdout;
-        my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
-        my @docs = $yaml_fmt->read;
+        my @docs = docs_from_string( $stdout );
         cmp_deeply \@docs,
             [
                 {

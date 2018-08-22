@@ -1,9 +1,9 @@
 
 use ETL::Yertl 'Test';
 use Capture::Tiny qw( capture );
-use ETL::Yertl::Format::yaml;
 use ETL::Yertl::Command::ygrok;
 use ETL::Yertl::Command::yq;
+use File::Temp;
 my $SHARE_DIR = path( __DIR__, '..', 'share' );
 
 # XXX: This could be moved into a test utility module and clean up a lot
@@ -18,11 +18,16 @@ sub test_command {
             $fh = $stdin->openr;
         }
         elsif ( ref $stdin eq 'ARRAY' ) {
-            my $yaml = ETL::Yertl::Format::yaml->new->write( @{ $stdin } );
-            open $fh, '<', \$yaml;
+            my $fmt = ETL::Yertl::Format->get( 'yaml' );
+            my $yaml = join "", map { $fmt->format( $_ ) } @$stdin;
+            $fh = File::Temp->new;
+            print { $fh } $yaml;
+            seek $fh, 0, 0;
         }
         else {
-            open $fh, '<', \$stdin;
+            $fh = File::Temp->new;
+            print { $fh } $stdin;
+            seek $fh, 0, 0;
         }
         local *STDIN = $fh;
         return test_command( $cmd, %args );
@@ -33,9 +38,7 @@ sub test_command {
     };
     ok !$exit, 'nothing returned';
     ok !$stderr, 'nothing on stderr' or diag $stderr;
-    open my $fh, '<', \$stdout;
-    my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
-    my @docs = $yaml_fmt->read;
+    my @docs = docs_from_string( $stdout );
     return \@docs;
 }
 

@@ -2,11 +2,11 @@
 use ETL::Yertl 'Test';
 use Test::Lib;
 use ETL::Yertl::Format::csv;
-use ETL::Yertl::Util qw( pairkeys );
 
 my @FORMATTER_MODULES;
 BEGIN {
-    @FORMATTER_MODULES = grep { eval "use $_; 1" } pairkeys @ETL::Yertl::Format::csv::FORMAT_MODULES;
+    @FORMATTER_MODULES = grep { eval "use $_; 1" }
+        map { $_->[0] } ETL::Yertl::Format::csv::_formatter_classes();
     plan skip_all => 'No formatter modules available (tried ' . join( ", ", @FORMATTER_MODULES ) . ')'
         unless @FORMATTER_MODULES;
 }
@@ -30,72 +30,59 @@ my @EXPECT_FROM = (
 );
 
 subtest 'default formatter' => sub {
-    subtest 'input' => sub {
-        my $formatter = $CLASS->new( input => $EXPECT_TO->openr );
-        my $got = [ $formatter->read ];
-        cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
+    subtest 'read_buffer' => sub {
+        my $formatter = $CLASS->new;
+        my $given = join "", map { $formatter->format( $_ ) } @EXPECT_FROM;
+        $formatter = $CLASS->new;
+        cmp_deeply [ $formatter->read_buffer( \$given ) ], \@EXPECT_FROM;
     };
 
-    subtest 'output' => sub {
+    subtest 'format' => sub {
         my $formatter = $CLASS->new;
-        eq_or_diff $formatter->write( @EXPECT_FROM ), $EXPECT_TO->slurp;
+        eq_or_diff join( "", map { $formatter->format( $_ ) } @EXPECT_FROM ), $EXPECT_TO->slurp;
     };
 };
 
 subtest 'formatter modules' => sub {
     for my $formatter_module ( @FORMATTER_MODULES ) {
         subtest $formatter_module => sub {
-            subtest 'input' => sub {
-                my $formatter = $CLASS->new(
-                    input => $EXPECT_TO->openr,
-                    format_module => $formatter_module,
-                );
-                my $got = [ $formatter->read ];
-                cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
+            subtest 'read_buffer' => sub {
+                my $formatter = $CLASS->new( formatter_class => $formatter_module );
+                my $given = join "", map { $formatter->format( $_ ) } @EXPECT_FROM;
+                $formatter = $CLASS->new( formatter_class => $formatter_module );
+                cmp_deeply [ $formatter->read_buffer( \$given ) ], \@EXPECT_FROM;
             };
 
-            subtest 'output' => sub {
-                my $formatter = $CLASS->new( format_module => $formatter_module );
-                eq_or_diff $formatter->write( @EXPECT_FROM ), $EXPECT_TO->slurp;
+            subtest 'format' => sub {
+                my $formatter = $CLASS->new( formatter_class => $formatter_module );
+                eq_or_diff join( "", map { $formatter->format( $_ ) } @EXPECT_FROM ), $EXPECT_TO->slurp;
             };
 
             subtest 'delimiter ":"' => sub {
-                subtest 'input' => sub {
+                subtest 'read_buffer' => sub {
                     my $formatter = $CLASS->new(
-                        input => $EXPECT_COLON->openr,
-                        format_module => $formatter_module,
+                        formatter_class => $formatter_module,
                         delimiter => ":",
                     );
-                    my $got = [ $formatter->read ];
-                    cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
+                    my $given = join "", map { $formatter->format( $_ ) } @EXPECT_FROM;
+                    $formatter = $CLASS->new(
+                        formatter_class => $formatter_module,
+                        delimiter => ":",
+                    );
+                    cmp_deeply [ $formatter->read_buffer( \$given ) ], \@EXPECT_FROM;
                 };
 
-                subtest 'output' => sub {
+                subtest 'format' => sub {
                     my $formatter = $CLASS->new(
-                        format_module => $formatter_module,
+                        formatter_class => $formatter_module,
                         delimiter => ":",
                     );
-                    eq_or_diff $formatter->write( @EXPECT_FROM ), $EXPECT_COLON->slurp;
+                    eq_or_diff join( "", map { $formatter->format( $_ ) } @EXPECT_FROM ), $EXPECT_COLON->slurp;
                 };
             };
 
         };
     }
-};
-
-subtest 'no formatter available' => sub {
-    local @ETL::Yertl::Format::csv::FORMAT_MODULES = (
-        'Not::CSV::Module' => 0,
-        'Not::Other::Module' => 0,
-        'LowVersion' => 1,
-    );
-    throws_ok {
-        $CLASS->new->format_module;
-    } qr{Could not load a formatter for CSV[.] Please install one of the following modules:};
-    like $@, qr{Not::CSV::Module \(Any version\)};
-    like $@, qr{Not::Other::Module \(Any version\)};
-    like $@, qr{LowVersion \(version 1\)};
-    unlike $@, qr{csv[.]pm line \d+}, 'does not contain module/line';
 };
 
 done_testing;

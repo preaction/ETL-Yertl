@@ -16,6 +16,9 @@ use ETL::Yertl;
 use ETL::Yertl::Util qw( load_module );
 use Getopt::Long qw( GetOptionsFromArray :config pass_through );
 use IO::Interactive qw( is_interactive );
+use ETL::Yertl::Format;
+use ETL::Yertl::FormatStream;
+use IO::Async::Loop;
 
 sub main {
     my $class = shift;
@@ -50,11 +53,12 @@ sub main {
             die "Must give a metric\n" unless $metric;
         }
 
-        my $in_fmt = load_module( format => 'default' )->new( input => \*STDIN );
         my $count = 0;
-
-        while ( my @docs = $in_fmt->read ) {
-            for my $doc ( @docs ) {
+        my $loop = IO::Async::Loop->new;
+        my $in = ETL::Yertl::FormatStream->new_for_stdin(
+            on_doc => sub {
+                my ( $self, $doc, $eof ) = @_;
+                return unless $doc;
                 #; use Data::Dumper
                 #; say "Got doc: " . Dumper $doc;
                 if ( $opt{short} ) {
@@ -78,9 +82,11 @@ sub main {
                     $db->write_ts( $doc );
                     $count++;
                 }
-            }
-        }
-
+            },
+            on_read_eof => sub { $loop->stop },
+        );
+        $loop->add( $in );
+        $loop->run;
         #; say "Wrote $count points";
     }
     # Read metrics
@@ -95,10 +101,10 @@ sub main {
         } );
         if ( $opt{short} ) {
             my %ts = map { $_->{timestamp} => $_->{value} } @points;
-            print $out_fmt->write( \%ts );
+            print $out_fmt->format( \%ts );
         }
         else {
-            print $out_fmt->write( $_ ) for @points;
+            print $out_fmt->format( $_ ) for @points;
         }
     }
 

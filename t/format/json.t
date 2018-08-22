@@ -2,11 +2,11 @@
 use ETL::Yertl 'Test';
 use Test::Lib;
 use ETL::Yertl::Format::json;
-use ETL::Yertl::Util qw( pairkeys );
 
 my @FORMATTER_MODULES;
 BEGIN {
-    @FORMATTER_MODULES = grep { eval "use $_; 1" } pairkeys @ETL::Yertl::Format::json::FORMAT_MODULES;
+    @FORMATTER_MODULES = grep { eval "use $_; 1" }
+        map { $_->[0] } ETL::Yertl::Format::json::_formatter_classes();
     plan skip_all => 'No formatter modules available (tried ' . join( ", ", @FORMATTER_MODULES ) . ')'
         unless @FORMATTER_MODULES;
 }
@@ -26,60 +26,34 @@ my @EXPECT_FROM = (
     [qw( foo bar baz )],
 );
 
-subtest 'default formatter' => sub {
-    subtest 'input' => sub {
-        my $formatter = $CLASS->new(
-            input => $EXPECT_TO->openr,
-        );
-        my $got = [ $formatter->read ];
-        cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
+subtest 'default formatter class' => sub {
+    subtest 'read_buffer' => sub {
+        my $formatter = $CLASS->new;
+        my $given = $formatter->format( $EXPECT_FROM[0] );
+        cmp_deeply $formatter->read_buffer( \$given ), $EXPECT_FROM[0];
     };
 
-    subtest 'output' => sub {
+    subtest 'format' => sub {
         my $formatter = $CLASS->new;
-        eq_or_diff $formatter->write( @EXPECT_FROM ), $EXPECT_TO->slurp;
+        eq_or_diff join( "", map { $formatter->format( $_ ) } @EXPECT_FROM ), $EXPECT_TO->slurp;
     };
 };
 
 subtest 'formatter modules' => sub {
     for my $formatter_module ( @FORMATTER_MODULES ) {
         subtest $formatter_module => sub {
-            subtest 'input' => sub {
-                my $formatter = $CLASS->new(
-                    input => $EXPECT_TO->openr,
-                    format_module => $formatter_module,
-                );
-                my $got = [ $formatter->read ];
-                cmp_deeply $got, \@EXPECT_FROM or diag explain $got;
+            subtest 'read_buffer' => sub {
+                my $formatter = $CLASS->new( formatter_class => $formatter_module );
+                my $given = $formatter->format( $EXPECT_FROM[0] );
+                cmp_deeply $formatter->read_buffer( \$given ), $EXPECT_FROM[0];
             };
 
-            subtest 'output' => sub {
-                my $formatter = $CLASS->new( format_module => $formatter_module );
-                eq_or_diff $formatter->write( @EXPECT_FROM ), $EXPECT_TO->slurp;
-            };
-
-            subtest 'decode' => sub {
-                my $formatter = $CLASS->new( format_module => $formatter_module );
-                my $given = $formatter->write( $EXPECT_FROM[0] );
-                cmp_deeply $formatter->decode( $given ), $EXPECT_FROM[0];
+            subtest 'format' => sub {
+                my $formatter = $CLASS->new( formatter_class => $formatter_module );
+                eq_or_diff join( "", map { $formatter->format( $_ ) } @EXPECT_FROM ), $EXPECT_TO->slurp;
             };
         };
     }
-};
-
-subtest 'no formatter available' => sub {
-    local @ETL::Yertl::Format::json::FORMAT_MODULES = (
-        'Not::JSON::Module' => 0,
-        'Not::Other::Module' => 0,
-        'LowVersion' => 1,
-    );
-    throws_ok {
-        $CLASS->new->format_module;
-    } qr{Could not load a formatter for JSON[.] Please install one of the following modules:};
-    like $@, qr{Not::JSON::Module \(Any version\)};
-    like $@, qr{Not::Other::Module \(Any version\)};
-    like $@, qr{LowVersion \(version 1\)};
-    unlike $@, qr{json[.]pm line \d+}, 'does not contain module/line';
 };
 
 done_testing;

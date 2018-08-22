@@ -1,7 +1,7 @@
 
 use ETL::Yertl 'Test';
 use Capture::Tiny qw( capture );
-use ETL::Yertl::Format::yaml;
+use ETL::Yertl::FormatStream;
 my $SHARE_DIR = path( __DIR__, '..', 'share' );
 
 my $script = "$FindBin::Bin/../../bin/yfrom";
@@ -33,9 +33,7 @@ subtest 'JSON -> DOC' => sub {
         my ( $stdout, $stderr, $exit ) = capture { yfrom->main( 'json', $json_fn ) };
         is $exit, 0, 'exit 0';
         ok !$stderr, 'nothing on stderr' or diag $stderr;
-        open my $fh, '<', \$stdout;
-        my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
-        cmp_deeply [ $yaml_fmt->read ], \@expect;
+        cmp_deeply [ docs_from_string( $stdout ) ], \@expect;
     };
 
     subtest 'stdin' => sub {
@@ -43,9 +41,7 @@ subtest 'JSON -> DOC' => sub {
         my ( $stdout, $stderr, $exit ) = capture { yfrom->main( 'json' ) };
         is $exit, 0, 'exit 0';
         ok !$stderr, 'nothing on stderr' or diag $stderr;
-        open my $fh, '<', \$stdout;
-        my $yaml_fmt = ETL::Yertl::Format::yaml->new( input => $fh );
-        cmp_deeply [ $yaml_fmt->read ], \@expect;
+        cmp_deeply [ docs_from_string( $stdout ) ], \@expect;
     };
 };
 
