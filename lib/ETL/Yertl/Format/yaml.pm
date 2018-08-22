@@ -35,10 +35,24 @@ sub _formatter_classes {
 
 sub read_buffer {
     my ( $self, $buffref, $eof ) = @_;
-    if ( $$buffref =~ s/(.+(?:\n---[^\n]*\n|\Z))//s ) {
-        my @docs = $self->{_load}->( $1 );
-        return @docs;
+    my @docs;
+    $self->{_doc_buf} ||= '';
+    while ( $$buffref =~ s/^(.*\n)// ) {
+        my $line = $1;
+        if ( $line =~ /^---/ && $self->{_doc_buf} ) {
+            #; say STDERR "## Got document\n$self->{_doc_buf}";
+            push @docs, $self->{_load}->( $self->{_doc_buf} );
+            $self->{_doc_buf} = '';
+        }
+        else {
+            $self->{_doc_buf} .= $line;
+        }
     }
+    if ( $eof && $self->{_doc_buf} ) {
+        #; say STDERR "## Got document\n$self->{_doc_buf}";
+        push @docs, $self->{_load}->( $self->{_doc_buf} );
+    }
+    return @docs;
 }
 
 sub format {

@@ -30,7 +30,7 @@ subtest 'default formatter' => sub {
     subtest 'read_buffer' => sub {
         my $formatter = $CLASS->new;
         my $given = $formatter->format( $EXPECT_FROM[0] );
-        cmp_deeply $formatter->read_buffer( \$given ), $EXPECT_FROM[0];
+        cmp_deeply $formatter->read_buffer( \$given, 1 ), $EXPECT_FROM[0];
     };
 
     subtest 'output' => sub {
@@ -49,7 +49,7 @@ subtest 'formatter modules' => sub {
             subtest 'read_buffer' => sub {
                 my $formatter = $CLASS->new( formatter_class => $format_module );
                 my $given = $formatter->format( $EXPECT_FROM[0] );
-                cmp_deeply $formatter->read_buffer( \$given ), $EXPECT_FROM[0];
+                cmp_deeply $formatter->read_buffer( \$given, 1 ), $EXPECT_FROM[0];
             };
 
             subtest 'output' => sub {
