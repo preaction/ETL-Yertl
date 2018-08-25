@@ -34,7 +34,6 @@ Completely new to Yertl? Start here with the guides:
 
 ### Filter/Transform
 
-* [ymask - Filter by properties using a simple mask](/pod/ymask)
 * [yq - A transform mini-language](/pod/yq)
 
 ## Other Resources

@@ -40,9 +40,6 @@ __END__
     $ yfrom csv file.csv >work.yml
     $ yfrom json file.json >work.yml
 
-    # Mask document
-    $ ymask 'field/inner' work.yml >masked.yml
-
     # Convert file to output format
     $ yto csv work.yml
     $ yto json work.yml
