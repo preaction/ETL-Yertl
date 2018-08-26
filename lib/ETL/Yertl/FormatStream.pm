@@ -45,7 +45,12 @@ use Carp qw( croak );
 sub configure {
     my ( $self, %args ) = @_;
 
-    $self->{format} = delete $args{format} || ETL::Yertl::Format->get_default;
+    if ( exists $args{format} ) {
+        $self->{format} = delete $args{format};
+    }
+    elsif ( !$self->{format} ) {
+        $self->{format} = ETL::Yertl::Format->get_default;
+    }
 
     for my $event ( qw( on_doc ) ) {
         $self->{ $event } = delete $args{ $event } if exists $args{ $event };
