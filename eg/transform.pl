@@ -8,6 +8,9 @@ use Carp qw( croak );
 
 use base 'IO::Async::Notifier';
 
+# XXX override pipe, <, and > to set on_read_doc and on_write_doc
+# handlers appropriately
+
 sub configure {
     my ( $self, %args ) = @_;
 
@@ -105,51 +108,108 @@ use ETL::Yertl::FormatStream;
 use ETL::Yertl::Format;
 use ETL::Yertl::Transform::Dump;
 use ETL::Yertl::Transform::AddHello;
+use Module::Runtime qw( use_module );
+use Carp qw( croak );
+
+# loop() helper create/maintain loop singleton
 use IO::Async::Loop;
+sub loop() {
+    state $loop = IO::Async::Loop->new;
+    return $loop;
+}
 
-my $loop = IO::Async::Loop->new;
+# format attribute takes simple string for named format object
+sub stream(%) {
+    my ( %args ) = @_;
+    if ( $args{format} && !ref $args{format} ) {
+        $args{format} = ETL::Yertl::Format->get( $args{format} );
+    }
+    my $stream = ETL::Yertl::FormatStream->new( %args );
+    loop->add( $stream );
+    return $stream;
+}
 
-my $input = ETL::Yertl::FormatStream->new_for_stdin(
-    format => ETL::Yertl::Format->get( 'json' ),
+# stdin() helper should automatically add to loop singleton
+sub stdin(;%) {
+    my ( %args ) = @_;
+    $args{read_handle} = \*STDIN;
+    return stream( %args );
+}
+
+# stdout() helper should set autoflush and add to loop singleton
+sub stdout(;%) {
+    my ( %args ) = @_;
+    $args{write_handle} = \*STDOUT;
+    $args{autoflush} //= 1;
+    return stream( %args );
+}
+
+# transform( Name => %args ) helper. add to loop
+sub transform($;%) {
+    my ( $xform, %args ) = @_;
+    my $obj;
+    if ( !ref $xform ) {
+        my $name = ucfirst $xform;
+        my $module = "ETL::Yertl::Transform::${name}";
+        $obj = use_module( $module )->new( %args );
+    }
+    elsif ( ref $xform eq 'CODE' ) {
+        $obj = ETL::Yertl::Transform->new(
+            %args,
+            transform_doc => $xform,
+        );
+    }
+    loop->add( $obj );
+    return $obj;
+}
+
+my $xform = transform( Dump =>
+    source => stdin( format => 'json' ),
 );
-$loop->add( $input );
-my $output = ETL::Yertl::FormatStream->new_for_stdout(
-    autoflush => 1,
-    format => ETL::Yertl::Format->get_default,
-);
-$loop->add( $output );
 
-my $xform = ETL::Yertl::Transform::Dump->new(
-    source => $input,
-);
-$loop->add( $xform );
+# transform( Name => %args ) helper. add to loop
+my $xform2 = transform( AddHello => source => $xform, destination => stdout );
 
-my $xform2 = ETL::Yertl::Transform::AddHello->new(
-    source => $xform,
-    destination => $output, # intermediate destination
-);
-$loop->add( $xform2 );
+# file( '>', $name, %args ) helper to create FormatStream + add to loop
+sub file( $$;% ) {
+    my ( $mode, $name, %args ) = @_;
+    # Detect whether to read_handle/write_handle via '<', '>'
+    open my $fh, $mode, $name
+        or croak sprintf q{Can't open file "%s": %s}, $name, $!;
+    if ( $mode =~ /^</ ) {
+        $args{read_handle} = $fh;
+    }
+    elsif ( $mode =~ /^>/ ) {
+        $args{write_handle} = $fh;
+    }
+    else {
+        croak sprintf q{Can't determine if mode "%s" is read or write}, $mode;
+    }
+    return stream( %args );
+}
 
-open my $fh, '>', 'output.yaml';
-my $output2 = ETL::Yertl::FormatStream->new(
-    write_handle => $fh,
-);
-$loop->add( $output2 );
-
-# Simple transform as callback
-my $xform3 = ETL::Yertl::Transform->new(
-    source => $xform2,
-    transform_doc => sub {
+# transform( sub => %args ) helper. add to loop
+transform(
+    sub {
         my ( $self, $doc ) = @_;
         say STDERR "# Hey";
         # Return instead of write
         ; say "Returning a doc";
         return $doc;
     },
-    destination => $output2,
+    source => $xform2,
+    destination => file( '>', 'output.yaml' ),
 );
-$loop->add( $xform3 );
 
-$loop->run;
+# loop()->run
+loop->run;
 
+# XXX Need to handle cleanup correctly
+# Each handle with input increments input counter
+# Each EOF reached decrements counter
+# Once counter reaches zero, all outputs are given an on_flush callback
+# that resolves a future and closed
+# When all on_flush futures are resolved, we are done
+# Transforms will need an on_read_eof event to link up and probably an
+# on_flush event or something that we can use when everything is done
 
