@@ -43,31 +43,42 @@ sub configure {
 
     if ( $args{source} ) {
         # Register ourselves with the source
-        # XXX What happens to our original source?
         my $source = $self->{source} = delete $args{source};
         weaken $self;
         $source->configure(
             on_doc => sub {
                 my ( $source, $doc, $eof ) = @_;
-                # Use `later` for cooperative multi-tasking. If our
-                # transform_doc event takes a long time or if we have
-                # a very long chain of transforms, we could wait a long
-                # time before reading from the input buffer again.
-                # This should get us better performance in reading at
-                # the expense of memory. If memory use becomes
-                # a problem, if we can't finish writing fast enough, we
-                # might need a more intelligent solution here (a number
-                # of documents in-flight based on memory size or
-                # something).
-                $self->loop->later( sub {
-                    local $_ = $doc;
-                    my @docs = $self->invoke_event( transform_doc => $doc );
-                    # ; say "Writing docs from return: " . join ", ", @docs;
-                    # ; use Data::Dumper;
-                    # ; say STDERR Dumper( \@docs );
-                    $self->write( $_ ) for grep { $_ } @docs;
-                } );
+                local $_ = $doc;
+                my @docs = $self->invoke_event( transform_doc => $doc );
+                # ; say "Writing docs from return: " . join ", ", @docs;
+                # ; use Data::Dumper;
+                # ; say STDERR Dumper( \@docs );
+                $self->write( $_ ) for grep { $_ } @docs;
                 return;
+            },
+            # XXX This probably needs to be done better:
+            # * Users can't add their own handler to this event at all,
+            #   making it more difficult to add Yertl streams to larger
+            #   programs
+            # * This requires on_read_eof to be called after all
+            #   transforms are complete, which prevents cooperative
+            #   multitasking by using `$self->loop->later` to defer
+            #   execution of the transform_doc method/callback
+            on_read_eof => sub {
+                if ( my $dest = $self->{destination} ) {
+                    if ( $dest->{write_handle} != \*STDOUT ) {
+                        # Gracefully close the destination and then let
+                        # anyone using us as a source know we're finished
+                        $dest->configure( on_closed => sub {
+                            $self->maybe_invoke_event( 'on_read_eof' );
+                        } );
+                        $dest->close_when_empty;
+                        return;
+                    }
+                }
+                # We emit our own on_read_eof event so downstream things
+                # can clean up
+                $self->maybe_invoke_event( 'on_read_eof' );
             },
         );
     }
@@ -84,12 +95,15 @@ sub configure {
         $self->{destination} = delete $args{destination};
     }
 
-    for my $event ( qw( transform_doc on_doc ) ) {
+    for my $event ( qw( transform_doc on_doc on_read_eof ) ) {
         $self->{ $event } = delete $args{ $event } if exists $args{ $event };
     }
     croak "Expected either a transform_doc callback or to be able to ->transform_doc"
         unless $self->can_event( 'transform_doc' );
     $self->{on_doc} ||= sub { }; # Default on_doc does nothing
+    $self->{on_read_eof} ||= sub {
+        main::loop()->stop;
+    }; # Default on_read_eof exits the loop
 
     $self->SUPER::configure( %args );
 }
@@ -224,13 +238,4 @@ my $xform
 
 # loop()->run
 loop->run;
-
-# XXX Need to handle cleanup correctly
-# Each handle with input increments input counter
-# Each EOF reached decrements counter
-# Once counter reaches zero, all outputs are given an on_flush callback
-# that resolves a future and closed
-# When all on_flush futures are resolved, we are done
-# Transforms will need an on_read_eof event to link up and probably an
-# on_flush event or something that we can use when everything is done
 
