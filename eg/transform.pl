@@ -60,6 +60,7 @@ sub configure {
                 # of documents in-flight based on memory size or
                 # something).
                 $self->loop->later( sub {
+                    local $_ = $doc;
                     my @docs = $self->invoke_event( transform_doc => $doc );
                     # ; say "Writing docs from return: " . join ", ", @docs;
                     # ; use Data::Dumper;
@@ -109,11 +110,10 @@ use Data::Dumper;
 use base 'ETL::Yertl::Transform';
 
 sub transform_doc {
-    my ( $self, $doc ) = @_;
     local $Data::Dumper::Terse = 1;
     local $Data::Dumper::Indent = 0;
-    say STDERR "# DUMPER: " . Dumper( $doc );
-    $self->write( $doc );
+    say STDERR "# DUMPER: " . Dumper( $_ );
+    return $_;
 }
 
 package Local::AddHello;
@@ -214,11 +214,10 @@ my $xform
     | transform( "Local::AddHello" ) >> stdout
     | transform(
         sub {
-            my ( $self, $doc ) = @_;
             say STDERR "# Hey";
             # Return instead of write
             ; say "Returning a doc";
-            return $doc;
+            return $_;
         },
     ) >> file( '>', 'output.yaml' )
     ;
