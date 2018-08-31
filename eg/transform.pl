@@ -8,8 +8,35 @@ use Carp qw( croak );
 
 use base 'IO::Async::Notifier';
 
-# XXX override pipe, <, and > to set on_read_doc and on_write_doc
+# override pipe, <<, and >> to set on_read_doc and on_write_doc
 # handlers appropriately
+use overload
+    '>>' => \&_set_output,
+    '<<' => \&_set_input,
+    '|' => \&_pipe,
+    'fallback' => 1,
+    ;
+
+sub _set_output {
+    my ( $self, $output ) = @_;
+    $self->configure( destination => $output );
+    return $self;
+}
+
+sub _set_input {
+    my ( $self, $input ) = @_;
+    $self->configure( source => $input );
+    return $self;
+}
+
+sub _pipe {
+    my ( $self, $other, $swap ) = @_;
+    if ( $swap ) {
+        ( $self, $other ) = ( $other, $self );
+    }
+    $other->configure( source => $self );
+    return $other;
+}
 
 sub configure {
     my ( $self, %args ) = @_;
@@ -145,6 +172,7 @@ sub stdout(;%) {
 }
 
 # transform( Name => %args ) helper. add to loop
+# transform( sub => %args ) helper. add to loop
 sub transform($;%) {
     my ( $xform, %args ) = @_;
     my $obj;
@@ -162,13 +190,6 @@ sub transform($;%) {
     loop->add( $obj );
     return $obj;
 }
-
-my $xform = transform( Dump =>
-    source => stdin( format => 'json' ),
-);
-
-# transform( Name => %args ) helper. add to loop
-my $xform2 = transform( AddHello => source => $xform, destination => stdout );
 
 # file( '>', $name, %args ) helper to create FormatStream + add to loop
 sub file( $$;% ) {
@@ -188,18 +209,20 @@ sub file( $$;% ) {
     return stream( %args );
 }
 
-# transform( sub => %args ) helper. add to loop
-transform(
-    sub {
-        my ( $self, $doc ) = @_;
-        say STDERR "# Hey";
-        # Return instead of write
-        ; say "Returning a doc";
-        return $doc;
-    },
-    source => $xform2,
-    destination => file( '>', 'output.yaml' ),
-);
+my $xform
+    = stdin( format => 'json' )
+    | transform( "Dump" )
+    | transform( "AddHello" ) >> stdout
+    | transform(
+        sub {
+            my ( $self, $doc ) = @_;
+            say STDERR "# Hey";
+            # Return instead of write
+            ; say "Returning a doc";
+            return $doc;
+        },
+    ) >> file( '>', 'output.yaml' )
+    ;
 
 # loop()->run
 loop->run;
