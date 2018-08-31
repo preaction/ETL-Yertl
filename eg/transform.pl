@@ -102,8 +102,8 @@ sub write {
     $self->invoke_event( on_doc => $doc );
 }
 
-package ETL::Yertl::Transform::Dump;
-BEGIN { $INC{ 'ETL/Yertl/Transform/Dump.pm' } = __FILE__ };
+package Local::Dump;
+BEGIN { $INC{ 'Local/Dump.pm' } = __FILE__ };
 use ETL::Yertl;
 use Data::Dumper;
 use base 'ETL::Yertl::Transform';
@@ -116,8 +116,8 @@ sub transform_doc {
     $self->write( $doc );
 }
 
-package ETL::Yertl::Transform::AddHello;
-BEGIN { $INC{ 'ETL/Yertl/Transform/AddHello.pm' } = __FILE__ };
+package Local::AddHello;
+BEGIN { $INC{ 'Local/AddHello.pm' } = __FILE__ };
 use ETL::Yertl;
 use base 'ETL::Yertl::Transform';
 
@@ -133,8 +133,8 @@ package main;
 use ETL::Yertl;
 use ETL::Yertl::FormatStream;
 use ETL::Yertl::Format;
-use ETL::Yertl::Transform::Dump;
-use ETL::Yertl::Transform::AddHello;
+use Local::Dump;
+use Local::AddHello;
 use Module::Runtime qw( use_module );
 use Carp qw( croak );
 
@@ -177,8 +177,7 @@ sub transform($;%) {
     my ( $xform, %args ) = @_;
     my $obj;
     if ( !ref $xform ) {
-        my $name = ucfirst $xform;
-        my $module = "ETL::Yertl::Transform::${name}";
+        my $module = $xform;
         $obj = use_module( $module )->new( %args );
     }
     elsif ( ref $xform eq 'CODE' ) {
@@ -211,8 +210,8 @@ sub file( $$;% ) {
 
 my $xform
     = stdin( format => 'json' )
-    | transform( "Dump" )
-    | transform( "AddHello" ) >> stdout
+    | transform( "Local::Dump" )
+    | transform( "Local::AddHello" ) >> stdout
     | transform(
         sub {
             my ( $self, $doc ) = @_;
