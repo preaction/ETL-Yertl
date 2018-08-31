@@ -101,9 +101,6 @@ sub configure {
     croak "Expected either a transform_doc callback or to be able to ->transform_doc"
         unless $self->can_event( 'transform_doc' );
     $self->{on_doc} ||= sub { }; # Default on_doc does nothing
-    $self->{on_read_eof} ||= sub {
-        main::loop()->stop;
-    }; # Default on_read_eof exits the loop
 
     $self->SUPER::configure( %args );
 }
@@ -115,6 +112,23 @@ sub write {
         $dest->write( $doc );
     }
     $self->invoke_event( on_doc => $doc );
+}
+
+sub run {
+    my ( $self ) = @_;
+
+    # Run the transforms until this point
+    # Default on_read_eof exits the loop. This gets replaced by a new
+    # on_read_eof when transforms are added as a source for another
+    # transform
+    my $on_read_eof = $self->{on_read_eof} || sub { };
+    $self->configure(
+        on_read_eof => sub {
+            $on_read_eof->( @_ );
+            $self->loop->stop;
+        },
+    );
+    $self->loop->run;
 }
 
 package Local::Dump;
@@ -237,5 +251,5 @@ my $xform
     ;
 
 # loop()->run
-loop->run;
+$xform->run;
 
