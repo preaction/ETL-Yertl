@@ -309,6 +309,14 @@ A set of tools for manipulating JSON (constrast with Yertl's YAML). For
 interoperability, set the C<YERTL_FORMAT> environment variable to
 C<"json">.
 
+=item L<Catmandu|http://librecat.org>
+
+A generic data processing toolkit. Convert data between multiple
+formats, import/export into multiple databases, and manipulate data with
+a mini-language.
+
+This project is very much like Yertl, and more mature besides.
+
 =item L<jq|http://stedolan.github.io/jq/>
 
 A filter for JSON documents. The inspiration for L<yq>. For
@@ -320,6 +328,40 @@ C<"json">.
 JSON Transformer. Allows multiple ways of manipulating JSON, including
 L<JSONPath|http://goessner.net/articles/JsonPath/>. For interoperability,
 set the C<YERTL_FORMAT> environment variable to C<"json">.
+
+=item L<pv (Pipe Viewer)|http://www.ivarch.com/programs/pv.shtml>
+
+This tool helps examine how fast data is flowing through a shell
+pipeline. If the size of the data is known, it can even provide
+a progress bar and an ETA.
+
+=item L<netcat (nc)|http://netcat.sourceforge.net>
+
+Netcat allows simple streaming over a network. Using Netcat you can
+start a Yertl pipeline on one machine and finish it on another machine.
+For example, you could generate metrics on each client machine, and then
+write them to a central machine to insert into a database on that
+machine.
+
+Netcat does not come with any security, so be careful (use firewalls).
+
+=item L<socat|http://www.dest-unreach.org/socat/doc/socat.html>
+
+Socat is a multi-purpose relay. It is similar to Netcat but with many
+more features such as SSL and client verification. Socat has security,
+so you can use this like Netcat in cases where you must accept data from
+the Internet.
+
+=item L<parallel (GNU Parallel)|https://www.gnu.org/software/parallel/>
+
+GNU Parallel is a shell tool for executing jobs in parallel on one or more
+computers. Parallel is very similar to C<xargs>, except it will execute
+the commands on other computers.
+
+=item L<distribution|https://github.com/wizzat/distribution>
+
+This tool creates charts. Pipe into it from C<yq> to create simple
+charts from your data.
 
 =back
 
