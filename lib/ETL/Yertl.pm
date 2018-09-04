@@ -19,7 +19,7 @@ sub loop;
 sub import {
     my ( $class, @args ) = @_;
     $class->export_to_level( 1, @EXPORT );
-    $class->SUPER::import( @args );
+    goto &Import::Base::import;
 }
 
 our @IMPORT_MODULES = (
