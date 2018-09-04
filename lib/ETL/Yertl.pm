@@ -4,7 +4,23 @@ our $VERSION = '0.040';
 
 use strict;
 use warnings;
-use base 'Import::Base';
+use feature qw( :5.10 );
+use base 'Import::Base', 'Exporter';
+use Carp qw( croak );
+use Module::Runtime qw( use_module );
+use ETL::Yertl::FormatStream;
+use ETL::Yertl::Format;
+use IO::Async::Loop;
+
+our @EXPORT = qw( loop stream stdin stdout transform file );
+
+sub loop;
+
+sub import {
+    my ( $class, @args ) = @_;
+    $class->export_to_level( 1, @EXPORT );
+    $class->SUPER::import( @args );
+}
 
 our @IMPORT_MODULES = (
     strict => [],
@@ -28,6 +44,162 @@ $ETL::Yertl::VERBOSE = $ENV{YERTL_VERBOSE} || 0;
 sub yertl::diag {
     my ( $level, $text ) = @_;
     print STDERR "$text\n" if $ETL::Yertl::VERBOSE >= $level;
+}
+
+# format attribute takes simple string for named format object
+sub stream(%) {
+    my ( %args ) = @_;
+    if ( $args{format} && !ref $args{format} ) {
+        $args{format} = ETL::Yertl::Format->get( $args{format} );
+    }
+    my $stream = ETL::Yertl::FormatStream->new( %args );
+    loop->add( $stream );
+    return $stream;
+}
+
+=sub stdin
+
+    my $stdin = stdin( %args );
+
+Get a L<ETL::Yertl::FormatStream> object for standard input. C<%args> is a list
+of key/value pairs passed to L<ETL::Yertl::FormatStream/new>. Useful keys are:
+
+=over
+
+=item format
+
+Specify the format that standard input is. Defaults to C<yaml> or the value
+of C<YERTL_FORMAT> (see L<ETL::Yertl::Format/get_default>.
+
+=back
+
+=cut
+
+sub stdin(;%) {
+    my ( %args ) = @_;
+    $args{read_handle} = \*STDIN;
+    return stream( %args );
+}
+
+=sub stdout
+
+    my $stdout = stdout( %args );
+
+Get a L<ETL::Yertl::FormatStream> object for standard output. C<%args> is a list
+of key/value pairs passed to L<ETL::Yertl::FormatStream/new>. Useful keys are:
+
+=over
+
+=item format
+
+Specify the format that standard input is. Defaults to C<yaml> or the value
+of C<YERTL_FORMAT> (see L<ETL::Yertl::Format/get_default>.
+
+=item autoflush
+
+Immediately write documents to standard output to improve
+responsiveness, instead of queuing them for later writes for efficiency.
+This defaults to C<1> (on). Set it to C<0> to turn autoflush off.
+
+=back
+
+=cut
+
+sub stdout(;%) {
+    my ( %args ) = @_;
+    $args{write_handle} = \*STDOUT;
+    $args{autoflush} //= 1;
+    return stream( %args );
+}
+
+=sub transform
+
+    my $xform = transform( sub { ... } );
+    my $xform = transform( 'Local::Transform::Class' => @args );
+
+Create a new L<ETL::Yertl::Transform> object, passing in either a subref
+to transform documents, or a class to instantiate and arguments to pass
+to its constructor.
+
+The subref will receive two arguments: The L<ETL::Yertl::Transform>
+object and the document to transform. C<$_> will also be set to the
+document to transform.  The subref should return the transformed
+document (either a new document, or the existing document after being
+modified).
+
+If given a transform class, it should inherit from
+L<ETL::Yertl::Transform>. The class will be loaded and an object
+instantiated using the C<@args>.
+
+=cut
+
+sub transform($;%) {
+    my ( $xform, @args ) = @_;
+    my $obj;
+    if ( !ref $xform ) {
+        my $module = $xform;
+        $obj = use_module( $module )->new( @args );
+    }
+    elsif ( ref $xform eq 'CODE' ) {
+        $obj = ETL::Yertl::Transform->new(
+            @args,
+            transform_doc => $xform,
+        );
+    }
+    loop->add( $obj );
+    return $obj;
+}
+
+=sub file
+
+    my $stream = file( $mode, $path, %args );
+
+Create a L<ETL::Yertl::FormatStream> object for the given C<$path>.
+C<$mode> should be one of C<< < >> for reading or C<< > >> for writing.
+C<%args> are additional arguments to pass to the
+L<ETL::Yertl::FormatStream> constructor. Useful keys are:
+
+=over
+
+=item format
+
+Specify the format that standard input is. Defaults to C<yaml> or the value
+of C<YERTL_FORMAT> (see L<ETL::Yertl::Format/get_default>.
+
+=back
+
+=cut
+
+sub file( $$;% ) {
+    my ( $mode, $name, %args ) = @_;
+    # Detect whether to read_handle/write_handle via '<', '>'
+    open my $fh, $mode, $name
+        or croak sprintf q{Can't open file "%s": %s}, $name, $!;
+    if ( $mode =~ /^</ ) {
+        $args{read_handle} = $fh;
+    }
+    elsif ( $mode =~ /^>/ ) {
+        $args{write_handle} = $fh;
+    }
+    else {
+        croak sprintf q{Can't determine if mode "%s" is read or write}, $mode;
+    }
+    return stream( %args );
+}
+
+=sub loop
+
+    my $loop = loop();
+
+Get the L<IO::Async::Loop> singleton. Use this to add other L<IO::Async> objects
+to a larger program. This is not needed for simple Yertl streams, and is mostly
+used internally.
+
+=cut
+
+sub loop() {
+    state $loop = IO::Async::Loop->new;
+    return $loop;
 }
 
 1;
@@ -56,7 +228,11 @@ __END__
     ### In Perl...
     use ETL::Yertl;
 
-    # XXX: To do: Perl API
+    # Give everyone a 5% raise
+    my $xform = file( '<', 'employees.yaml' )
+              | transform( sub { $_->{salary} *= 1.05 } )
+              >> stdout;
+    $xform->run;
 
 =head1 DESCRIPTION
 
