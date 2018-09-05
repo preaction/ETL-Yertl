@@ -283,7 +283,7 @@ sub run {
     # Default on_read_eof exits the loop. This gets replaced by a new
     # on_read_eof when transforms are added as a source for another
     # transform
-    my $on_read_eof = $self->{on_read_eof} || sub { };
+    my $on_read_eof = $self->{on_read_eof} || $self->can( 'on_read_eof' ) || sub { };
     $self->configure(
         on_read_eof => sub {
             $on_read_eof->( @_ );
