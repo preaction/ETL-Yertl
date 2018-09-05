@@ -12,13 +12,20 @@ use ETL::Yertl::FormatStream;
 use ETL::Yertl::Format;
 use IO::Async::Loop;
 
-our @EXPORT = qw( loop stream stdin stdout transform file );
+our @EXPORT = qw( stdin stdout transform file );
+our @EXPORT_OK = qw( loop );
 
 sub loop;
 
 sub import {
-    my ( $class, @args ) = @_;
-    $class->export_to_level( 1, @EXPORT );
+    $_[0]->export_to_level( 1, undef, @EXPORT );
+    for my $i ( 1..$#_ ) {
+        if ( grep { $_ eq $_[ $i ] } @EXPORT_OK ) {
+            $_[0]->export_to_level( 1, undef, $_[ $i ] );
+            splice @_, $i, 1;
+            redo;
+        }
+    }
     goto &Import::Base::import;
 }
 
@@ -194,6 +201,8 @@ sub file( $$;% ) {
 Get the L<IO::Async::Loop> singleton. Use this to add other L<IO::Async> objects
 to a larger program. This is not needed for simple Yertl streams, and is mostly
 used internally.
+
+This is not exported by default. You can import it using C<< use ETL::Yertl 'loop' >>.
 
 =cut
 
