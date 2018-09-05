@@ -32,7 +32,7 @@ subtest 'empty does not print' => sub {
     my ( $output, $stderr ) = capture { yq->main( $filter ) };
     ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
     my @got = @{ YAML::Tiny->read_string( $output ) };
-    cmp_deeply \@got, [ 'bar' ];
+    cmp_deeply \@got, [ 'bar' ] or diag explain \@got;
 };
 
 subtest 'single document with no --- separator' => sub {
@@ -41,7 +41,7 @@ subtest 'single document with no --- separator' => sub {
     my ( $output, $stderr ) = capture { yq->main( $filter ) };
     ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
     my @got = @{ YAML::Tiny->read_string( $output ) };
-    cmp_deeply \@got, [ 'flop' ];
+    cmp_deeply \@got, [ 'flop' ] or diag explain \@got;
 };
 
 subtest 'file in ARGV' => sub {
@@ -50,7 +50,7 @@ subtest 'file in ARGV' => sub {
     my ( $output, $stderr ) = capture { yq->main( $filter, "$file" ) };
     ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
     my @got = @{ YAML::Tiny->read_string( $output ) };
-    cmp_deeply \@got, [ 'bar' ];
+    cmp_deeply \@got, [ 'bar' ] or diag explain \@got;
 
     subtest 'multiple files with no seperators' => sub {
         my $file = $SHARE_DIR->child( yaml => 'noseperator.yaml' );
@@ -58,7 +58,7 @@ subtest 'file in ARGV' => sub {
         my ( $output, $stderr ) = capture { yq->main( $filter, "$file", "$file" ) };
         ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
         my @got = @{ YAML::Tiny->read_string( $output ) };
-        cmp_deeply \@got, [ 'bar', 'bar' ];
+        cmp_deeply \@got, [ 'bar', 'bar' ] or diag explain \@got;
     };
 };
 
@@ -68,7 +68,7 @@ subtest 'multiple documents print properly' => sub {
     my ( $output, $stderr ) = capture { yq->main( $filter ) };
     ok !$stderr, 'stderr is empty' or diag "STDERR: $stderr";
     my @got = @{ YAML::Tiny->read_string( $output ) };
-    cmp_deeply \@got, [ 'bar', 'buzz' ];
+    cmp_deeply \@got, [ 'bar', 'buzz' ] or diag explain \@got;
 };
 
 subtest 'finish() gets called' => sub {

@@ -1,7 +1,7 @@
 
 use ETL::Yertl 'Test';
-use ETL::Yertl::Command::yq;
-my $class = 'ETL::Yertl::Command::yq';
+use ETL::Yertl::Transform::Yq;
+my $class = 'ETL::Yertl::Transform::Yq';
 
 subtest 'raw numbers' => sub {
     my $doc = {

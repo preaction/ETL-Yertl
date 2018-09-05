@@ -1,12 +1,60 @@
-package ETL::Yertl::Command::yq::Regex;
+package ETL::Yertl::Transform::Yq;
 our $VERSION = '0.041';
-# ABSTRACT: A regex-based parser for programs
+# ABSTRACT: A mini-language for transforming structured data
 
 use ETL::Yertl;
+use base 'ETL::Yertl::Transform';
 use boolean qw( :all );
 use Regexp::Common;
 use Time::Local qw( timegm );
+use Carp qw( croak );
 use ETL::Yertl::Util qw( firstidx );
+
+sub configure {
+    my ( $self, %args ) = @_;
+    $self->{filter} = delete $args{filter} if $args{filter};
+    if ( !$self->{filter} ) {
+        croak "filter attribute is required";
+    }
+    return $self->SUPER::configure( %args );
+}
+
+sub transform_doc {
+    my ( $self, $doc ) = @_;
+    return unless $doc; # XXX: This shouldn't be happening, but it is
+    my @output = $self->filter( $self->{filter}, $doc, $self->{scope} //= {} );
+    return $self->post_process( @output );
+}
+
+sub post_process {
+    my ( $self, @input ) = @_;
+    my @output = map { isTrue( $_ ) ? "true" : isFalse( $_ ) ? "false" : $_ }
+                grep { !is_empty( $_ ) }
+                @input;
+    return @output;
+}
+
+sub on_read_eof {
+    my ( $self ) = @_;
+    my @output = $self->finish( $self->{scope} );
+    #; use Data::Dumper;
+    #; say STDERR Dumper \@output;
+    $self->write( @output ) if @output;
+    $self->{scope} = {};
+}
+
+sub finish {
+    my ( $self, $scope ) = @_;
+    # Finish the scope, cleaning up any collections
+    my @output;
+    if ( $scope->{sort} ) {
+        @output = map { $_->[1] } sort { $a->[0] cmp $b->[0] } @{ $scope->{sort} };
+    }
+    elsif ( $scope->{group_by} ) {
+        @output = ( $scope->{group_by} );
+    }
+    return $self->post_process( @output );
+}
 
 sub empty() {
     bless {}, 'empty';
