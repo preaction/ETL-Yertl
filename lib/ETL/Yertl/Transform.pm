@@ -275,6 +275,10 @@ written to the destination (if any).
 sub run {
     my ( $self ) = @_;
 
+    if ( !$self->loop ) {
+        croak "Can't run(): Transform not added to loop";
+    }
+
     # Run the transforms until this point
     # Default on_read_eof exits the loop. This gets replaced by a new
     # on_read_eof when transforms are added as a source for another
