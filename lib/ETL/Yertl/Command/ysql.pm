@@ -1,5 +1,5 @@
 package ETL::Yertl::Command::ysql;
-our $VERSION = '0.040';
+our $VERSION = '0.041';
 # ABSTRACT: Read and write documents with a SQL database
 
 use ETL::Yertl;

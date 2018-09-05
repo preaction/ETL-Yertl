@@ -1,5 +1,5 @@
 package ETL::Yertl::Util;
-our $VERSION = '0.040';
+our $VERSION = '0.041';
 # ABSTRACT: Utility functions for Yertl modules
 
 =head1 SYNOPSIS

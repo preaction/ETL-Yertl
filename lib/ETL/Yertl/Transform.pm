@@ -1,5 +1,5 @@
 package ETL::Yertl::Transform;
-our $VERSION = '0.040';
+our $VERSION = '0.041';
 # ABSTRACT: Transform a stream of documents
 
 =head1 SYNOPSIS

@@ -2,6 +2,8 @@ Changelog for ETL-Yertl
 
 {{ $NEXT }}
 
+0.040     2018-09-04 19:51:21-05:00 America/Chicago
+
     [Added]
 
     - Added ETL::Yertl::Transform class. This class holds a routine to
