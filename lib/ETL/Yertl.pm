@@ -12,7 +12,7 @@ use ETL::Yertl::FormatStream;
 use ETL::Yertl::Format;
 use IO::Async::Loop;
 
-our @EXPORT = qw( stdin stdout transform file );
+our @EXPORT = qw( stdin stdout transform file yq );
 our @EXPORT_OK = qw( loop );
 
 sub loop;
@@ -192,6 +192,23 @@ sub file( $$;% ) {
         croak sprintf q{Can't determine if mode "%s" is read or write}, $mode;
     }
     return stream( %args );
+}
+
+=sub yq
+
+    my $xform = yq( $filter );
+
+Create a L<ETL::Yertl::Transform::Yq> object with the given filter. See
+L<yq/SYNTAX> for full filter syntax.
+
+=cut
+
+sub yq( $ ) {
+    my ( $filter ) = @_;
+    return transform(
+        'ETL::Yertl::Transform::Yq',
+        filter => $filter,
+    );
 }
 
 =sub loop

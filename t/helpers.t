@@ -106,4 +106,11 @@ subtest 'file' => sub {
     };
 };
 
+subtest 'yq' => sub {
+    my $xform = yq( '.foo' );
+    isa_ok $xform, 'ETL::Yertl::Transform::Yq';
+    is $xform->{filter}, '.foo', 'filter is correct';
+    is $xform->loop, $loop, 'xform has loop singleton';
+};
+
 done_testing;
