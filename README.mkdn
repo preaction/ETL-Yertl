@@ -4,7 +4,7 @@ ETL::Yertl - ETL with a Shell
 
 # VERSION
 
-version 0.039
+version 0.040
 
 # STATUS
 
@@ -16,9 +16,6 @@ version 0.039
     # Convert file to Yertl's format
     $ yfrom csv file.csv >work.yml
     $ yfrom json file.json >work.yml
-
-    # Mask document
-    $ ymask 'field/inner' work.yml >masked.yml
 
     # Convert file to output format
     $ yto csv work.yml
@@ -36,7 +33,11 @@ version 0.039
     ### In Perl...
     use ETL::Yertl;
 
-    # XXX: To do: Perl API
+    # Give everyone a 5% raise
+    my $xform = file( '<', 'employees.yaml' )
+              | transform( sub { $_->{salary} *= 1.05 } )
+              >> stdout;
+    $xform->run;
 
 # DESCRIPTION
 
@@ -52,6 +53,81 @@ Yertl will have tools for:
 - Extracting data from web services
 - Writing data to web services
 - Distributing data through messaging APIs (ZeroMQ)
+
+# SUBROUTINES
+
+## stdin
+
+    my $stdin = stdin( %args );
+
+Get a [ETL::Yertl::FormatStream](https://metacpan.org/pod/ETL::Yertl::FormatStream) object for standard input. `%args` is a list
+of key/value pairs passed to ["new" in ETL::Yertl::FormatStream](https://metacpan.org/pod/ETL::Yertl::FormatStream#new). Useful keys are:
+
+- format
+
+    Specify the format that standard input is. Defaults to `yaml` or the value
+    of `YERTL_FORMAT` (see ["get\_default" in ETL::Yertl::Format](https://metacpan.org/pod/ETL::Yertl::Format#get_default).
+
+## stdout
+
+    my $stdout = stdout( %args );
+
+Get a [ETL::Yertl::FormatStream](https://metacpan.org/pod/ETL::Yertl::FormatStream) object for standard output. `%args` is a list
+of key/value pairs passed to ["new" in ETL::Yertl::FormatStream](https://metacpan.org/pod/ETL::Yertl::FormatStream#new). Useful keys are:
+
+- format
+
+    Specify the format that standard input is. Defaults to `yaml` or the value
+    of `YERTL_FORMAT` (see ["get\_default" in ETL::Yertl::Format](https://metacpan.org/pod/ETL::Yertl::Format#get_default).
+
+- autoflush
+
+    Immediately write documents to standard output to improve
+    responsiveness, instead of queuing them for later writes for efficiency.
+    This defaults to `1` (on). Set it to `0` to turn autoflush off.
+
+## transform
+
+    my $xform = transform( sub { ... } );
+    my $xform = transform( 'Local::Transform::Class' => @args );
+
+Create a new [ETL::Yertl::Transform](https://metacpan.org/pod/ETL::Yertl::Transform) object, passing in either a subref
+to transform documents, or a class to instantiate and arguments to pass
+to its constructor.
+
+The subref will receive two arguments: The [ETL::Yertl::Transform](https://metacpan.org/pod/ETL::Yertl::Transform)
+object and the document to transform. `$_` will also be set to the
+document to transform.  The subref should return the transformed
+document (either a new document, or the existing document after being
+modified).
+
+If given a transform class, it should inherit from
+[ETL::Yertl::Transform](https://metacpan.org/pod/ETL::Yertl::Transform). The class will be loaded and an object
+instantiated using the `@args`.
+
+## file
+
+    my $stream = file( $mode, $path, %args );
+
+Create a [ETL::Yertl::FormatStream](https://metacpan.org/pod/ETL::Yertl::FormatStream) object for the given `$path`.
+`$mode` should be one of `<` for reading or `>` for writing.
+`%args` are additional arguments to pass to the
+[ETL::Yertl::FormatStream](https://metacpan.org/pod/ETL::Yertl::FormatStream) constructor. Useful keys are:
+
+- format
+
+    Specify the format that standard input is. Defaults to `yaml` or the value
+    of `YERTL_FORMAT` (see ["get\_default" in ETL::Yertl::Format](https://metacpan.org/pod/ETL::Yertl::Format#get_default).
+
+## loop
+
+    my $loop = loop();
+
+Get the [IO::Async::Loop](https://metacpan.org/pod/IO::Async::Loop) singleton. Use this to add other [IO::Async](https://metacpan.org/pod/IO::Async) objects
+to a larger program. This is not needed for simple Yertl streams, and is mostly
+used internally.
+
+This is not exported by default. You can import it using `use ETL::Yertl 'loop'`.
 
 # SEE ALSO
 
@@ -95,6 +171,14 @@ Here are some other tools that can be used with Yertl
     interoperability, set the `YERTL_FORMAT` environment variable to
     `"json"`.
 
+- [Catmandu](http://librecat.org)
+
+    A generic data processing toolkit. Convert data between multiple
+    formats, import/export into multiple databases, and manipulate data with
+    a mini-language.
+
+    This project is very much like Yertl, and more mature besides.
+
 - [jq](http://stedolan.github.io/jq/)
 
     A filter for JSON documents. The inspiration for [yq](https://metacpan.org/pod/yq). For
@@ -106,6 +190,40 @@ Here are some other tools that can be used with Yertl
     JSON Transformer. Allows multiple ways of manipulating JSON, including
     [JSONPath](http://goessner.net/articles/JsonPath/). For interoperability,
     set the `YERTL_FORMAT` environment variable to `"json"`.
+
+- [pv (Pipe Viewer)](http://www.ivarch.com/programs/pv.shtml)
+
+    This tool helps examine how fast data is flowing through a shell
+    pipeline. If the size of the data is known, it can even provide
+    a progress bar and an ETA.
+
+- [netcat (nc)](http://netcat.sourceforge.net)
+
+    Netcat allows simple streaming over a network. Using Netcat you can
+    start a Yertl pipeline on one machine and finish it on another machine.
+    For example, you could generate metrics on each client machine, and then
+    write them to a central machine to insert into a database on that
+    machine.
+
+    Netcat does not come with any security, so be careful (use firewalls).
+
+- [socat](http://www.dest-unreach.org/socat/doc/socat.html)
+
+    Socat is a multi-purpose relay. It is similar to Netcat but with many
+    more features such as SSL and client verification. Socat has security,
+    so you can use this like Netcat in cases where you must accept data from
+    the Internet.
+
+- [parallel (GNU Parallel)](https://www.gnu.org/software/parallel/)
+
+    GNU Parallel is a shell tool for executing jobs in parallel on one or more
+    computers. Parallel is very similar to `xargs`, except it will execute
+    the commands on other computers.
+
+- [distribution](https://github.com/wizzat/distribution)
+
+    This tool creates charts. Pipe into it from `yq` to create simple
+    charts from your data.
 
 # AUTHOR
 

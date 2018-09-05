@@ -2,6 +2,22 @@ Changelog for ETL-Yertl
 
 {{ $NEXT }}
 
+    [Added]
+
+    - Added ETL::Yertl::Transform class. This class holds a routine to
+      transform documents that pass through it. Transforms can be linked
+      to FormatStream sources or additional Transforms to create a chain
+      of transforms. Each transform also can have a destination to write
+      documents after transform.
+
+    - Added helpers for stdin, stdout, file (creating FormatStream
+      objects) and transform (creating Transform objects).
+
+    [Fixed]
+
+    - Removed references to "ymask", a command we deleted a while ago.
+    - Fix FormatStream format being lost after a reconfigure.
+
 0.039     2018-08-22 13:09:41-05:00 America/Chicago
 
     [Fixed]
