@@ -47,6 +47,14 @@ use Scalar::Util qw( weaken );
 
 sub configure {
     my ( $self, %args ) = @_;
+
+    # Args to pass to streams as we create them
+    # XXX: This is why I would prefer already having the streams
+    # created!
+    for my $arg ( qw( format ) ) {
+        $self->{stream_args}{ $arg } = delete $args{ $arg } if $args{ $arg };
+    }
+
     if ( my $streams = delete $args{streams} ) {
         # TODO: Support any kind of Yertl input stream. Stream must not
         # yet be added to a loop, otherwise it will start producing
@@ -55,7 +63,6 @@ sub configure {
             croak "InputSeries streams must be file paths or filehandles";
         }
         $self->{streams} = $streams;
-        $self->_shift_stream;
     }
     for my $event ( qw( on_doc on_read_eof on_child_read_eof ) ) {
         $self->{ $event } = delete $args{ $event } if exists $args{ $event };
@@ -66,6 +73,11 @@ sub configure {
     }
 
     return $self->SUPER::configure( %args );
+}
+
+sub _add_to_loop {
+    my ( $self ) = @_;
+    $self->_shift_stream;
 }
 
 sub _shift_stream {
@@ -84,6 +96,7 @@ sub _shift_stream {
     }
 
     my $current_stream = $self->{current_stream} = ETL::Yertl::FormatStream->new(
+        %{ $self->{stream_args} },
         read_handle => $fh,
         on_doc => sub {
             my ( undef, $doc, $eof ) = @_;
