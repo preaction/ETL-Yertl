@@ -8,6 +8,7 @@ use Pod::Usage::Return qw( pod2usage );
 use Getopt::Long qw( GetOptionsFromArray );
 use ETL::Yertl::Format;
 use ETL::Yertl::FormatStream;
+use ETL::Yertl::InputSeries;
 use IO::Async::Loop;
 
 $|++; # no buffering
@@ -26,7 +27,10 @@ sub main {
         return 0;
     }
 
-    my ( $format, @files ) = @argv;
+    my $format = shift @argv;
+    # Check for - (STDIN) and stringify for sanity
+    my @files = map { $_ eq '-' ? \*STDIN : "$_" } @argv;
+    push @files, \*STDIN unless @files;
 
     if ( !$format ) {
         return pod2usage( "ERROR: Must give a format" );
@@ -38,42 +42,24 @@ sub main {
         return 1;
     }
 
-    my $loop = IO::Async::Loop->new;
-
     my $out = ETL::Yertl::FormatStream->new_for_stdout(
         autoflush => 1,
     );
+
+    my $series = ETL::Yertl::InputSeries->new(
+        streams => \@files,
+        format => $in_format,
+        on_doc => sub {
+            my ( $self, $doc, $eof ) = @_;
+            $out->write( $doc )->await;
+        },
+        on_read_eof => sub { shift->loop->stop },
+    );
+
+    my $loop = IO::Async::Loop->new;
     $loop->add( $out );
-
-    push @files, "-" unless @files;
-    for my $file ( @files ) {
-
-        # We're doing a similar behavior to <>, but manually for easier testing.
-        my %args = (
-            format => $in_format,
-            on_doc => sub {
-                my ( $self, $doc, $eof ) = @_;
-                $out->write( $doc )->await;
-            },
-            on_read_eof => sub { $loop->stop },
-        );
-        my $in;
-        if ( $file eq '-' ) {
-            $in = ETL::Yertl::FormatStream->new_for_stdin( %args );
-        }
-        else {
-            open my $fh, '<', $file or do {
-                warn "Could not open file '$file' for reading: $!\n";
-                next;
-            };
-            $in = ETL::Yertl::FormatStream->new(
-                read_handle => $fh,
-                %args,
-            );
-        }
-        $loop->add( $in );
-        $loop->run;
-    }
+    $loop->add( $series );
+    $loop->run;
 
     return 0;
 }
