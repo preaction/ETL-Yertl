@@ -3,10 +3,14 @@ package yq;
 our $VERSION = '0.041';
 # ABSTRACT: Filter YAML through a command-line program
 
-use ETL::Yertl;
+use ETL::Yertl 'loop';
 use Pod::Usage::Return qw( pod2usage );
 use Getopt::Long qw( GetOptionsFromArray );
-use ETL::Yertl::Command::yq;
+use ETL::Yertl::Format;
+use ETL::Yertl::FormatStream;
+use ETL::Yertl::LineStream;
+use ETL::Yertl::InputSeries;
+use IO::Async::Loop;
 
 $|++; # no buffering
 
@@ -29,12 +33,33 @@ sub main {
         return 0;
     }
 
-    eval {
-        ETL::Yertl::Command::yq->main( @argv, \%opt );
-    };
-    if ( $@ ) {
-        return pod2usage( "ERROR: $@" );
+    my $filter = shift @argv;
+    # Check for - (STDIN) and stringify for sanity
+    my @files = map { $_ eq '-' ? \*STDIN : "$_" } @argv;
+    push @files, \*STDIN unless @files;
+
+    if ( !$filter ) {
+        return pod2usage( "ERROR: Must give a filter" );
     }
+
+    my $output = $opt{xargs}
+               ? ETL::Yertl::LineStream->new_for_stdout( autoflush => 1 )
+               : stdout();
+
+    my $series = ETL::Yertl::InputSeries->new(
+        streams => \@files,
+    );
+
+    my $xform = transform(
+        'ETL::Yertl::Transform::Yq',
+        filter => $filter,
+        destination => $output,
+    ) << $series;
+
+    my $loop = loop();
+    $loop->add( $series );
+    $xform->run;
+
     return 0;
 }
 
