@@ -67,16 +67,14 @@ sub configure {
     for my $event ( qw( on_doc on_read_eof on_child_read_eof ) ) {
         $self->{ $event } = delete $args{ $event } if exists $args{ $event };
     }
-    if ( $self->{streams} ) {
-        $self->can_event( "on_doc" )
-            or croak "Expected either an on_doc callback or to be able to ->on_doc";
-    }
 
     return $self->SUPER::configure( %args );
 }
 
 sub _add_to_loop {
     my ( $self ) = @_;
+    $self->can_event( "on_doc" )
+        or croak "Expected either an on_doc callback or to be able to ->on_doc";
     $self->_shift_stream;
 }
 
