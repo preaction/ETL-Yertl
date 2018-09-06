@@ -313,10 +313,6 @@ Parse lines of text into Yertl documents.
 
 Read/write documents from SQL databases.
 
-=item L<ymask>
-
-Filter documents with a mask, letting only matching fields through.
-
 =item L<yq>
 
 A powerful mini-language for munging and filtering.
