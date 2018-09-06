@@ -1,5 +1,5 @@
 package ETL::Yertl::Transform::Yq;
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 # ABSTRACT: A mini-language for transforming structured data
 
 use ETL::Yertl;

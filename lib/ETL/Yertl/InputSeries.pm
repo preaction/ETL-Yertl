@@ -1,5 +1,5 @@
 package ETL::Yertl::InputSeries;
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 # ABSTRACT: Read a series of input streams
 
 =head1 SYNOPSIS
