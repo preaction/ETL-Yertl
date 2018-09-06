@@ -4,7 +4,7 @@ ETL::Yertl - ETL with a Shell
 
 # VERSION
 
-version 0.040
+version 0.041
 
 # STATUS
 
@@ -119,6 +119,13 @@ Create a [ETL::Yertl::FormatStream](https://metacpan.org/pod/ETL::Yertl::FormatS
     Specify the format that standard input is. Defaults to `yaml` or the value
     of `YERTL_FORMAT` (see ["get\_default" in ETL::Yertl::Format](https://metacpan.org/pod/ETL::Yertl::Format#get_default).
 
+## yq
+
+    my $xform = yq( $filter );
+
+Create a [ETL::Yertl::Transform::Yq](https://metacpan.org/pod/ETL::Yertl::Transform::Yq) object with the given filter. See
+["SYNTAX" in yq](https://metacpan.org/pod/yq#SYNTAX) for full filter syntax.
+
 ## loop
 
     my $loop = loop();
@@ -152,10 +159,6 @@ This is not exported by default. You can import it using `use ETL::Yertl 'loop'`
 - [ysql](https://metacpan.org/pod/ysql)
 
     Read/write documents from SQL databases.
-
-- [ymask](https://metacpan.org/pod/ymask)
-
-    Filter documents with a mask, letting only matching fields through.
 
 - [yq](https://metacpan.org/pod/yq)
 
@@ -235,7 +238,7 @@ Luke Triantafyllidis <ltriant@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Doug Bell.
+This software is copyright (c) 2018 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

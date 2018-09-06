@@ -2,6 +2,26 @@ Changelog for ETL-Yertl
 
 {{ $NEXT }}
 
+    [Added]
+
+    - Added ETL::Yertl::Transform::Yq. This allows you to use `yq`
+      filter language to transform documents in Perl code. The
+      corresponding `yq` helper makes it very easy to do:
+
+        use ETL::Yertl;
+        my $xform = stdin | yq( '.foo' ) >> stdout;
+        $xform->run;
+
+      ETL::Yertl::Transform::Yq replaces the ETL::Yertl::Command::yq
+      class, but the `yq` command-line program works exactly as it did
+      before.
+
+    - Added ETL::Yertl::InputSeries class. This creates a series of
+      streams for a set of input file paths or file handles. This is
+      used to implement the yto, yfrom, and yq commands: Each command
+      allows for listing multiple files as arguments, and will process
+      each file one-by-one in series.
+
 0.040     2018-09-04 19:51:21-05:00 America/Chicago
 
     [Added]
