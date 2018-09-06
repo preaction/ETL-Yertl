@@ -2,13 +2,19 @@
 use ETL::Yertl 'Test';
 use Capture::Tiny qw( capture );
 use ETL::Yertl::Command::ygrok;
-use ETL::Yertl::Command::yq;
 use File::Temp;
 my $SHARE_DIR = path( __DIR__, '..', 'share' );
 
-# XXX: This could be moved into a test utility module and clean up a lot
-# of test code!
-# XXX: This could also be the start of a pure-Perl API to the commands!!
+my $yq_script = "$FindBin::Bin/../../bin/yq";
+require $yq_script;
+
+# XXX: This should use the Perl API, but before it does, we need
+# to support:
+#   - Arrayref as an input (to feed in lines or documents)
+#   - String as an input (to feed in file content)
+#   - Arrayref as an output (to examine transformed documents)
+#   - Path::Tiny as input / output
+#   - ygrok as a transform (LineStream source, on_doc destination)
 sub test_command {
     my ( $cmd, %args ) = @_;
 
@@ -34,7 +40,7 @@ sub test_command {
     }
 
     my ( $stdout, $stderr, $exit ) = capture {
-        "ETL::Yertl::Command::$cmd"->main( @{ $args{args} || [] } );
+        $cmd->main( @{ $args{args} || [] } );
     };
     ok !$exit, 'nothing returned';
     ok !$stderr, 'nothing on stderr' or diag $stderr;
@@ -47,7 +53,7 @@ my $docs;
 subtest '1: parse apache log with ygrok' => sub {
     my $file = $SHARE_DIR->child( lines => 'http_common_log.txt' );
     my $pattern = '%{LOG.HTTP_COMMON}';
-    $docs = test_command( 'ygrok', stdin => $file, args => [ $pattern ] );
+    $docs = test_command( 'ETL::Yertl::Command::ygrok', stdin => $file, args => [ $pattern ] );
 };
 
 subtest '2: parse apache date with yq' => sub {
