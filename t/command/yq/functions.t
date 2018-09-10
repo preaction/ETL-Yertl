@@ -27,8 +27,18 @@ subtest 'empty' => sub {
         $out = $class->filter( 'empty', $doc );
     };
     isa_ok $out, 'empty';
-    like $stderr, qr/empty does not take arguments/,
-        "Captured warning that 'empty' does not take arguments";
+    unlike $stderr, qr/empty does not take arguments/,
+        "Does not warn that 'empty' does not take arguments";
+
+    subtest 'empty with arguments' => sub {
+        my $out;
+        my ( $stdout, $stderr, $exit ) = capture {
+            $out = $class->filter( 'empty( . )', $doc );
+        };
+        isa_ok $out, 'empty';
+        like $stderr, qr/empty does not take arguments/,
+            "Captured warning that 'empty' does not take arguments";
+    };
 };
 
 subtest 'group_by( EXPR )' => sub {

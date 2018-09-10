@@ -159,7 +159,8 @@ sub filter {
 
     # Function calls
     elsif ( my ( $func, @args ) = $filter =~ /^((?&FUNC_NAME))(?:\(\s*((?&EXPR))\s*(?:,\s*((?&EXPR))\s*)*\))?$GRAMMAR$/ ) {
-        diag( 1, "F: $func, ARGS: " . ( join( ', ', grep defined, @args ) || '' ) );
+        diag( 1, "F: $func, ARGS: " . ( join( ', ', map { defined ? $_ : '<undef>' } @args ) || '' ) );
+        @args = grep defined, @args;
         if ( $func eq 'empty' ) {
             if ( @args ) {
                 warn "empty does not take arguments\n";
