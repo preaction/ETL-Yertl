@@ -1,5 +1,6 @@
 
 use ETL::Yertl 'Test';
+use Capture::Tiny qw( capture );
 use ETL::Yertl::Transform::Yq;
 my $class = 'ETL::Yertl::Transform::Yq';
 
@@ -21,8 +22,13 @@ subtest 'grep( EXPR )' => sub {
 };
 
 subtest 'empty' => sub {
-    my $out = $class->filter( 'empty', $doc );
+    my $out;
+    my ( $stdout, $stderr, $exit ) = capture {
+        $out = $class->filter( 'empty', $doc );
+    };
     isa_ok $out, 'empty';
+    like $stderr, qr/empty does not take arguments/,
+        "Captured warning that 'empty' does not take arguments";
 };
 
 subtest 'group_by( EXPR )' => sub {
