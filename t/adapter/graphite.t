@@ -139,7 +139,9 @@ subtest 'write ts' => sub {
     );
 
     my $time = time;
+    no warnings 'once';
     local *CORE::GLOBAL::time = sub { $time };
+    use warnings;
     $db->write_ts( @points );
     wait_for { $empty };
 
