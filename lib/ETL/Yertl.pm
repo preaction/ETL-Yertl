@@ -19,11 +19,13 @@ sub loop;
 
 sub import {
     $_[0]->export_to_level( 1, undef, @EXPORT );
-    for my $i ( 1..$#_ ) {
-        if ( grep { $_ eq ($_[ $i ] //= '') } @EXPORT_OK ) {
+    # C-style for loop because we remove items from the array and need
+    # to keep comparing against $#_
+    for ( my $i = 1; $i <= $#_; $i++ ) {
+        if ( grep { $_ eq $_[ $i ] } @EXPORT_OK ) {
             $_[0]->export_to_level( 1, undef, $_[ $i ] );
             splice @_, $i, 1;
-            redo;
+            redo unless $i > $#_;
         }
     }
     goto &Import::Base::import;
