@@ -4,7 +4,7 @@ our $VERSION = '0.042';
 
 use strict;
 use warnings;
-use feature qw( :5.10 );
+use 5.010;
 use base 'Import::Base', 'Exporter';
 use Carp qw( croak );
 use Module::Runtime qw( use_module );
@@ -20,7 +20,7 @@ sub loop;
 sub import {
     $_[0]->export_to_level( 1, undef, @EXPORT );
     for my $i ( 1..$#_ ) {
-        if ( grep { $_ eq $_[ $i ] } @EXPORT_OK ) {
+        if ( grep { $_ eq ($_[ $i ] //= '') } @EXPORT_OK ) {
             $_[0]->export_to_level( 1, undef, $_[ $i ] );
             splice @_, $i, 1;
             redo;
