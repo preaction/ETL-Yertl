@@ -2,6 +2,8 @@ Changelog for ETL-Yertl
 
 {{ $NEXT }}
 
+0.042     2018-09-10 20:56:10-05:00 America/Chicago
+
     [Fixed]
 
     - Fixed a half-dozen warnings, including:
