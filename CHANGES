@@ -2,6 +2,15 @@ Changelog for ETL-Yertl
 
 {{ $NEXT }}
 
+    [Fixed]
+
+    - Fixed a half-dozen warnings, including:
+        - Warnings thrown while importing the `loop` sub from ETL::Yertl
+        - Warnings thrown while overloading `CORE::GLOBAL::time` during
+          testing
+        - Warnings thrown about 'empty' not taking any arguments
+      Thanks @jkeenan for fixing all these!
+
 0.041     2018-09-05 22:22:36-05:00 America/Chicago
 
     [Added]
