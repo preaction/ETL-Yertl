@@ -16,7 +16,7 @@ my $loop = IO::Async::Loop->new;
 testing_loop( $loop );
 
 sub test_format_stream {
-    my ( $path, $expect_output, $format ) = @_;
+    my ( $path, $format ) = @_;
 
     subtest 'read_handle and on_doc' => sub {
         my @docs;
@@ -51,18 +51,21 @@ sub test_format_stream {
         $stream->write( { foo => 'bar' } );
 
         my $output = $tmp->slurp;
-        is $output, $expect_output, 'output is correct';
+        my ($doc) = docs_from_string($output);
+        cmp_deeply(
+            $doc,
+            { foo => 'bar' },
+            'output is correct'
+        );
     };
 }
 
 subtest 'default format' => \&test_format_stream,
     $SHARE_DIR->child( yaml => 'test.yaml' ),
-    "---\nfoo: bar\n",
     ;
 
 subtest 'format object (ETL::Yertl::Format::json)' => \&test_format_stream,
     $SHARE_DIR->child( json => 'test.json' ),
-    qq{{\n   "foo" : "bar"\n}\n},
     ETL::Yertl::Format->get( 'json' ),
     ;
 
