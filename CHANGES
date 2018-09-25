@@ -2,6 +2,16 @@ Changelog for ETL-Yertl
 
 {{ $NEXT }}
 
+    [Fixed]
+
+    - Fixed a test failure when using YAML::Syck. Thanks @ltriant!
+      [Github #159]
+
+    [Added]
+
+    - Added the query and bind parameters when reporting a SQL error in
+      ysql. This should make it easier to debug these errors.
+
 0.042     2018-09-10 20:56:10-05:00 America/Chicago
 
     [Fixed]
