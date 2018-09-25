@@ -11,6 +11,7 @@ use SQL::Abstract;
 use IO::Async::Loop;
 use ETL::Yertl::Format;
 use ETL::Yertl::FormatStream;
+use Scalar::Util qw( looks_like_number );
 
 sub main {
     my $class = shift;
@@ -188,11 +189,11 @@ sub main {
                         if ( !$query || $new_query ne $query ) {
                             $query = $new_query;
                             $sth = $dbh->prepare( $query )
-                                or die "SQL error in prepare: " . $dbh->errstr . "\n";
+                                or die _query_error( "prepare", $dbh, $query, \@bind_args );
                         }
 
                         $sth->execute( @bind_args )
-                            or die "SQL error in execute: " . $dbh->errstr . "\n";
+                            or die _query_error( "execute", $dbh, $query, \@bind_args );
                         while ( my $doc = $sth->fetchrow_hashref ) {
                             print $out_fmt->format( $doc );
                         }
@@ -206,10 +207,10 @@ sub main {
             else {
                 my ( $query, @bind_args ) = $sql->insert( $opt{insert}, \@args );
                 my $sth = $dbh->prepare( $query )
-                    or die "SQL error in prepare: " . $dbh->errstr . "\n";
+                    or _query_error( "prepare", $dbh, $query, \@bind_args );
 
                 $sth->execute( @bind_args )
-                    or die "SQL error in execute: " . $dbh->errstr . "\n";
+                    or _query_error( "execute", $dbh, $query, \@bind_args );
                 while ( my $doc = $sth->fetchrow_hashref ) {
                     print $out_fmt->format( $doc );
                 }
@@ -245,7 +246,7 @@ sub main {
         $query =~ s/\$\.[\w.]+/?/g;
 
         my $sth = $dbh->prepare( $query )
-            or die "SQL error in prepare: " . $dbh->errstr . "\n";
+            or _query_error( "prepare", $dbh, $query, [] );
 
         if ( !-t *STDIN && !-z *STDIN ) {
             my $loop = IO::Async::Loop->new;
@@ -254,8 +255,9 @@ sub main {
                     my ( $self, $doc, $eof ) = @_;
                     return unless $doc;
 
-                    $sth->execute( map { select_doc( $_, $doc ) } @fields )
-                        or die "SQL error in execute: " . $dbh->errstr . "\n";
+                    my @bind_args = map { select_doc( $_, $doc ) } @fields;
+                    $sth->execute( @bind_args )
+                        or _query_error( "execute", $dbh, $query, \@bind_args );
                     while ( my $doc = $sth->fetchrow_hashref ) {
                         print $out_fmt->write( $doc );
                     }
@@ -268,7 +270,7 @@ sub main {
         }
         else {
             $sth->execute( @args )
-                or die "SQL error in execute: " . $dbh->errstr . "\n";
+                or _query_error( "execute", $dbh, $query, \@args );
             while ( my $doc = $sth->fetchrow_hashref ) {
                 print $out_fmt->format( $doc );
             }
@@ -276,6 +278,26 @@ sub main {
 
         return 0;
     }
+}
+
+sub _query_error {
+    my ( $method, $dbh, $query, $bind_args ) = @_;
+    my $error = qq{SQL error in %s: %s\n  Query: %s\n};
+    my @fields = ( $method, $dbh->errstr, $query );
+    if ( $method eq 'execute' ) {
+        $error .= "  Binds: %s\n";
+        if ( @$bind_args ) {
+            push @fields,
+                join ", ",
+                map { looks_like_number $_ ? $_ : qq{"$_"} }
+                @$bind_args
+                ;
+        }
+        else {
+            push @fields, '<none>';
+        }
+    }
+    die sprintf $error, @fields;
 }
 
 sub config {

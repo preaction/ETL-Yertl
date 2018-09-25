@@ -869,16 +869,19 @@ subtest 'query' => sub {
             isnt $exit, 0, 'error happened';
             ok !$stdout, 'nothing on stdout' or diag $stdout;
             like $stderr, qr{ERROR: SQL error in prepare: near "FROM": syntax error};
+            like $stderr, qr{\QQuery: SELECT FROM person}, 'stderr contains query';
             unlike $stderr, qr{Usage:}, "we don't need usage info";
         };
 
         subtest 'SQL error in execute' => sub {
             my ( $stdout, $stderr, $exit ) = capture {
-                ysql->main( 'testdb', 'SELECT * FROM person WHERE id=?', 1, 2 );
+                ysql->main( 'testdb', 'SELECT * FROM person WHERE id=?', 1, "foo" );
             };
             isnt $exit, 0, 'error happened';
             ok !$stdout, 'nothing on stdout' or diag $stdout;
             like $stderr, qr{ERROR: SQL error in execute: called with 2 bind variables when 1 are needed};
+            like $stderr, qr{\QQuery: SELECT * FROM person WHERE id=?}, 'stderr contains query';
+            like $stderr, qr{\QBinds: 1, "foo"}, 'stderr contains bind variables';
             unlike $stderr, qr{Usage:}, "we don't need usage info";
         };
 
@@ -889,6 +892,7 @@ subtest 'query' => sub {
             isnt $exit, 0, 'error happened';
             ok !$stdout, 'nothing on stdout' or diag $stdout;
             like $stderr, qr{ERROR: SQL error in prepare: near "FROM": syntax error};
+            like $stderr, qr{\QQuery: SELECT FROM person}, 'stderr contains query';
             unlike $stderr, qr{DBD::SQLite::db prepare failed:}, 'does not contain second error from DBI';
             unlike $stderr, qr{Usage:}, "we don't need usage info";
         };
