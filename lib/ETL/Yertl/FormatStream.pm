@@ -1,5 +1,5 @@
 package ETL::Yertl::FormatStream;
-our $VERSION = '0.043';
+our $VERSION = '0.044';
 # ABSTRACT: Read/write I/O stream with Yertl formatters
 
 =head1 SYNOPSIS

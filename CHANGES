@@ -2,6 +2,8 @@ Changelog for ETL-Yertl
 
 {{ $NEXT }}
 
+0.043     2018-09-25 18:13:41-05:00 America/Chicago
+
     [Fixed]
 
     - Fixed a test failure when using YAML::Syck. Thanks @ltriant!
