@@ -2,6 +2,8 @@ Changelog for ETL-Yertl
 
 {{ $NEXT }}
 
+0.044     2020-07-27 21:28:55-05:00 America/Chicago
+
     [Fixed]
 
     - Fixed a warning caused by IO::Async 0.74 and later. Thanks

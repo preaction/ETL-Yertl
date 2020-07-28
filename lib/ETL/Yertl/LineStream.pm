@@ -1,5 +1,5 @@
 package ETL::Yertl::LineStream;
-our $VERSION = '0.044';
+our $VERSION = '0.045';
 # ABSTRACT: Read/write I/O streams in lines
 
 =head1 SYNOPSIS
