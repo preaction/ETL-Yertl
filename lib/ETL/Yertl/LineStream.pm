@@ -38,6 +38,16 @@ L<ETL::Yertl>
 
 use ETL::Yertl;
 use base 'IO::Async::Stream';
+use Fcntl;
+
+sub configure {
+    my ( $self, %args ) = @_;
+    if ( $args{autoflush} && $args{write_handle} ) {
+        my $flags = fcntl( $args{write_handle}, F_GETFL, 0 );
+        fcntl( $args{write_handle}, F_SETFL, $flags | O_NONBLOCK );
+    }
+    $self->SUPER::configure( %args );
+}
 
 sub on_read {
     my ( $self, $buffref, $eof ) = @_;
