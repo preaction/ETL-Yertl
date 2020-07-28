@@ -2,6 +2,12 @@ Changelog for ETL-Yertl
 
 {{ $NEXT }}
 
+    [Fixed]
+
+    - Fixed a warning caused by IO::Async 0.74 and later. Thanks
+      @tehmoth and @andk for reporting this issue! [Github #164, Github
+      #163]
+
 0.043     2018-09-25 18:13:41-05:00 America/Chicago
 
     [Fixed]
